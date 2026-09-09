@@ -5,7 +5,7 @@
  * (https://developers.google.com/health/reference/rest/v4/users.dataTypes.dataPoints/list):
  *   steps.interval.start_time >= "2023-11-24T00:00:00Z" AND steps.interval.start_time < "2023-11-25T00:00:00Z"
  *   sleep.interval.end_time >= "…Z" AND sleep.interval.end_time < "…Z"        (sleep filters on END time)
- *   dailyHeartRateVariability.date < "2024-08-15"                            (daily types: camelCase + .date)
+ *   daily_heart_rate_variability.date < "2024-08-15"                            (daily types: camelCase + .date)
  *   exercise.interval.civil_start_time >= "2023-11-24" AND … < "2023-11-25"
  */
 export type Kind = 'session' | 'daily' | 'interval' | 'sample';
@@ -41,11 +41,11 @@ export const METRIC_UNITS: Record<MetricId, string> = {
 export const DATA_TYPES: DataTypeSpec[] = [
   { dataType: 'sleep', kind: 'session', filterField: 'sleep.interval.end_time', filterKind: 'physical', method: 'list',
     produces: ['sleep_minutes_asleep', 'sleep_minutes_awake', 'sleep_minutes_in_period', 'sleep_efficiency_pct', 'sleep_deep_minutes', 'sleep_rem_minutes', 'sleep_light_minutes', 'sleep_start', 'sleep_end'] },
-  { dataType: 'daily-heart-rate-variability', kind: 'daily', filterField: 'dailyHeartRateVariability.date', filterKind: 'civil-date', method: 'list', produces: ['hrv_avg_ms', 'hrv_deep_rmssd_ms'] },
-  { dataType: 'daily-resting-heart-rate', kind: 'daily', filterField: 'dailyRestingHeartRate.date', filterKind: 'civil-date', method: 'list', produces: ['rhr_bpm'] },
-  { dataType: 'daily-respiratory-rate', kind: 'daily', filterField: 'dailyRespiratoryRate.date', filterKind: 'civil-date', method: 'list', produces: ['respiratory_rate_bpm'] },
-  { dataType: 'daily-oxygen-saturation', kind: 'daily', filterField: 'dailyOxygenSaturation.date', filterKind: 'civil-date', method: 'list', produces: ['spo2_avg_pct'] },
-  { dataType: 'daily-vo2-max', kind: 'daily', filterField: 'dailyVo2Max.date', filterKind: 'civil-date', method: 'list', produces: ['vo2max'] },
+  { dataType: 'daily-heart-rate-variability', kind: 'daily', filterField: 'daily_heart_rate_variability.date', filterKind: 'civil-date', method: 'list', produces: ['hrv_avg_ms', 'hrv_deep_rmssd_ms'] },
+  { dataType: 'daily-resting-heart-rate', kind: 'daily', filterField: 'daily_resting_heart_rate.date', filterKind: 'civil-date', method: 'list', produces: ['rhr_bpm'] },
+  { dataType: 'daily-respiratory-rate', kind: 'daily', filterField: 'daily_respiratory_rate.date', filterKind: 'civil-date', method: 'list', produces: ['respiratory_rate_bpm'] },
+  { dataType: 'daily-oxygen-saturation', kind: 'daily', filterField: 'daily_oxygen_saturation.date', filterKind: 'civil-date', method: 'list', produces: ['spo2_avg_pct'] },
+  { dataType: 'daily-vo2-max', kind: 'daily', filterField: 'daily_vo2_max.date', filterKind: 'civil-date', method: 'list', produces: ['vo2max'] },
   // Interval types aggregated per civil day via dailyRollUp
   { dataType: 'steps', kind: 'interval', filterField: 'steps.interval.start_time', filterKind: 'physical', method: 'dailyRollUp', produces: ['steps'] },
   { dataType: 'active-zone-minutes', kind: 'interval', filterField: 'active_zone_minutes.interval.start_time', filterKind: 'physical', method: 'dailyRollUp', produces: ['active_zone_minutes', 'azm_fat_burn_min', 'azm_cardio_min', 'azm_peak_min'] },
