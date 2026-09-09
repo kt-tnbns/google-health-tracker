@@ -2,7 +2,7 @@
 
 ระบบส่วนตัวสำหรับดึงข้อมูล **Fitbit Air** ผ่าน **Google Health API** มาเก็บบน VPS (Dokploy) แล้ววิเคราะห์/สรุปรายวัน
 
-สถานะ: **Milestone 1 — data access & inspection** (ยังไม่มีส่วนคำนวณ baseline / GLM / Telegram)
+สถานะ: data access & inspection · AI coach (chat) · **Recovery index, Cardio load, Journal → Weekly insights, Strength log, Fitness/Bio age** (สูตรทั้งหมดใน `docs/calculations.md`) · UI ตาม `design.md` — ยังไม่มี daily briefing อัตโนมัติ / Telegram / Energy Bank (มีแค่ตัวทดสอบ)
 
 ## โครงสร้าง
 
@@ -20,9 +20,26 @@ src/
     normalize.ts          pure functions: raw DataPoint → daily_metrics (missing ≠ 0)
     time.ts               timezone helpers (Asia/Bangkok) ไม่พึ่ง lib ภายนอก
     ingest.service.ts     fetch → store raw → upsert (idempotent)
+  coach/
+    context.ts            deterministic context: latest / 7-day baseline / delta / missing (versioned)
+    prompt.ts             versioned coaching instructions (PROMPT_VERSION)
+    glm.client.ts         OpenAI-compatible streaming client (Z.ai / BigModel)
+    coach.service.ts      chat: persist turns + context snapshot; numbers-only fallback when GLM fails
   http/
     auth.controller.ts    /auth/google/*
     data.controller.ts    /api/*  (guarded by x-admin-token)
+    coach.controller.ts   /api/coach/*  (SSE streaming chat)
+    scores.controller.ts  /api/scores, journal, insights, strength, fitness, bioage, energy probe
+    ui.controller.ts      /ui  (serves src/http/ui/* — vanilla SPA, TH/EN, dark/light, responsive)
+  scores/
+    stats.ts              mean/sd/median/MAD, EWMA, Hedges' g, bootstrap CI, Mann–Whitney (seeded PRNG)
+    recovery.ts           Recovery index (ln RMSSD, SWC, per-person z-scores) — recovery-v0.1
+    load.ts               daily load (TRIMP / HR zones / AZM), EWMA 7/28, ACWR, monotony — load-v0.1
+    insights.ts           journal tags vs next-morning outcomes, gated — insights-v0.1
+    strength.ts           tonnage, hard sets, e1RM (Epley/Brzycki), weekly
+    bioage.ts             PhenoAge (Levine 2018) + Fitness age (HUNT3)
+    scores.service.ts     DB glue for all of the above + energy-bank feasibility probe
+docs/calculations.md      what each number means, evidence vs heuristic, minimum data, sources
 ```
 
 ### ชั้นข้อมูลใน Postgres
@@ -33,7 +50,8 @@ src/
 | `api_responses` | response ดิบจาก Google ทุกหน้า ทุกครั้งที่ดึง (URL, status, payload, batch_id) — ไม่มี token |
 | `daily_metrics` | ค่าต่อวันต่อ metric (PK = day+metric) → ดึงซ้ำกี่ครั้งก็ไม่ซ้ำแถว; `value NULL` = ไม่มีข้อมูล |
 | `computed_results` | (เฟสถัดไป) baseline/deviation พร้อม algorithm_version |
-| `coaching_reports` | (เฟสถัดไป) output จาก GLM + prompt_version + delivery state |
+| `coach_messages` | แชทกับ coach: ทุกคำตอบเก็บ model, prompt_version, context_snapshot (สิ่งที่โมเดลเห็นจริง), usage, error |
+| `coaching_reports` | (เฟสถัดไป) daily briefing อัตโนมัติ + delivery state |
 | `checkins` | (เฟสถัดไป) self check-in |
 
 ## ตั้งค่า Google Cloud (ทำครั้งเดียว)
@@ -65,6 +83,7 @@ npm run start:dev
 
 | Method | Path | ทำอะไร |
 |---|---|---|
+| GET | `/ui` | หน้าเว็บตรวจสอบ: สถานะ, ปุ่ม refresh, ตารางค่าต่อวัน, raw JSON (กรอก admin token ครั้งเดียว) |
 | GET | `/auth/google/start?token=…` | เปิดในเบราว์เซอร์ → หน้า consent ของ Google |
 | GET | `/auth/google/callback` | Google เรียกกลับ (ป้องกันด้วย `state`) |
 | GET | `/auth/google/status` | เชื่อมอยู่ไหม / scopes / error ล่าสุด / needsReconnect |
@@ -74,6 +93,24 @@ npm run start:dev
 | GET | `/api/days?days=14` | ตารางย่อ N วันล่าสุด |
 | GET | `/api/raw?limit=50` , `/api/raw/:id` | response ดิบจาก Google |
 | GET | `/api/devices` | อุปกรณ์ที่ Google เห็นในบัญชี (probe การเชื่อมต่อ) |
+| GET | `/api/coach/info` | model / prompt version / configured? |
+| GET | `/api/coach/context` | context ที่ coach เห็น (ตัวเลขล้วน) |
+| GET/DELETE | `/api/coach/messages` | ประวัติแชท / ล้าง |
+| POST | `/api/coach/chat` `{message, lang}` | ตอบแบบ stream (SSE) |
+| GET | `/api/scores?days=30` · POST `/api/scores/recompute` | recovery + load ต่อวัน (persist วันนี้ลง computed_results) |
+| GET/PUT | `/api/profile` | ปีเกิด/เพศ/HRmax สำหรับ TRIMP, fitness age, PhenoAge |
+| GET/PUT | `/api/journal`, `/api/journal/:day` · GET `/api/journal/tags` | แท็กพฤติกรรมรายวัน |
+| GET | `/api/insights?window=90` | ผลเปรียบเทียบ tag vs วันอื่น (surfaced เมื่อผ่านเกณฑ์) |
+| GET/POST/DELETE | `/api/strength/sessions` · GET `/api/strength/weekly` | strength log |
+| GET | `/api/fitness` · `/api/bioage` · POST `/api/bioage/panels` | VO₂max/fitness age · PhenoAge จากผลเลือด |
+| POST | `/api/energy/probe` | ดึง heart-rate 1 วัน วัด coverage — go/no-go สำหรับ Energy Bank |
+
+## AI coach — ขอบเขตที่ตั้งใจ
+
+- โมเดลเห็นเฉพาะ `context.ts` (ค่าล่าสุด, baseline 7 วัน, delta, missing) ในรูปตัวเลข — ไม่เห็น raw JSON, ไม่เห็นข้อมูลอื่น
+- ห้ามคิด "readiness score" / ไฟเขียว-แดง; ห้ามวินิจฉัย; ต้องบอกเมื่อข้อมูลขาดหรือ baseline สั้น (อยู่ใน `prompt.ts`)
+- ถ้า GLM ล่ม ระบบตอบด้วยสรุปตัวเลขล้วน (`deterministicSummary`) และบันทึก error ไว้
+- ข้อมูลสุขภาพที่ส่งไป GLM ออกจาก VPS ไปยัง Z.ai — ส่งเท่าที่จำเป็น (ไม่มีชื่อ/อีเมล/raw)
 
 ## กฎการ normalize ที่ตัดสินใจไว้ (แก้ได้ที่ `normalize.ts`)
 

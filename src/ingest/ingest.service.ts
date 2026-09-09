@@ -5,7 +5,7 @@ import { config } from '../config';
 import { PG_POOL } from '../db/db.module';
 import { FetchResult, HealthApiClient } from '../google/health-api.client';
 import { buildFilter, DATA_TYPES, DataTypeSpec } from './metrics';
-import { normalizeDaily, normalizeRollup, normalizeSleep, NormalizedMetric, NORMALIZER_VERSION } from './normalize';
+import { ExerciseSession, normalizeDaily, normalizeExercise, normalizeRollup, normalizeSleep, NormalizedMetric, NORMALIZER_VERSION } from './normalize';
 import { addDays, startOfCivilDay, todayCivil } from './time';
 
 export interface RefreshSummary {
@@ -42,6 +42,7 @@ export class IngestService {
         if (r.ok) {
           const rows = this.normalize(spec, r.items, tz);
           upserted = await this.upsertMetrics(rows, ids);
+          if (spec.dataType === 'exercise') upserted += await this.upsertExerciseSessions(normalizeExercise(r.items, tz).sessions, ids);
         }
         const last = r.pages[r.pages.length - 1];
         summary.perType.push({ dataType: spec.dataType, ok: r.ok, httpStatus: last?.status ?? 0, items: r.items.length, pages: r.pages.length, upserted, error: last?.errorText });
@@ -56,24 +57,36 @@ export class IngestService {
   }
 
   private fetchOne(spec: DataTypeSpec, startDate: string, endDate: string, tz: string): Promise<FetchResult> {
-    if (spec.kind === 'interval') return this.api.dailyRollUp(spec.dataType, startDate, endDate);
-    // Sleep: extend the physical window back by 1 day so a session that started the evening before
-    // `startDate` (and ended inside the window) is included.
-    const physStart = spec.kind === 'session' ? addDays(startDate, -1) : startDate;
-    const startIso = startOfCivilDay(physStart, tz).toISOString();
+    if (spec.method === 'dailyRollUp') return this.api.dailyRollUp(spec.dataType, startDate, endDate);
+    const startIso = startOfCivilDay(startDate, tz).toISOString();
     const endIso = startOfCivilDay(endDate, tz).toISOString();
     const filter = buildFilter(spec, startIso, endIso, startDate, endDate);
-    const pageSize = spec.kind === 'session' ? 25 : undefined;
-    return this.api.read(spec.dataType, spec.method, filter, { pageSize });
+    const pageSize = spec.kind === 'session' ? 25 : undefined;   // API max for sleep/exercise
+    return this.api.read(spec.dataType, spec.method, filter, { pageSize, maxPages: 20 });
   }
 
   private normalize(spec: DataTypeSpec, items: unknown[], tz: string): NormalizedMetric[] {
-    switch (spec.kind) {
-      case 'session': return normalizeSleep(items, tz);
-      case 'daily': return normalizeDaily(spec.dataType, items);
-      case 'interval': return normalizeRollup(spec.dataType, items);
-      default: return [];
+    if (spec.dataType === 'sleep') return normalizeSleep(items, tz);
+    if (spec.dataType === 'exercise') return normalizeExercise(items, tz).daily;
+    if (spec.method === 'dailyRollUp') return normalizeRollup(spec.dataType, items);
+    if (spec.kind === 'daily') return normalizeDaily(spec.dataType, items);
+    return [];
+  }
+
+  private async upsertExerciseSessions(sessions: ExerciseSession[], sourceIds: number[]): Promise<number> {
+    for (const s of sessions) {
+      await this.pool.query(
+        `INSERT INTO exercise_sessions (point_name, day, exercise_type, display_name, started_at, ended_at, active_min, avg_hr, calories_kcal, distance_m, steps, azm, zone_light_min, zone_moderate_min, zone_vigorous_min, zone_peak_min, source_response_ids, raw, updated_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18, now())
+         ON CONFLICT (started_at, exercise_type) DO UPDATE SET point_name = EXCLUDED.point_name, day = EXCLUDED.day, display_name = EXCLUDED.display_name, ended_at = EXCLUDED.ended_at,
+           active_min = EXCLUDED.active_min, avg_hr = EXCLUDED.avg_hr, calories_kcal = EXCLUDED.calories_kcal, distance_m = EXCLUDED.distance_m, steps = EXCLUDED.steps, azm = EXCLUDED.azm,
+           zone_light_min = EXCLUDED.zone_light_min, zone_moderate_min = EXCLUDED.zone_moderate_min, zone_vigorous_min = EXCLUDED.zone_vigorous_min, zone_peak_min = EXCLUDED.zone_peak_min,
+           source_response_ids = EXCLUDED.source_response_ids, raw = EXCLUDED.raw, updated_at = now()`,
+        [s.pointName ?? null, s.day, s.type, s.displayName ?? null, s.start, s.end, s.activeMin, s.avgHr, s.calories, s.distanceM, s.steps, s.azm,
+         s.zoneMin.light, s.zoneMin.moderate, s.zoneMin.vigorous, s.zoneMin.peak, sourceIds, JSON.stringify(s.raw)],
+      );
     }
+    return sessions.length;
   }
 
   private async storeRaw(batchId: string, spec: DataTypeSpec, r: FetchResult, startDate: string, endDate: string, tz: string): Promise<number[]> {
@@ -84,7 +97,7 @@ export class IngestService {
          VALUES ('google-health', $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`,
         [
           spec.dataType,
-          spec.kind === 'interval' ? 'dailyRollUp' : spec.method,
+          spec.method,
           p.url,
           p.requestBody ? JSON.stringify(p.requestBody) : null,
           startOfCivilDay(startDate, tz),
@@ -149,9 +162,16 @@ export class IngestService {
 
   async getRange(startDate: string, endDate: string) {
     const { rows } = await this.pool.query(
-      `SELECT day, metric, value, unit, status FROM daily_metrics WHERE day >= $1 AND day < $2 ORDER BY day, metric`,
+      `SELECT day, metric, value, unit, status, measured_start, measured_end FROM daily_metrics WHERE day >= $1 AND day < $2 ORDER BY day, metric`,
       [startDate, endDate],
     );
+    return rows;
+  }
+
+  async getExerciseSessions(startDate: string, endDate: string) {
+    const { rows } = await this.pool.query(
+      `SELECT id, day, exercise_type, display_name, started_at, ended_at, active_min, avg_hr, calories_kcal, distance_m, steps, azm, zone_light_min, zone_moderate_min, zone_vigorous_min, zone_peak_min
+       FROM exercise_sessions WHERE day >= $1 AND day < $2 ORDER BY started_at`, [startDate, endDate]);
     return rows;
   }
 

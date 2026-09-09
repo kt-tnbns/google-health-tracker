@@ -10,6 +10,9 @@ const schema = z.object({
   GOOGLE_CLIENT_SECRET: z.string().default(''),
   GOOGLE_REDIRECT_URI: z.string().optional(),
   TOKEN_ENCRYPTION_KEY: z.string().default(''),
+  GLM_API_KEY: z.string().default(''),
+  GLM_BASE_URL: z.string().default('https://api.z.ai/api/paas/v4'),
+  GLM_MODEL: z.string().default('glm-5.3'),
 });
 
 export type AppConfig = z.infer<typeof schema> & { googleRedirectUri: string };

@@ -1,6 +1,9 @@
 import { Global, Inject, Module, OnModuleDestroy } from '@nestjs/common';
-import { Pool } from 'pg';
+import { Pool, types } from 'pg';
 import { config } from '../config';
+
+// Return DATE columns as plain "YYYY-MM-DD" strings instead of timezone-shifted JS Dates.
+types.setTypeParser(types.builtins.DATE, (v: string) => v);
 
 export const PG_POOL = Symbol('PG_POOL');
 

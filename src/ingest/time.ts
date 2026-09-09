@@ -43,7 +43,8 @@ export function todayCivil(tz: string, now = new Date()): string {
 export function normalizeDate(v: unknown): string | undefined {
   if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}/.test(v)) return v.slice(0, 10);
   if (v && typeof v === 'object') {
-    const o = v as { year?: number; month?: number; day?: number };
+    // google.type.Date {year,month,day} or CivilDateTime {date:{year,month,day}, time:{…}}
+    const o = ((v as any).date && typeof (v as any).date === 'object' ? (v as any).date : v) as { year?: number; month?: number; day?: number };
     if (o.year && o.month && o.day) return `${o.year}-${String(o.month).padStart(2, '0')}-${String(o.day).padStart(2, '0')}`;
   }
   return undefined;

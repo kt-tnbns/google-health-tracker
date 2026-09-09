@@ -19,11 +19,15 @@ export class AuthController {
    * exactly `${PUBLIC_BASE_URL}/auth/google/callback`. Not admin-guarded (Google calls it) — protected by `state`.
    */
   @Get('callback')
-  async callback(@Query('code') code?: string, @Query('state') state?: string, @Query('error') error?: string) {
-    if (error) return { ok: false, error };
-    if (!code) return { ok: false, error: 'missing code' };
-    const status = await this.oauth.handleCallback(code, state);
-    return { ok: true, status };
+  async callback(@Res() res: Response, @Query('code') code?: string, @Query('state') state?: string, @Query('error') error?: string) {
+    if (error) return res.status(400).json({ ok: false, error });
+    if (!code) return res.status(400).json({ ok: false, error: 'missing code' });
+    try {
+      await this.oauth.handleCallback(code, state);
+    } catch (e) {
+      return res.status(400).json({ ok: false, error: (e as Error).message });
+    }
+    return res.redirect('/ui?connected=1');
   }
 
   @Get('status')

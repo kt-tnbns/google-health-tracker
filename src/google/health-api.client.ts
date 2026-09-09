@@ -112,8 +112,8 @@ export class HealthApiClient {
   }
 }
 
-/** "2026-09-09" -> CivilDateTime {year, month, day, hours:0, ...} */
+/** "2026-09-09" -> CivilDateTime { date: {year, month, day}, time: {hours:0,…} } (per REST reference). */
 export function civilDateTime(isoDate: string) {
   const [y, m, d] = isoDate.split('-').map(Number);
-  return { year: y, month: m, day: d, hours: 0, minutes: 0, seconds: 0 };
+  return { date: { year: y, month: m, day: d }, time: { hours: 0, minutes: 0, seconds: 0 } };
 }
