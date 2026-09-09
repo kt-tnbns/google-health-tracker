@@ -1,0 +1,58 @@
+import { BadRequestException, Controller, Get, NotFoundException, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { config } from '../config';
+import { HealthApiClient } from '../google/health-api.client';
+import { IngestService } from '../ingest/ingest.service';
+import { addDays, todayCivil } from '../ingest/time';
+import { AdminGuard } from './admin.guard';
+
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+@Controller('api')
+@UseGuards(AdminGuard)
+export class DataController {
+  constructor(private readonly ingest: IngestService, private readonly api: HealthApiClient) {}
+
+  /** Pull cloud data. POST /api/refresh?days=7  or  ?start=YYYY-MM-DD&end=YYYY-MM-DD (end exclusive). */
+  @Post('refresh')
+  refresh(@Query('days') days?: string, @Query('start') start?: string, @Query('end') end?: string) {
+    if ((start && !DATE_RE.test(start)) || (end && !DATE_RE.test(end))) throw new BadRequestException('dates must be YYYY-MM-DD');
+    const n = days ? Number(days) : undefined;
+    if (n !== undefined && (!Number.isInteger(n) || n < 1 || n > 90)) throw new BadRequestException('days must be 1..90');
+    return this.ingest.refresh({ startDate: start, endDate: end, days: n });
+  }
+
+  /** Today's (or a given day's) normalized metrics + list of missing fields. */
+  @Get('days/:day')
+  day(@Param('day') day: string) {
+    const d = day === 'today' ? todayCivil(config.USER_TIMEZONE) : day;
+    if (!DATE_RE.test(d)) throw new BadRequestException('day must be YYYY-MM-DD or "today"');
+    return this.ingest.getDay(d);
+  }
+
+  /** Compact table for the last N days (for baseline inspection). */
+  @Get('days')
+  range(@Query('days') days = '14') {
+    const n = Math.min(Math.max(Number(days) || 14, 1), 365);
+    const end = addDays(todayCivil(config.USER_TIMEZONE), 1);
+    return this.ingest.getRange(addDays(end, -n), end);
+  }
+
+  /** Raw upstream API responses (inspectable JSON). */
+  @Get('raw')
+  raw(@Query('limit') limit = '50') {
+    return this.ingest.listRaw(Math.min(Number(limit) || 50, 500));
+  }
+
+  @Get('raw/:id')
+  async rawOne(@Param('id') id: string) {
+    const row = await this.ingest.getRaw(Number(id));
+    if (!row) throw new NotFoundException();
+    return row;
+  }
+
+  /** Quick connectivity probe: which devices Google sees on the account. */
+  @Get('devices')
+  devices() {
+    return this.api.listPairedDevices();
+  }
+}

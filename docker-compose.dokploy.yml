@@ -1,0 +1,40 @@
+# Compose file for Dokploy: pulls the image built by GitHub Actions (no build on the VPS).
+# Dokploy → Create "Compose" service → source = this repo (or paste this file) → set env in Dokploy UI.
+# If the GHCR package is private, add a registry credential in Dokploy (Settings → Registry) first.
+services:
+  app:
+    image: ghcr.io/${GITHUB_REPOSITORY}:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL}
+      ADMIN_TOKEN: ${ADMIN_TOKEN}
+      USER_TIMEZONE: ${USER_TIMEZONE:-Asia/Bangkok}
+      DATABASE_URL: postgres://health:${POSTGRES_PASSWORD}@db:5432/health
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      TOKEN_ENCRYPTION_KEY: ${TOKEN_ENCRYPTION_KEY}
+    expose:
+      - "3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    # Dokploy adds Traefik labels for the domain automatically when you attach a domain to this service (port 3000).
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: health
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: health
+    volumes:
+      - health_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U health -d health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  health_pgdata:

@@ -1,0 +1,31 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://health:${POSTGRES_PASSWORD:-health}@db:5432/health
+    ports:
+      - "${PORT:-3000}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: health
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-health}
+      POSTGRES_DB: health
+    volumes:
+      # Named volume => survives redeploys. On Dokploy, map this to a persistent volume.
+      - health_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U health -d health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  health_pgdata:
