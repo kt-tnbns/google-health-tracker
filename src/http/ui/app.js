@@ -78,7 +78,7 @@ const I18N = {
 const S = {
   token: '', lang: 'th', theme: 'system', view: 'today',
   status: null, rows: [], byDay: {}, days: [], scores: null, coachInfo: null, coachHist: [], journalToday: null,
-  sleepRange: (typeof matchMedia !== 'undefined' && matchMedia('(max-width: 599px)').matches) ? 7 : 14, selectedDay: null, loading: {}, err: {}, lastFetch: null, demo: false, raw: [], ctx: null,
+  sleepRange: 7, selectedDay: null, loading: {}, err: {}, lastFetch: null, demo: false, raw: [], ctx: null,
   insights: null, fitness: null, strength: null, strengthWeekly: null, bio: null, profile: null, coachOpen: false,
 };
 try { S.token = sessionStorage.getItem('adminToken') || ''; } catch {}
@@ -95,7 +95,10 @@ const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${Stri
 const val = (day, m) => { const r = S.byDay[day]?.[m]; return r && r.status !== 'missing' && r.value !== null ? Number(r.value) : null; };
 const mean = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
 const latestDayWith = (m) => { for (let i = S.days.length - 1; i >= 0; i--) if (val(S.days[i], m) !== null) return S.days[i]; return null; };
-const base7 = (d, m) => mean(S.days.filter((x) => x < d).slice(-7).map((x) => val(x, m)).filter((x) => x !== null));
+const MIN_BASE = 3;   // prior days with data needed before we show a comparison
+const priorVals = (d, m) => S.days.filter((x) => x < d).slice(-7).map((x) => val(x, m)).filter((x) => x !== null);
+const base7 = (d, m) => { const xs = priorVals(d, m); return xs.length >= MIN_BASE ? mean(xs) : null; };
+const baseInfo = (d, m) => { const n = priorVals(d, m).length; return n >= MIN_BASE ? '' : `<span class="muted">${t('collecting')} (${n}/7)</span>`; };
 const $ = (sel, root = document) => root.querySelector(sel);
 const app = () => $('#app');
 
@@ -109,7 +112,7 @@ async function api(path, opts = {}) {
 
 function applyTheme() {
   const root = document.documentElement;
-  if (S.theme === 'system') root.removeAttribute('data-theme') || root.setAttribute('data-theme', matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  if (S.theme === 'system') root.setAttribute('data-theme', matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   else root.setAttribute('data-theme', S.theme);
   document.documentElement.lang = S.lang;
 }
@@ -136,10 +139,13 @@ const ICO = {
 function sparkline(days, m, color) {
   const pts = days.map((d, i) => [i, val(d, m)]);
   const have = pts.filter((p) => p[1] !== null);
-  if (have.length < 2) return '<svg viewBox="0 0 100 36" aria-hidden="true"></svg>';
+  if (!have.length) return '<svg viewBox="0 0 100 36" aria-hidden="true"></svg>';
   const W = 100, H = 36, pad = 4;
   const ys = have.map((p) => p[1]), lo = Math.min(...ys), hi = Math.max(...ys), span = hi - lo || 1;
   const x = (i) => pad + (i / Math.max(1, days.length - 1)) * (W - 2 * pad), y = (v) => H - pad - ((v - lo) / span) * (H - 2 * pad);
+  if (have.length < 3) {   // too few points for a trend line — show the points only, no misleading slope
+    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${have.map((p) => `<circle cx="${x(p[0]).toFixed(1)}" cy="${(H / 2).toFixed(1)}" r="3.5" fill="${color}" stroke="var(--surface)" stroke-width="2" vector-effect="non-scaling-stroke"/>`).join('')}</svg>`;
+  }
   let d = '', prev = false;
   for (const [i, v] of pts) { if (v === null) { prev = false; continue; } d += `${prev ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`; prev = true; }   // no interpolation across gaps
   const last = have[have.length - 1];
@@ -214,7 +220,7 @@ function sleepBars(el, days) {
     tip.innerHTML = `<b>${esc(dateS(d))}</b>` + (asleep[i] === null ? `<div class="r"><span>${t('noDay')}</span></div>` : `<div class="r"><span>${t('asleepTotal')}</span><span>${hm(asleep[i])}</span></div>` + rows.map(([v, c, lab]) => `<div class="r"><span><i style="background:${c}"></i>${lab}</span><span>${num(v)} ${t('minutes')}</span></div>`).join('') + (rows.length ? `<div class="r"><span>${t('recorded')}</span><span>${hm(totals[i])}</span></div>` : ''));
     const sr = svg.getBoundingClientRect(), er = el.getBoundingClientRect(), right = i < days.length / 2;
     tip.style.transform = right ? 'translate(14px,-50%)' : 'translate(calc(-100% - 14px),-50%)';
-    tip.style.left = `${sr.left - er.left + ((L + slot * (i + 0.5)) / W) * sr.width}px`; tip.style.top = `${sr.top - er.top + sr.height / 2}px`; tip.style.opacity = 1;
+    tip.style.left = `${el.scrollLeft + sr.left - er.left + ((L + slot * (i + 0.5)) / W) * sr.width}px`; tip.style.top = `${sr.top - er.top + sr.height / 2}px`; tip.style.opacity = 1;
   };
   svg.onmousemove = (ev) => { const i = ev.target.dataset.i; if (i !== undefined) show(+i); };
   svg.onmouseleave = () => { tip.style.opacity = 0; };
@@ -342,9 +348,9 @@ function sleepSummary() {
   return `<section class="card sleep-card">
     <div class="eyebrow"><span>${t('lastSleep')}</span><span>${t('woke')} ${dateS(d, { weekday: 'short', day: 'numeric', month: 'short' })}</span></div>
     <div class="hero-val">${asleep === null ? '—' : `${Math.floor(asleep / 60)}<small>${t('hrs')}</small>${Math.round(asleep % 60)}<small>${t('min')}</small>`}</div>
-    <div class="small t2">${delta === null ? t('noBaseline') : `${t('vs7')} · ${delta >= 0 ? t('more') : t('less')} ${hm(Math.abs(delta))}`}${row?.status === 'partial' ? ` · ${t('multiSession')}` : ''}</div>
-    ${tot ? `<div class="stage-bar" role="img" aria-label="${t('recorded')} ${hm(tot)}">${seg(deep, 'var(--deep)')}${seg(rem, 'var(--rem)')}${seg(light, 'var(--light)')}${seg(awake, 'var(--awake)')}</div>` : `<div class="rule"></div><div class="small muted">${t('noStages')}</div>`}
-    <div class="kv" style="margin-top:${tot ? 0 : 12}px"><div><b>${clock(row?.measured_start)} → ${clock(row?.measured_end)}</b><span>${t('interval')}</span></div><div><b>${eff === null ? '—' : eff.toFixed(0) + '%'}</b><span>${t('efficiency')}</span></div></div>
+    <div class="small t2">${delta === null ? `${t('noBaseline')} (${priorVals(d, 'sleep_minutes_asleep').length}/7)` : `${t('vs7')} · ${delta >= 0 ? t('more') : t('less')} ${hm(Math.abs(delta))}`}${row?.status === 'partial' ? ` · ${t('multiSession')}` : ''}</div>
+    ${tot ? `<div class="stage-bar" role="img" aria-label="${t('recorded')} ${hm(tot)}">${seg(deep, 'var(--deep)')}${seg(rem, 'var(--rem)')}${seg(light, 'var(--light)')}${seg(awake, 'var(--awake)')}</div>` : `<div class="small muted" style="margin-top:12px">${t('noStages')}</div>`}
+    <div class="kv"><div><span>${t('interval')}</span><b>${clock(row?.measured_start)} → ${clock(row?.measured_end)}</b></div><div><span>${t('efficiency')}</span><b>${eff === null ? '—' : eff.toFixed(0) + '%'}</b></div></div>
     ${tot ? `<div class="legend"><span><i style="background:var(--deep)"></i>${t('deep')} ${n0(deep)}</span><span><i style="background:var(--rem)"></i>${t('rem')} ${n0(rem)}</span><span><i style="background:var(--light)"></i>${t('light')} ${n0(light)}</span><span><i style="background:var(--awake)"></i>${t('awake')} ${n0(awake)}</span></div>` : ''}
     <div style="margin-top:12px"><a href="#" data-day="${d}" class="small">${t('details')} →</a></div>
   </section>`;
@@ -356,7 +362,7 @@ const VITALS = [
 ];
 function metricCard(def, latestOverall) {
   const d = latestDayWith(def.m); const v = d ? val(d, def.m) : null; const b = d ? base7(d, def.m) : null;
-  let cmp = `<span class="muted">${t('collecting')}</span>`;
+  let cmp = d ? baseInfo(d, def.m) : `<span class="muted">${t('collecting')}</span>`;
   if (v !== null && b !== null) { const diff = v - b; cmp = `${diff >= 0 ? '+' : '−'}${num(Math.abs(diff), def.dec)} ${def.unit} <span class="muted">${t('vs7')}</span>`; }
   const stale = d && latestOverall && d !== latestOverall;
   return `<button class="metric" data-metric="${def.m}" aria-label="${t(def.k)}">
@@ -422,7 +428,7 @@ function renderToday() {
   } else {
     const latestOverall = S.days[S.days.length - 1];
     body += recoveryBlock();
-    body += `<div class="grid12"><div class="span5">${sleepSummary()}</div><div class="span7"><div class="section-head"><h2>${t('vitals')}</h2><button class="icon-btn ghost" title="${t('vitalsInfo')}" aria-label="${t('vitalsInfo')}">${ICO.info}</button></div><div class="metrics">${VITALS.map((v) => metricCard(v, latestOverall)).join('')}</div></div></div>`;
+    body += `<div class="grid12"><div class="span5">${sleepSummary()}</div><div class="span7"><div class="section-head"><h2>${t('vitals')}</h2><span class="pop-wrap"><button class="icon-btn ghost" id="vitalsInfo" aria-label="${t('vitalsInfo')}" aria-expanded="false">${ICO.info}</button><div class="popover" role="tooltip" hidden>${t('vitalsInfo')}</div></span></div><div class="metrics">${VITALS.map((v) => metricCard(v, latestOverall)).join('')}</div></div></div>`;
     body += sleepHistory();
     body += activityBlock();
   }
@@ -442,7 +448,15 @@ function bindToday() {
   document.querySelectorAll('#main [data-range]').forEach((b) => (b.onclick = () => { S.sleepRange = +b.dataset.range; renderToday(); }));
   document.querySelectorAll('#main a[data-day]').forEach((a) => (a.onclick = (e) => { e.preventDefault(); openDay(a.dataset.day); }));
   document.querySelectorAll('#main .metric[data-metric]').forEach((b) => (b.onclick = () => openDay(latestDayWith(b.dataset.metric) || S.days[S.days.length - 1])));
-  const sc = $('#sleepChart'); if (sc) sleepBars(sc, S.days.slice(-S.sleepRange));
+  const vi = $('#vitalsInfo');
+  if (vi) {
+    const pop = vi.nextElementSibling;
+    const close = () => { pop.hidden = true; vi.setAttribute('aria-expanded', 'false'); document.removeEventListener('click', onDoc, true); };
+    const onDoc = (e) => { if (!vi.parentElement.contains(e.target)) close(); };
+    vi.onclick = (e) => { e.stopPropagation(); if (pop.hidden) { pop.hidden = false; vi.setAttribute('aria-expanded', 'true'); document.addEventListener('click', onDoc, true); } else close(); };
+  }
+  const sc = $('#sleepChart');
+  if (sc) { sleepBars(sc, S.days.slice(-S.sleepRange)); sc.scrollLeft = sc.scrollWidth; }   // 2) start at the latest day; scroll left for history
 }
 
 async function refreshData() {
