@@ -157,3 +157,10 @@ PhenoAge = 141.50225 + ln(−0.0055305 · ln(1 − M)) / 0.090165
 - **Main sleep vs naps**: a session belongs to the civil day it *ended* on. Non-nap sessions feed the main-sleep metrics (longest wins, status `partial` if several). Naps (`metadata.nap = true`) are summed into `sleep_nap_minutes`; `sleep_total_asleep_minutes` = main + naps; `sleep_sessions_count` counts both. A naps-only day keeps main-sleep metrics missing.
 - **Sleeping HR** (`sleeping_hr_bpm`) = mean of `heart-rate` samples whose `sampleTime.physicalTime` falls inside the main-sleep interval. One request per night after the main pass; `details.coveragePct` = minutes with ≥1 sample ÷ interval minutes. Status `ok` when coverage ≥ 50%, `partial` below, `missing` when no samples. Nights ≥ 2 days old with ≥ 85% coverage are not refetched. Distinct from daily resting HR (`rhr_bpm`, Google's own daily value).
 - Not derived (no field in the API, definition not published): sleep score, restlessness, sound sleep, time to sound sleep, full awakenings, interruptions. Read those in the Google Health app.
+
+
+## Health rules table (`src/rules/rules.ts`, rules-v1)
+
+Every good / fair / low label shown in the UI and every verdict the coach gives comes from one table with three kinds of rule:
+**reference** (fixed bands with a cited source: NSF/AASM 7–9 h; efficiency ≥ 85 %; sleep-onset ≤ 30 min; stage % ranges from wearable guidance; WHO 150 min/week ≈ 150 AZM; steps plateau 8,000+ from Paluch 2022), **personal** (mean ± max(SD, floor) of the prior 14 days, ≥ 3 days, for HRV, RHR, SpO₂, breathing rate, sleeping HR — direction-aware: a deviation toward "better" is labelled good, toward "worse" fair, never low) and **goal** (targets from Settings → Your coach; progress = value ÷ target, met ≥ 100 %, fair ≥ 80 %).
+`GET /api/rules` returns the table, `GET /api/rules/eval?days=N` the per-day evaluation. The coach receives the latest day's checks as `RULE CHECKS` and is instructed to quote those labels only. Missing metrics produce no check (never treated as zero). Bump `RULES_VERSION` when a band, source or wording changes.

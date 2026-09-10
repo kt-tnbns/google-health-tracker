@@ -47,6 +47,7 @@ const I18N = {
     verbosity: 'ความยาวคำตอบ', verb_brief: 'สั้น', verb_normal: 'ปกติ', occupation: 'อาชีพ / ลักษณะงาน', occupationPh: 'เช่น Software engineer นั่งหน้าจอทั้งวัน', lifestyle: 'ไลฟ์สไตล์', lifestylePh: 'เช่น นอนดึกช่วงปล่อยงาน ดื่มกาแฟ 2 แก้ว/วัน ว่ายน้ำสัปดาห์ละครั้ง', healthNotes: 'สุขภาพที่โค้ชควรรู้', healthPh: 'เช่น ปวดหลังล่างเป็นๆ หายๆ ห้ามแนะนำท่า deadlift หนัก · ข้อมูลนี้อยู่บนเซิร์ฟเวอร์ของคุณเท่านั้น', exercisePurpose: 'ออกกำลังเพื่ออะไร', purposePh: 'เช่น สุขภาพทั่วไปและนอนหลับดีขึ้น / ลดไขมัน / เพิ่มกล้าม / วิ่ง 10K', customInstr: 'สิ่งที่อยากให้โค้ชทำ/ไม่ทำ', customPh: 'เช่น อย่าพูดเรื่องแคลอรี · ใช้ภาษาผู้ชายๆ ห้วนๆ · ถ้านอนน้อยกว่า 6 ชม. ให้เตือนเรื่องขับรถ',
     goals: 'เป้าหมายของคุณ', goalSleep: 'นอนต่อคืน (ชม.)', goalSteps: 'ก้าว/วัน', goalAzm: 'นาทีในโซนหัวใจ/สัปดาห์', chatNotes: 'สิ่งที่บอกโค้ชผ่านแชท', chatNotesHint: 'พิมพ์ในแชทว่า “จำไว้ว่า …” หรือ “/remember …” โค้ชจะเก็บไว้ที่นี่', removeNote: 'ลบ', rememberHint: 'พิมพ์ “จำไว้ว่า …” เพื่อบอกเรื่องตัวคุณให้โค้ชจำ',
     timeInBed: 'อยู่บนเตียง', fellAsleepIn: 'หลับภายใน', napsLabel: 'งีบ', totalInclNaps: 'รวมงีบ', sleepHr: 'HR ขณะหลับ', effDef: 'ประสิทธิภาพ = เวลาหลับ ÷ เวลาอยู่บนเตียง (นิยามเดียวกับ Google Health)', prevDay: 'วันก่อนหน้า', nextDay: 'วันถัดไป', sleepHrHint: 'ค่าเฉลี่ยชีพจรตลอดช่วงหลับ · ต่างจากชีพจรขณะพักรายวัน', coverageOf: 'ครอบคลุม',
+    goalWord: 'เป้า', rulesTitle: 'กฎที่ใช้ตัดสินว่าค่าไหนดี', rulesSub: 'ทุกป้าย ดี/พอใช้/ต่ำ ในแอปและคำตัดสินของโค้ชมาจากตารางนี้เท่านั้น มีแหล่งอ้างอิงและเวอร์ชันกำกับ', ruleKind_reference: 'เกณฑ์อ้างอิง', ruleKind_personal: 'baseline ส่วนตัว', ruleKind_goal: 'เป้าหมายของคุณ', lvl_good: 'ดี', lvl_fair: 'พอใช้', lvl_low: 'ต่ำ', lvl_note: 'นอกช่วงที่พบบ่อย', lvl_na: 'ยังเทียบไม่ได้', source: 'ที่มา', weekTotal: '7 วันล่าสุด',
     err_generic: 'เกิดข้อผิดพลาด', partialFetch: 'บางชนิดข้อมูลดึงไม่สำเร็จ',
   },
   en: {
@@ -92,6 +93,7 @@ const I18N = {
     verbosity: 'Reply length', verb_brief: 'Brief', verb_normal: 'Normal', occupation: 'Occupation / kind of work', occupationPh: 'e.g. Software engineer, desk work all day', lifestyle: 'Lifestyle', lifestylePh: 'e.g. late nights around releases, 2 coffees a day, swim once a week', healthNotes: 'Health context the coach should know', healthPh: 'e.g. recurring lower-back pain, no heavy deadlifts · stays on your server only', exercisePurpose: 'Why you exercise', purposePh: 'e.g. general health and better sleep / fat loss / muscle / a 10K', customInstr: 'What the coach should or should not do', customPh: 'e.g. never talk about calories · blunt tone · if I sleep < 6 h, warn me about driving',
     goals: 'Your goals', goalSleep: 'Sleep per night (h)', goalSteps: 'Steps / day', goalAzm: 'Zone minutes / week', chatNotes: 'Things you told the coach in chat', chatNotesHint: 'Type “remember that …” or “/remember …” in the chat and it lands here', removeNote: 'Remove', rememberHint: 'Type “remember that …” to tell the coach something about you',
     timeInBed: 'Time in bed', fellAsleepIn: 'fell asleep in', napsLabel: 'naps', totalInclNaps: 'total incl. naps', sleepHr: 'Sleeping HR', effDef: 'Efficiency = time asleep ÷ time in bed (same definition as Google Health)', prevDay: 'Previous day', nextDay: 'Next day', sleepHrHint: 'Mean heart rate across the sleep interval · distinct from daily resting HR', coverageOf: 'coverage',
+    goalWord: 'goal', rulesTitle: 'Rules that decide what “good” means', rulesSub: 'Every good/fair/low label in the app and every verdict from the coach comes from this table only — each with a source and version', ruleKind_reference: 'reference', ruleKind_personal: 'personal baseline', ruleKind_goal: 'your goal', lvl_good: 'good', lvl_fair: 'fair', lvl_low: 'low', lvl_note: 'outside common range', lvl_na: 'not comparable yet', source: 'Source', weekTotal: 'last 7 days',
     err_generic: 'Something went wrong', partialFetch: 'Some data types failed to fetch',
   },
 };
@@ -101,7 +103,7 @@ const S = {
   token: '', lang: 'th', theme: 'system', view: 'today',
   status: null, rows: [], byDay: {}, days: [], scores: null, coachInfo: null, coachHist: [], journalToday: null,
   sleepRange: 7, selectedDay: null, loading: {}, err: {}, lastFetch: null, demo: false, raw: [], ctx: null,
-  exercise: [], coachProfile: null, insights: null, fitness: null, strength: null, strengthWeekly: null, bio: null, profile: null, coachOpen: false,
+  exercise: [], coachProfile: null, rules: null, insights: null, fitness: null, strength: null, strengthWeekly: null, bio: null, profile: null, coachOpen: false,
 };
 try { S.token = sessionStorage.getItem('adminToken') || ''; } catch {}
 try { S.lang = localStorage.getItem('lang') || (navigator.language.startsWith('th') ? 'th' : 'en'); S.theme = localStorage.getItem('theme') || 'system'; } catch {}
@@ -115,6 +117,11 @@ const dateS = (d, o = { weekday: 'short', day: 'numeric', month: 'short' }) => n
 const dt = (iso) => (iso ? new Date(iso).toLocaleString(LOC(), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—');
 const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 const det = (day, m) => S.byDay[day]?.[m]?.details || null;
+const chk = (day, id) => S.rules?.byDay?.[day]?.find((c) => c.id === id) || null;
+const lvlCls = (l) => (l === 'good' ? 'ok' : l === 'low' ? 'warn' : l === 'fair' ? 'fair' : '');
+const lvlBadge = (c) => (c ? `<span class="badge ${lvlCls(c.level)}" title="${esc(c.source)}">${t('lvl_' + c.level)}</span>` : '');
+const ruleText = (c) => (c ? esc(c.text?.[S.lang] ?? c.text?.en ?? '') : '');
+const goalBar = (c) => (c ? `<div class="goal"><div class="row between"><span class="small t2">${t('goalWord')} ${c.unit === 'min' ? hm(c.target) : num(c.target)}${c.unit === 'steps' ? ' ' + t('steps') : c.unit === 'min' && c.id !== 'goal.sleep' ? ' ' + t('minutes') : ''}</span><span class="small ${c.level === 'good' ? 'ok-text' : 't2'}">${Math.round((c.progress ?? 0) * 100)}%</span></div><div class="gbar"><span style="width:${Math.round((c.progress ?? 0) * 100)}%;background:${c.level === 'good' ? 'var(--c-teal)' : c.level === 'fair' ? 'var(--c-yellow)' : 'var(--c-orange)'}"></span></div></div>` : '');
 const val = (day, m) => { const r = S.byDay[day]?.[m]; return r && r.status !== 'missing' && r.value !== null ? Number(r.value) : null; };
 const mean = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
 const latestDayWith = (m) => { for (let i = S.days.length - 1; i >= 0; i--) if (val(S.days[i], m) !== null) return S.days[i]; return null; };
@@ -261,6 +268,7 @@ async function loadCore() {
     api('/api/coach/messages').catch(() => []), api('/api/raw?limit=5').catch(() => []), api('/api/exercise?days=35').catch(() => []),
   ]);
   S.exercise = Array.isArray(ex) ? ex : [];
+  S.rules = await api('/api/rules/eval?days=35').catch(() => null);
   S.rows = rows; S.byDay = {}; for (const r of rows) (S.byDay[r.day.slice(0, 10)] ||= {})[r.metric] = r;
   S.days = Object.keys(S.byDay).sort(); S.scores = scores; S.coachInfo = info; S.coachHist = hist; S.raw = raw;
   S.lastFetch = raw[0]?.fetched_at ?? null;
@@ -377,7 +385,8 @@ function sleepSummary() {
     <div class="hero-val">${asleep === null ? '—' : `${Math.floor(asleep / 60)}<small>${t('hrs')}</small>${Math.round(asleep % 60)}<small>${t('min')}</small>`}</div>
     <div class="small t2">${delta === null ? `${t('noBaseline')} (${priorVals(d, 'sleep_minutes_asleep').length}/7)` : `${t('vs7')} · ${delta >= 0 ? t('more') : t('less')} ${hm(Math.abs(delta))}`}${row?.status === 'partial' ? ` · ${t('multiSession')}` : ''}</div>
     ${tot ? `<div class="stage-bar" role="img" aria-label="${t('recorded')} ${hm(tot)}">${seg(deep, 'var(--deep)')}${seg(rem, 'var(--rem)')}${seg(light, 'var(--light)')}${seg(awake, 'var(--awake)')}</div>` : `<div class="small muted" style="margin-top:12px">${t('noStages')}</div>`}
-    <div class="kv kv3"><div><span>${t('interval')}</span><b>${clock(row?.measured_start)} → ${clock(row?.measured_end)}</b></div><div><span>${t('timeInBed')}</span><b>${tib === null ? '—' : hm(tib)}</b></div><div title="${t('effDef')}"><span>${t('efficiency')}</span><b>${eff === null ? '—' : eff.toFixed(0) + '%'}</b></div></div>
+    <div class="kv kv3"><div><span>${t('interval')}</span><b>${clock(row?.measured_start)} → ${clock(row?.measured_end)}</b></div><div><span>${t('timeInBed')}</span><b>${tib === null ? '—' : hm(tib)}</b></div><div title="${esc(chk(d, 'sleep.efficiency')?.source || t('effDef'))}"><span>${t('efficiency')}</span><b>${eff === null ? '—' : eff.toFixed(0) + '%'} ${lvlBadge(chk(d, 'sleep.efficiency'))}</b></div></div>
+    ${goalBar(chk(d, 'goal.sleep'))}
     ${nap || shr !== null ? `<div class="small t2" style="margin-top:8px">${[nap ? `${t('napsLabel')} ${hm(nap)} · ${t('totalInclNaps')} ${hm(tot2)}` : '', shr !== null ? `${t('sleepHr')} ${num(shr)} bpm` : ''].filter(Boolean).join(' · ')}</div>` : ''}
     ${tot ? `<div class="legend"><span><i style="background:var(--deep)"></i>${t('deep')} ${n0(deep)}</span><span><i style="background:var(--rem)"></i>${t('rem')} ${n0(rem)}</span><span><i style="background:var(--light)"></i>${t('light')} ${n0(light)}</span><span><i style="background:var(--awake)"></i>${t('awake')} ${n0(awake)}</span></div>` : ''}
     <div style="margin-top:12px"><a href="#" data-day="${d}" class="small">${t('details')} →</a></div>
@@ -406,7 +415,11 @@ function activityBlock() {
   const l = S.scores?.load?.[S.scores.load.length - 1];
   const sd = latestDayWith('steps'), ad = latestDayWith('active_zone_minutes');
   const dayLabel = sd && sd !== todayStr() ? ` · ${t('dataOfDay')} ${dateS(sd)}` : '';
-  const card = (k, d, m, unit, c) => { const v = d ? val(d, m) : null; return `<div class="metric" style="min-height:0;--mc:${c}"><div class="label">${t(k)}</div><div class="val">${v === null ? '<span class="dash">—</span>' : `${num(v)}<small>${unit}</small>`}</div>${sparkline(S.days.slice(-14), m, c)}</div>`; };
+  const card = (k, d, m, unit, c, extra = '') => { const v = d ? val(d, m) : null; return `<div class="metric" style="min-height:0;--mc:${c}"><div class="label">${t(k)}</div><div class="val">${v === null ? '<span class="dash">—</span>' : `${num(v)}<small>${unit}</small>`}</div>${extra}${sparkline(S.days.slice(-14), m, c)}</div>`; };
+  const stepsChk = sd ? chk(sd, 'goal.steps') || chk(sd, 'activity.steps') : null;
+  const azmWeek = ad ? chk(ad, 'goal.azm_week') || chk(ad, 'activity.azm_week') : null;
+  const stepsExtra = stepsChk ? (stepsChk.kind === 'goal' ? goalBar(stepsChk) : `<div class="cmp">${lvlBadge(stepsChk)} <span class="muted">${ruleText(stepsChk)}</span></div>`) : '';
+  const azmExtra = azmWeek ? (azmWeek.kind === 'goal' ? `<div class="cmp">${t('weekTotal')} ${num(azmWeek.value)} ${t('minutes')}</div>${goalBar(azmWeek)}` : `<div class="cmp">${t('weekTotal')} ${num(azmWeek.value)} ${t('minutes')} ${lvlBadge(azmWeek)}</div>`) : '';
   const loadCard = l ? `<div class="metric" style="min-height:0;--mc:var(--c-purple)">
       <div class="label">${t('cardioLoad')}</div>
       <div class="val">${l.load === null ? '<span class="dash">—</span>' : `${num(l.load)}<small>${l.source}</small>`}</div>
@@ -414,7 +427,7 @@ function activityBlock() {
       <div class="cmp">${l.acwr !== null ? `${t('acwr')} ${l.acwr} <span class="badge ${l.acwrBand === 'spike' ? 'warn' : ''}">${t('band_' + l.acwrBand)}</span>` : `<span class="muted">${t('needs28')} (${l.history}/28)</span>`}</div>
       <div class="foot">${t('loadNote')}</div></div>` : '';
   return `<section><div class="section-head"><h2>${t('activity')}<span class="small t2" style="font-weight:400">${dayLabel}</span></h2></div>
-    <div class="metrics" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">${card('steps', sd, 'steps', '', 'var(--c-yellow)')}${card('azm', ad, 'active_zone_minutes', 'min', 'var(--c-orange)')}${loadCard}</div></section>`;
+    <div class="metrics" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">${card('steps', sd, 'steps', '', 'var(--c-yellow)', stepsExtra)}${card('azm', ad, 'active_zone_minutes', 'min', 'var(--c-orange)', azmExtra)}${loadCard}</div></section>`;
 }
 
 function sleepHistory() {
@@ -515,9 +528,20 @@ function rangeBar(v, lo, hi, fmt, opts = {}) {
   const a = Math.min(lo, v) - pad, b = Math.max(hi, v) + pad, pct = (x) => (((x - a) / (b - a)) * 100).toFixed(1);
   return `<div class="range"><span class="band" style="left:${pct(lo)}%;width:${(((hi - lo) / (b - a)) * 100).toFixed(1)}%"></span><i class="mk" style="left:${pct(v)}%"></i><span class="lab" style="left:${pct(lo)}%">${fmt(lo)}</span><span class="lab" style="left:${pct(hi)}%">${fmt(hi)}</span></div>`;
 }
+const PERSONAL_RULE = { hrv_avg_ms: 'personal.hrv', rhr_bpm: 'personal.rhr', spo2_avg_pct: 'personal.spo2', respiratory_rate_bpm: 'personal.rr', sleeping_hr_bpm: 'personal.sleeping_hr' };
 function vitalRow(def, day) {
   const v = val(day, def.m); if (v === null) return '';
-  const b = personalBand(day, def.m); const f = (x) => num(x, def.dec);
+  const rc = chk(day, PERSONAL_RULE[def.m]); const f = (x) => num(x, def.dec);
+  if (rc) {   // server-evaluated rule: band, level and text all come from the rules table
+    const has = rc.band && Number.isFinite(rc.band.lo);
+    const bar = has ? rangeBar(v, rc.band.lo, rc.band.hi, f, { minPad: BASE_FLOOR[def.m] }) : `<div class="range"><i class="mk" style="left:50%"></i></div>`;
+    const chip = has ? lvlBadge(rc) : `<span class="badge">${t('collecting')} (${rc.band?.n ?? 0}/${MIN_BASE})</span>`;
+    const rangeTxt = has ? `${t('yourRange')} ${f(rc.band.lo)}–${f(rc.band.hi)} ${def.unit}` : '';
+    let hint = has ? (/^(Within|อยู่ในช่วง)/.test(rc.text?.en || '') || /^อยู่ในช่วง/.test(rc.text?.th || '') ? rangeTxt : `${ruleText(rc)} · ${rangeTxt}`) : t('needMore');
+    if (def.hint) hint = `${def.hint(day)} · ${hint}`;
+    return `<div class="vrow" style="--mc:${def.c}"><span class="nm">${t(def.k)}</span><span class="vv">${f(v)}<small>${def.unit}</small></span>${bar}<span class="st">${chip}</span><span class="hint">${hint}</span></div>`;
+  }
+  const b = personalBand(day, def.m);
   let status = '', chip = `<span class="badge">${t('collecting')} (${b.n}/${MIN_BASE})</span>`, bar = `<div class="range"><i class="mk" style="left:50%"></i></div>`, hint = t('needMore');
   if (b.lo !== undefined) {
     status = v > b.hi ? 'above' : v < b.lo ? 'below' : 'within';
@@ -535,16 +559,18 @@ function sleepStory(day) {
   const tib = val(day, 'sleep_minutes_in_period'), lat = val(day, 'sleep_latency_min'), nap = val(day, 'sleep_nap_minutes') || 0, tot2 = val(day, 'sleep_total_asleep_minutes');
   const deep = val(day, 'sleep_deep_minutes'), rem = val(day, 'sleep_rem_minutes'), light = val(day, 'sleep_light_minutes');
   const b = base7(day, 'sleep_minutes_asleep'), delta = b === null ? null : asleep - b;
-  const effWord = eff === null ? '' : eff >= 90 ? t('effGood') : eff >= 85 ? t('effOk') : t('effLow');
-  const effCls = eff === null ? '' : eff >= 90 ? 'ok' : eff >= 85 ? '' : 'warn';
+  const effC = chk(day, 'sleep.efficiency'), durC = chk(day, 'sleep.duration'), latC = chk(day, 'sleep.latency'), goalC = chk(day, 'goal.sleep');
+  const effWord = effC ? t('lvl_' + effC.level) : eff === null ? '' : eff >= 85 ? t('effGood') : eff >= 75 ? t('effOk') : t('effLow');
+  const effCls = effC ? lvlCls(effC.level) : eff === null ? '' : eff >= 85 ? 'ok' : eff >= 75 ? '' : 'warn';
   const stagesTot = [deep, rem, light].filter((x) => x !== null).reduce((a, x) => a + x, 0);
-  const stageRow = (k, v, c) => { if (v === null || !stagesTot) return ''; const pct = (v / stagesTot) * 100, [lo, hi] = STAGE_TYPICAL[k]; const st = pct < lo ? 'below' : pct > hi ? 'above' : 'within';
-    return `<div class="vrow" style="--mc:${c}"><span class="nm">${t(k)}</span><span class="vv">${num(v)}<small>${t('minutes')} · ${pct.toFixed(0)}%</small></span>${rangeBar(pct, lo, hi, (x) => `${Math.round(x)}%`, { minPad: 5 })}<span class="st"><span class="badge ${st === 'within' ? 'ok' : ''}">${t(st)}</span></span><span class="hint">${t('typical')} ${lo}–${hi}% ${t('ofSleep')}</span></div>`; };
+  const stageRow = (k, v, c) => { if (v === null || !stagesTot) return ''; const rc = chk(day, 'sleep.stage.' + k); const pct = (v / stagesTot) * 100; const [lo, hi] = rc?.good?.lo != null ? [rc.good.lo, rc.good.hi] : STAGE_TYPICAL[k]; const st = pct < lo ? 'below' : pct >= hi ? 'above' : 'within';
+    return `<div class="vrow" style="--mc:${c}"><span class="nm">${t(k)}</span><span class="vv">${num(v)}<small>${t('minutes')} · ${pct.toFixed(0)}%</small></span>${rangeBar(pct, lo, hi, (x) => `${Number.isInteger(x) ? x : x.toFixed(1)}%`, { minPad: 5 })}<span class="st">${rc ? lvlBadge(rc) : `<span class="badge ${st === 'within' ? 'ok' : ''}">${t(st)}</span>`}</span><span class="hint">${rc ? ruleText(rc) : `${t('typical')} ${lo}–${hi}% ${t('ofSleep')}`}</span></div>`; };
   return `
     <div class="hero-val" style="font-size:40px;line-height:48px;margin:0">${Math.floor(asleep / 60)}<small>${t('hrs')}</small>${Math.round(asleep % 60)}<small>${t('min')}</small></div>
-    <div class="story">${t('storySlept')} <b>${hm(asleep)}</b> · ${clock(row?.measured_start)} → ${clock(row?.measured_end)}<br>
-      ${delta === null ? t('storyBase') : `<b>${hm(Math.abs(delta))}</b> ${delta >= 0 ? t('storyMore') : t('storyLess')}`}${eff !== null ? ` · ${t('efficiency')} <b title="${t('effDef')}">${eff.toFixed(0)}%</b> <span class="badge ${effCls}">${effWord}</span>` : ''}${awake !== null ? ` · ${t('awakeFor')} <b>${num(awake)} ${t('minutes')}</b>` : ''}${row?.status === 'partial' ? ` · ${t('multiSession')}` : ''}<br>
-      ${[tib !== null ? `${t('timeInBed')} <b>${hm(tib)}</b>` : '', lat !== null ? `${t('fellAsleepIn')} <b>${num(lat)} ${t('minutes')}</b>` : '', nap ? `${t('napsLabel')} <b>${hm(nap)}</b> · ${t('totalInclNaps')} <b>${hm(tot2)}</b>` : ''].filter(Boolean).join(' · ')}</div>
+    <div class="story">${t('storySlept')} <b>${hm(asleep)}</b> · ${clock(row?.measured_start)} → ${clock(row?.measured_end)}${durC ? ` ${lvlBadge(durC)} <span class="muted">${ruleText(durC)}</span>` : ''}<br>
+      ${delta === null ? t('storyBase') : `<b>${hm(Math.abs(delta))}</b> ${delta >= 0 ? t('storyMore') : t('storyLess')}`}${eff !== null ? ` · ${t('efficiency')} <b title="${esc(effC?.source || t('effDef'))}">${eff.toFixed(0)}%</b> <span class="badge ${effCls}">${effWord}</span>` : ''}${awake !== null ? ` · ${t('awakeFor')} <b>${num(awake)} ${t('minutes')}</b>` : ''}${row?.status === 'partial' ? ` · ${t('multiSession')}` : ''}<br>
+      ${[tib !== null ? `${t('timeInBed')} <b>${hm(tib)}</b>` : '', lat !== null ? `${t('fellAsleepIn')} <b>${num(lat)} ${t('minutes')}</b>${latC && latC.level !== 'good' ? ` ${lvlBadge(latC)}` : ''}` : '', nap ? `${t('napsLabel')} <b>${hm(nap)}</b> · ${t('totalInclNaps')} <b>${hm(tot2)}</b>` : ''].filter(Boolean).join(' · ')}</div>
+    ${goalC ? `${goalBar(goalC)}<div class="meta">${ruleText(goalC)}</div>` : ''}
     ${stagesTot ? `<div class="stage-bar" style="margin:4px 0 0">${[[deep, 'var(--deep)'], [rem, 'var(--rem)'], [light, 'var(--light)'], [awake, 'var(--awake)']].map(([v, c]) => (v ? `<span style="width:${((v / (stagesTot + (awake || 0))) * 100).toFixed(1)}%;background:${c}"></span>` : '')).join('')}</div>
     ${stageRow('deep', deep, 'var(--deep)')}${stageRow('rem', rem, 'var(--rem)')}${stageRow('light', light, 'var(--light)')}` : `<div class="small muted">${t('noStages')}</div>`}`;
 }
@@ -557,6 +583,7 @@ function activityStory(day) {
   if (steps === null && azm === null && !sess.length && !l) return `<div class="empty">${t('noActivity')}</div>`;
   return `
     <div class="kpi3"><div><b style="color:var(--c-yellow)">${steps === null ? '—' : num(steps)}</b><span>${t('steps')}</span></div><div><b style="color:var(--c-orange)">${azm === null ? '—' : num(azm)}</b><span>${t('azm')}</span></div><div><b style="color:var(--c-teal)">${exm === null ? (sess.length ? num(sess.reduce((a, e) => a + (+e.active_min || 0), 0)) : '—') : num(exm)}</b><span>${t('exerciseMin')}</span></div></div>
+    ${(() => { const sc = chk(day, 'goal.steps'), ac = chk(day, 'goal.azm_week') || chk(day, 'activity.azm_week'), st = chk(day, 'activity.steps'); return [sc ? `${goalBar(sc)}<div class="meta">${ruleText(sc)}</div>` : st ? `<div class="small">${lvlBadge(st)} <span class="t2">${ruleText(st)}</span></div>` : '', ac ? (ac.kind === 'goal' ? `<div class="small t2" style="margin-top:6px">${t('weekTotal')}: ${num(ac.value)} ${t('minutes')}</div>${goalBar(ac)}<div class="meta">${ruleText(ac)}</div>` : `<div class="small" style="margin-top:6px">${t('weekTotal')}: <b>${num(ac.value)} ${t('minutes')}</b> ${lvlBadge(ac)} <span class="t2">${ruleText(ac)}</span></div>`) : ''].join(''); })()}
     ${zTot ? `<div class="zones">${zones.map((z) => `<span style="width:${((z[1] / zTot) * 100).toFixed(1)}%;background:${z[2]}"></span>`).join('')}</div><div class="legend-inline" style="margin-top:6px">${zones.map((z) => `<span><i style="background:${z[2]}"></i>${t(z[0])} ${num(z[1])} ${t('minutes')}</span>`).join('')}</div>` : ''}
     ${sess.length ? sess.map((e) => `<div class="sess"><span class="ic">${ICO.pulse}</span><b>${esc(e.display_name || e.exercise_type || '—')}</b><span class="meta">${clock(e.started_at)} · ${e.active_min ?? '—'} ${t('minutes')}${e.avg_hr ? ` · ${t('avgHr')} ${e.avg_hr}` : ''}${e.azm ? ` · ${e.azm} AZM` : ''}</span></div>`).join('') : `<div class="small muted">${t('noSessions')}</div>`}
     ${l ? `<div class="vrow" style="--mc:var(--c-purple)"><span class="nm">${t('loadDay')}</span><span class="vv">${l.load === null ? '—' : num(l.load)}<small>${esc(l.source || '')}</small></span><div class="small t2" style="grid-column:2">${t('acute')} ${num(l.acute, 1) ?? '—'} · ${t('chronic')} ${num(l.chronic, 1) ?? '—'}</div><span class="st">${l.acwr !== null ? `<span class="badge ${l.acwrBand === 'spike' ? 'warn' : ''}">${t('band_' + l.acwrBand)} · ${l.acwr}</span>` : `<span class="badge">${t('needs28')}</span>`}</span></div>` : ''}`;
@@ -780,6 +807,7 @@ function renderSettings() {
     <section class="card span12"><h2>${t('setDiag')}</h2><div class="small t2">${t('diagNote')}</div><div class="rule"></div>
       <div class="row" style="margin-bottom:12px"><span class="badge">${t('model')}: ${esc(info?.model || '—')}</span><span class="badge">${t('promptVersion')}: ${esc(info?.promptVersion || '—')}</span>${info && !info.configured ? `<span class="badge warn">${t('coachOff')}</span>` : ''}${S.demo ? `<span class="badge warn">${t('demo')}</span>` : ''}</div>
       <div class="row"><button class="sm" id="ctxBtn">${t('coachContext')}</button><button class="sm" id="recomputeBtn">${t('recompute')}</button><button class="sm" id="probeBtn">${t('probe')}</button><span class="meta" id="probeStatus"></span></div>
+      <div class="rule"></div><h2 class="small" style="font-size:15px">${t('rulesTitle')}</h2><div class="meta" style="margin-bottom:8px">${t('rulesSub')}</div><div class="tbl" id="rulesTbl">…</div>
       <div class="rule"></div><h2 class="small" style="font-size:15px">${t('rawData')}</h2>
       <div class="tbl" id="rawTbl"></div>
       <div class="row" style="margin-top:8px"><button class="sm ghost" id="copyBtn" hidden>${t('copy')}</button></div><pre id="diagPre" hidden></pre>
@@ -828,6 +856,10 @@ function bindSettings() {
   $('#ctxBtn').onclick = async () => showDiag(await api('/api/coach/context'));
   $('#recomputeBtn').onclick = async () => showDiag(await api('/api/scores/recompute', { method: 'POST' }));
   $('#probeBtn').onclick = async () => { $('#probeStatus').textContent = t('probing'); try { const r = await api('/api/energy/probe', { method: 'POST' }); $('#probeStatus').textContent = r.ok ? `${t('coverage')} ${r.coveragePct}% · ${r.samples} ${t('samples')} · ${t('verdict_' + r.verdict)}` : r.error || t('err_generic'); showDiag(r); } catch (e) { $('#probeStatus').textContent = e.message; } };
+  api('/api/rules').then((r) => {
+    const bands = (x) => x.bands ? x.bands.map((b) => `<span class="badge ${lvlCls(b.level)}" style="margin:2px 4px 2px 0">${b.min ?? ''}${b.min != null && b.max != null ? '–' : b.min != null ? '+' : b.max != null ? '< ' : ''}${b.max ?? ''} ${x.unit} · ${t('lvl_' + b.level)}</span>`).join('') : x.personal ? `<span class="meta">mean ± max(SD, ${x.personal.floor}) · ${x.personal.windowDays} d · ≥ ${x.personal.minDays} d</span>` : `<span class="meta">${esc(x.goal.profileField)}</span>`;
+    $('#rulesTbl').innerHTML = `<div class="meta" style="margin-bottom:6px">${esc(r.version)}</div><table><thead><tr><th>id</th><th>${t('type')}</th><th>${t('range')}</th><th>${t('source')}</th></tr></thead><tbody>${r.rules.map((x) => `<tr><td><b>${esc(x.title?.[S.lang] || x.id)}</b><div class="meta">${esc(x.id)}</div></td><td class="muted">${t('ruleKind_' + x.kind)}</td><td style="white-space:normal;min-width:220px">${bands(x)}</td><td class="muted" style="white-space:normal;max-width:420px">${esc(x.source)}</td></tr>`).join('')}</tbody></table>`;
+  }).catch(() => { $('#rulesTbl').textContent = '—'; });
   api('/api/raw?limit=40').then((rows) => {
     $('#rawTbl').innerHTML = `<table><thead><tr><th>id</th><th>${t('fetched')}</th><th>${t('type')}</th><th>${t('status')}</th><th class="num">${t('items')}</th><th>${t('range')}</th></tr></thead><tbody>${rows.map((r) => `<tr><td><a href="#" data-raw="${r.id}">#${r.id}</a></td><td class="muted">${dt(r.fetched_at)}</td><td>${esc(r.data_type)} <span class="muted">${esc(r.method)}</span></td><td class="${r.http_status < 300 ? '' : 'err'}">${r.http_status}</td><td class="num">${r.item_count ?? ''}</td><td class="muted">${esc(r.range_start?.slice(0, 10))} → ${esc(r.range_end?.slice(0, 10))}</td></tr>`).join('') || `<tr><td colspan="6" class="muted">${t('noData')}</td></tr>`}</tbody></table>`;
     $('#rawTbl').querySelectorAll('a[data-raw]').forEach((a) => (a.onclick = async (e) => { e.preventDefault(); showDiag(await api(`/api/raw/${a.dataset.raw}`)); }));

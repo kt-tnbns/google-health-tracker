@@ -8,13 +8,14 @@ import { ChatMessage, GlmClient } from './glm.client';
 import { CoachProfile, DEFAULT_PROFILE, PROMPT_VERSION, systemPrompt } from './prompt';
 import { ScoresService } from '../scores/scores.service';
 import { LOAD_VERSION } from '../scores/load';
+import { RulesService } from '../rules/rules.service';
 
 export type Lang = 'th' | 'en';
 
 @Injectable()
 export class CoachService {
   private readonly log = new Logger(CoachService.name);
-  constructor(@Inject(PG_POOL) private readonly pool: Pool, private readonly glm: GlmClient, private readonly scores: ScoresService) {}
+  constructor(@Inject(PG_POOL) private readonly pool: Pool, private readonly glm: GlmClient, private readonly scores: ScoresService, private readonly rules: RulesService) {}
 
   info() {
     return { configured: this.glm.configured, model: this.glm.model, promptVersion: PROMPT_VERSION, baseUrl: config.GLM_BASE_URL };
@@ -36,6 +37,10 @@ export class CoachService {
       ctx.insights = ins.insights.filter((i) => i.surfaced).slice(0, 3).map((i) => ({ tag: i.tag, label: i.label, unit: i.unit, diff: i.diff, nTagged: i.nTagged, nUntagged: i.nUntagged, g: i.g, ci: i.ci }));
       const j = await this.scores.journal(today, today);
       ctx.journalToday = j[0]?.tags ?? [];
+      const ev = await this.rules.evaluate(3);
+      const evDays = Object.keys(ev.byDay).sort();
+      const latest = evDays[evDays.length - 1];
+      if (latest) ctx.ruleChecks = { day: latest, version: ev.version, checks: ev.byDay[latest].map((c) => ({ id: c.id, kind: c.kind, metric: c.metric, value: c.value === null ? null : Math.round(c.value * 10) / 10, level: c.level, text: c.text.en, band: c.band && Number.isFinite(c.band.lo) ? { lo: Math.round(c.band.lo * 10) / 10, hi: Number.isFinite(c.band.hi) ? Math.round(c.band.hi * 10) / 10 : null } : undefined, target: c.target })) };
     } catch (e) {
       this.log.warn(`scores unavailable for coach context: ${(e as Error).message}`);
     }

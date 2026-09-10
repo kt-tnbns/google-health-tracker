@@ -37,6 +37,8 @@ export interface CoachContext {
   load?: { day: string; load: number | null; source: string; acute: number | null; chronic: number | null; acwr: number | null; acwrBand: string | null; monotony: number | null; version: string } | null;
   insights?: { tag: string; label: string; unit: string; diff: number; nTagged: number; nUntagged: number; g: number | null; ci: { lo: number; hi: number } | null }[];
   journalToday?: string[];
+  /** App-evaluated health rules for the latest day (reference bands, personal baselines, user goals). */
+  ruleChecks?: { day: string; version: string; checks: { id: string; kind: string; metric: string; value: number | null; level: string; text: string; band?: { lo: number; hi: number | null }; target?: number }[] } | null;
 }
 
 const TRACKED: { metric: MetricId; upIsGood: boolean | null }[] = [
@@ -132,6 +134,10 @@ export function renderContextForPrompt(ctx: CoachContext): string {
     const s = ctx.sleepLatest;
     lines.push(`LATEST SLEEP (wake day ${s.day}${s.partial ? ', partial: several sessions' : ''}): asleep=${fmt(s.asleepMin)}min awake=${fmt(s.awakeMin)}min efficiency=${fmt(s.efficiencyPct)}% deep=${fmt(s.deepMin)} rem=${fmt(s.remMin)} light=${fmt(s.lightMin)} timeInBed=${fmt(s.timeInBedMin)}min fellAsleepIn=${fmt(s.latencyMin)}min naps=${fmt(s.napMin)}min totalAsleepInclNaps=${fmt(s.totalAsleepMin)}min sleepingHR=${fmt(s.sleepingHrBpm)}bpm start=${s.start ?? '?'} end=${s.end ?? '?'} (efficiency = asleep ÷ time in bed, Google's definition)`);
   } else lines.push('LATEST SLEEP: none');
+  if (ctx.ruleChecks?.checks.length) {
+    lines.push(`RULE CHECKS for ${ctx.ruleChecks.day} (${ctx.ruleChecks.version}; evaluated by the app — use these labels, never your own thresholds):`);
+    for (const c of ctx.ruleChecks.checks) lines.push(`  ${c.id} [${c.kind}] ${c.metric}=${c.value ?? '—'} → ${c.level}${c.band ? ` (range ${c.band.lo}–${c.band.hi ?? '∞'})` : ''}${c.target !== undefined ? ` (goal ${c.target})` : ''}: ${c.text}`);
+  }
   lines.push('METRICS (latest vs mean of up to 7 prior days):');
   for (const m of ctx.metrics) {
     if (m.latest === null) { lines.push(`- ${m.metric}: no data`); continue; }

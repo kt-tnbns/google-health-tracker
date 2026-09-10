@@ -31,6 +31,12 @@ class StubApi {
       const items = [{ dailyRestingHeartRate: { date: { year: 2026, month: 9, day: 9 }, beatsPerMinute: 57 } }];
       return { ok: true, items, pages: [page(url, { dataPoints: items })] };
     }
+    if (dataType === 'heart-rate') {
+      // one sample per minute across the stubbed sleep interval (16:30Z → 23:40Z), bpm 55/56/57 → mean 56
+      const t0 = Date.parse('2026-09-08T16:30:00Z');
+      const items = Array.from({ length: 430 }, (_, i) => ({ heartRate: { sampleTime: { physicalTime: new Date(t0 + i * 60_000).toISOString() }, beatsPerMinute: 55 + (i % 3) } }));
+      return { ok: true, items, pages: [page(url, { dataPoints: items })] };
+    }
     if (dataType === 'daily-oxygen-saturation') {
       // simulate a 403 (scope not granted) — must be recorded, not thrown
       return { ok: false, items: [], pages: [{ ...page(url, { error: { code: 403, message: 'insufficient scope' } }, 403), errorText: 'insufficient scope' }] };
@@ -60,18 +66,28 @@ d('IngestService (integration)', () => {
 
   it('stores raw pages and upserts normalized rows idempotently', async () => {
     const first = await svc.refresh({ startDate: '2026-09-07', endDate: '2026-09-10' });
-    expect(first.perType.find((t) => t.dataType === 'sleep')).toMatchObject({ ok: true, items: 1, upserted: 9 });
+    expect(first.perType.find((t) => t.dataType === 'sleep')).toMatchObject({ ok: true, items: 1, upserted: 13 });   // 9 main-sleep metrics + latency, naps, total, session count
+    expect(first.perType.find((t) => t.dataType === 'heart-rate')).toMatchObject({ ok: true, items: 430, upserted: 1 });
     expect(first.perType.find((t) => t.dataType === 'daily-oxygen-saturation')).toMatchObject({ ok: false, httpStatus: 403 });
 
     const before = await pool.query('SELECT count(*)::int AS n FROM daily_metrics');
-    const raw1 = await pool.query('SELECT count(*)::int AS n FROM api_responses');
+    const raw1 = await pool.query(`SELECT count(*)::int AS n FROM api_responses WHERE data_type <> 'heart-rate'`);
 
-    // second run: same window -> same number of normalized rows, more raw rows (history kept)
+    // second run: same window -> same number of normalized rows, raw rows doubled (history kept).
+    // heart-rate is excluded from the doubling check: a night with ≥85% coverage that ended >2 days ago is not refetched.
     await svc.refresh({ startDate: '2026-09-07', endDate: '2026-09-10' });
     const after = await pool.query('SELECT count(*)::int AS n FROM daily_metrics');
-    const raw2 = await pool.query('SELECT count(*)::int AS n FROM api_responses');
+    const raw2 = await pool.query(`SELECT count(*)::int AS n FROM api_responses WHERE data_type <> 'heart-rate'`);
     expect(after.rows[0].n).toBe(before.rows[0].n);
     expect(raw2.rows[0].n).toBe(raw1.rows[0].n * 2);
+
+    // sleeping HR: mean of the stubbed samples inside the sleep interval, full coverage, Google-definition efficiency
+    const shr = await pool.query(`SELECT value, status, details FROM daily_metrics WHERE day = '2026-09-09' AND metric = 'sleeping_hr_bpm'`);
+    expect(Number(shr.rows[0].value)).toBe(56);
+    expect(shr.rows[0].status).toBe('ok');
+    expect(shr.rows[0].details.coveragePct).toBe(100);
+    const eff = await pool.query(`SELECT value FROM daily_metrics WHERE day = '2026-09-09' AND metric = 'sleep_efficiency_pct'`);
+    expect(Number(eff.rows[0].value)).toBeCloseTo((402 / 430) * 100, 1);
 
     // the newer value won
     const day = await svc.getDay('2026-09-09');
