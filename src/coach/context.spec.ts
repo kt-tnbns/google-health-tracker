@@ -42,3 +42,12 @@ describe('coach context', () => {
     expect(renderContextForPrompt(ctx)).toContain('LATEST SLEEP: none');
   });
 });
+
+describe('local clock in coach context', () => {
+  const { localClock } = require('./context');
+  it('renders ISO instants as the user\'s local 24-hour time, not UTC', () => {
+    expect(localClock('2026-09-09T17:53:00Z', 'Asia/Bangkok')).toBe('00:53');
+    expect(localClock('2026-09-10T00:02:00Z', 'Asia/Bangkok')).toBe('07:02');
+    expect(localClock(null, 'Asia/Bangkok')).toBe('?');
+  });
+});

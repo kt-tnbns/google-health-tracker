@@ -30,7 +30,7 @@ export class CoachController {
 
   /** Server-Sent Events: `data: {"delta":"..."}` chunks, then `data: {"done":true,"id":n}`. */
   @Post('chat')
-  async chat(@Body() body: { message?: string; lang?: string }, @Req() req: Request, @Res() res: Response) {
+  async chat(@Body() body: { message?: string; lang?: string; clock?: string }, @Req() req: Request, @Res() res: Response) {
     const message = (body?.message ?? '').toString();
     const lang: Lang = body?.lang === 'en' ? 'en' : 'th';
     if (!message.trim()) throw new BadRequestException('message is required');
@@ -42,7 +42,7 @@ export class CoachController {
     const ac = new AbortController();
     req.on('close', () => ac.abort());
     try {
-      const r = await this.coach.chat(message, lang, (delta) => send({ delta }), ac.signal);
+      const r = await this.coach.chat(message, lang, (delta) => send({ delta }), ac.signal, body?.clock === '12' ? '12' : '24');
       send({ done: true, id: r.id });
     } catch (e) {
       send({ error: (e as Error).message });

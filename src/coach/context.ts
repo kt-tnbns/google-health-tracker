@@ -129,10 +129,10 @@ export function buildContext(rows: MetricRow[], today: string, timezone: string,
 /** Compact plain-text rendering for the model prompt (numbers only, no interpretation). */
 export function renderContextForPrompt(ctx: CoachContext): string {
   const lines: string[] = [];
-  lines.push(`today=${ctx.today} tz=${ctx.timezone} context_version=${ctx.version}`);
+  lines.push(`today=${ctx.today} tz=${ctx.timezone} (all clock times below are LOCAL time in this zone, 24-hour — quote them as local time, never as UTC) context_version=${ctx.version}`);
   if (ctx.sleepLatest) {
     const s = ctx.sleepLatest;
-    lines.push(`LATEST SLEEP (wake day ${s.day}${s.partial ? ', partial: several sessions' : ''}): asleep=${fmt(s.asleepMin)}min awake=${fmt(s.awakeMin)}min efficiency=${fmt(s.efficiencyPct)}% deep=${fmt(s.deepMin)} rem=${fmt(s.remMin)} light=${fmt(s.lightMin)} timeInBed=${fmt(s.timeInBedMin)}min fellAsleepIn=${fmt(s.latencyMin)}min naps=${fmt(s.napMin)}min totalAsleepInclNaps=${fmt(s.totalAsleepMin)}min sleepingHR=${fmt(s.sleepingHrBpm)}bpm start=${s.start ?? '?'} end=${s.end ?? '?'} (efficiency = asleep ÷ time in bed, Google's definition)`);
+    lines.push(`LATEST SLEEP (wake day ${s.day}${s.partial ? ', partial: several sessions' : ''}): asleep=${fmt(s.asleepMin)}min awake=${fmt(s.awakeMin)}min efficiency=${fmt(s.efficiencyPct)}% deep=${fmt(s.deepMin)} rem=${fmt(s.remMin)} light=${fmt(s.lightMin)} timeInBed=${fmt(s.timeInBedMin)}min fellAsleepIn=${fmt(s.latencyMin)}min naps=${fmt(s.napMin)}min totalAsleepInclNaps=${fmt(s.totalAsleepMin)}min sleepingHR=${fmt(s.sleepingHrBpm)}bpm bedtime=${localClock(s.start, ctx.timezone)} wake=${localClock(s.end, ctx.timezone)} (local time; efficiency = asleep ÷ time in bed, Google's definition)`);
   } else lines.push('LATEST SLEEP: none');
   if (ctx.ruleChecks?.checks.length) {
     lines.push(`RULE CHECKS for ${ctx.ruleChecks.day} (${ctx.ruleChecks.version}; evaluated by the app — use these labels, never your own thresholds):`);
@@ -167,4 +167,10 @@ export function renderContextForPrompt(ctx: CoachContext): string {
 
 function fmt(v: number | null | undefined) { return v === null || v === undefined ? '—' : String(v); }
 function round(n: number, d: number) { const p = 10 ** d; return Math.round(n * p) / p; }
+/** "HH:MM" (24 h) in the user's zone, with the weekday when it differs from the wake day context. */
+export function localClock(iso: string | null, tz: string): string {
+  if (!iso) return '?';
+  const d = new Date(iso); if (Number.isNaN(d.getTime())) return '?';
+  return new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(d);
+}
 function toIso(v: unknown): string | null { if (!v) return null; return v instanceof Date ? v.toISOString() : String(v); }

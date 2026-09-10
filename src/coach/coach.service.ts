@@ -91,7 +91,7 @@ export class CoachService {
    * Streams the assistant reply through `onDelta`. Persists the user turn immediately and the
    * assistant turn (with the exact context snapshot) when done — or with `error` if GLM failed.
    */
-  async chat(userText: string, lang: Lang, onDelta: (t: string) => void, signal?: AbortSignal): Promise<{ id: number; text: string }> {
+  async chat(userText: string, lang: Lang, onDelta: (t: string) => void, signal?: AbortSignal, clock: '12' | '24' = '24'): Promise<{ id: number; text: string }> {
     const text = userText.trim().slice(0, 4000);
     if (!text) throw new Error('empty message');
     await this.pool.query(`INSERT INTO coach_messages (role, content, lang) VALUES ('user', $1, $2)`, [text, lang]);
@@ -110,7 +110,7 @@ export class CoachService {
     const profile = await this.profile().catch(() => DEFAULT_PROFILE);
     const prior = await this.history(16);
     const messages: ChatMessage[] = [
-      { role: 'system', content: systemPrompt(lang, renderContextForPrompt(ctx), profile) },
+      { role: 'system', content: systemPrompt(lang, renderContextForPrompt(ctx), profile, clock) },
       ...prior.filter((m) => !m.error).map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content as string })),
     ];
     // history() already includes the user turn we just inserted (it is the last row)

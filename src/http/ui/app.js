@@ -48,6 +48,7 @@ const I18N = {
     goals: 'เป้าหมายของคุณ', goalSleep: 'นอนต่อคืน (ชม.)', goalSteps: 'ก้าว/วัน', goalAzm: 'นาทีในโซนหัวใจ/สัปดาห์', chatNotes: 'สิ่งที่บอกโค้ชผ่านแชท', chatNotesHint: 'พิมพ์ในแชทว่า “จำไว้ว่า …” หรือ “/remember …” โค้ชจะเก็บไว้ที่นี่', removeNote: 'ลบ', rememberHint: 'พิมพ์ “จำไว้ว่า …” เพื่อบอกเรื่องตัวคุณให้โค้ชจำ',
     timeInBed: 'อยู่บนเตียง', fellAsleepIn: 'หลับภายใน', napsLabel: 'งีบ', totalInclNaps: 'รวมงีบ', sleepHr: 'HR ขณะหลับ', effDef: 'ประสิทธิภาพ = เวลาหลับ ÷ เวลาอยู่บนเตียง (นิยามเดียวกับ Google Health)', prevDay: 'วันก่อนหน้า', nextDay: 'วันถัดไป', sleepHrHint: 'ค่าเฉลี่ยชีพจรตลอดช่วงหลับ · ต่างจากชีพจรขณะพักรายวัน', coverageOf: 'ครอบคลุม',
     goalWord: 'เป้า', rulesTitle: 'กฎที่ใช้ตัดสินว่าค่าไหนดี', rulesSub: 'ทุกป้าย ดี/พอใช้/ต่ำ ในแอปและคำตัดสินของโค้ชมาจากตารางนี้เท่านั้น มีแหล่งอ้างอิงและเวอร์ชันกำกับ', ruleKind_reference: 'เกณฑ์อ้างอิง', ruleKind_personal: 'baseline ส่วนตัว', ruleKind_goal: 'เป้าหมายของคุณ', lvl_good: 'ดี', lvl_fair: 'พอใช้', lvl_low: 'ต่ำ', lvl_note: 'นอกช่วงที่พบบ่อย', lvl_na: 'ยังเทียบไม่ได้', source: 'ที่มา', weekTotal: '7 วันล่าสุด',
+    clockFmt: 'รูปแบบเวลา', clock24: '24 ชั่วโมง (07:02)', clock12: '12 ชั่วโมง (7:02 AM)',
     err_generic: 'เกิดข้อผิดพลาด', partialFetch: 'บางชนิดข้อมูลดึงไม่สำเร็จ',
   },
   en: {
@@ -94,27 +95,29 @@ const I18N = {
     goals: 'Your goals', goalSleep: 'Sleep per night (h)', goalSteps: 'Steps / day', goalAzm: 'Zone minutes / week', chatNotes: 'Things you told the coach in chat', chatNotesHint: 'Type “remember that …” or “/remember …” in the chat and it lands here', removeNote: 'Remove', rememberHint: 'Type “remember that …” to tell the coach something about you',
     timeInBed: 'Time in bed', fellAsleepIn: 'fell asleep in', napsLabel: 'naps', totalInclNaps: 'total incl. naps', sleepHr: 'Sleeping HR', effDef: 'Efficiency = time asleep ÷ time in bed (same definition as Google Health)', prevDay: 'Previous day', nextDay: 'Next day', sleepHrHint: 'Mean heart rate across the sleep interval · distinct from daily resting HR', coverageOf: 'coverage',
     goalWord: 'goal', rulesTitle: 'Rules that decide what “good” means', rulesSub: 'Every good/fair/low label in the app and every verdict from the coach comes from this table only — each with a source and version', ruleKind_reference: 'reference', ruleKind_personal: 'personal baseline', ruleKind_goal: 'your goal', lvl_good: 'good', lvl_fair: 'fair', lvl_low: 'low', lvl_note: 'outside common range', lvl_na: 'not comparable yet', source: 'Source', weekTotal: 'last 7 days',
+    clockFmt: 'Time format', clock24: '24-hour (07:02)', clock12: '12-hour (7:02 AM)',
     err_generic: 'Something went wrong', partialFetch: 'Some data types failed to fetch',
   },
 };
 
 /* ================= state & helpers ================= */
 const S = {
-  token: '', lang: 'th', theme: 'system', view: 'today',
+  token: '', lang: 'th', theme: 'system', clock: '24', view: 'today',
   status: null, rows: [], byDay: {}, days: [], scores: null, coachInfo: null, coachHist: [], journalToday: null,
   sleepRange: 7, selectedDay: null, loading: {}, err: {}, lastFetch: null, demo: false, raw: [], ctx: null,
   exercise: [], coachProfile: null, rules: null, insights: null, fitness: null, strength: null, strengthWeekly: null, bio: null, profile: null, coachOpen: false,
 };
 try { S.token = sessionStorage.getItem('adminToken') || ''; } catch {}
-try { S.lang = localStorage.getItem('lang') || (navigator.language.startsWith('th') ? 'th' : 'en'); S.theme = localStorage.getItem('theme') || 'system'; } catch {}
+try { S.lang = localStorage.getItem('lang') || (navigator.language.startsWith('th') ? 'th' : 'en'); S.theme = localStorage.getItem('theme') || 'system'; S.clock = localStorage.getItem('clock') === '12' ? '12' : '24'; } catch {}
 const t = (k) => (I18N[S.lang] && I18N[S.lang][k]) ?? I18N.th[k] ?? k;
 const LOC = () => (S.lang === 'th' ? 'th-TH' : 'en-GB');
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const num = (v, d = 0) => (v === null || v === undefined || Number.isNaN(+v) ? null : Number(v).toLocaleString('en-US', { maximumFractionDigits: d }));
 const hm = (m) => (m === null || m === undefined ? '—' : `${Math.floor(m / 60)} ${t('hrs')} ${Math.round(m % 60)} ${t('min')}`);
-const clock = (iso) => (iso ? new Date(iso).toLocaleTimeString(LOC(), { hour: '2-digit', minute: '2-digit' }) : '—');
+const H12 = () => ({ hour: S.clock === '12' ? 'numeric' : '2-digit', minute: '2-digit', hour12: S.clock === '12' });
+const clock = (iso) => (iso ? new Date(iso).toLocaleTimeString(S.clock === '12' ? 'en-US' : LOC(), H12()) : '—');
 const dateS = (d, o = { weekday: 'short', day: 'numeric', month: 'short' }) => new Date(d + 'T00:00:00').toLocaleDateString(LOC(), o);
-const dt = (iso) => (iso ? new Date(iso).toLocaleString(LOC(), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—');
+const dt = (iso) => (iso ? `${new Date(iso).toLocaleDateString(LOC(), { day: 'numeric', month: 'short' })} ${clock(iso)}` : '—');
 const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 const det = (day, m) => S.byDay[day]?.[m]?.details || null;
 const chk = (day, id) => S.rules?.byDay?.[day]?.find((c) => c.id === id) || null;
@@ -686,7 +689,7 @@ async function sendChat(text) {
   const typing = document.createElement('div'); typing.className = 'msg ai typing'; typing.innerHTML = '<i></i><i></i><i></i>'; box.appendChild(typing); box.scrollTop = box.scrollHeight;
   let el = null, acc = '';
   try {
-    const res = await fetch('/api/coach/chat', { method: 'POST', headers: { 'content-type': 'application/json', 'x-admin-token': S.token }, body: JSON.stringify({ message: text, lang: S.lang }) });
+    const res = await fetch('/api/coach/chat', { method: 'POST', headers: { 'content-type': 'application/json', 'x-admin-token': S.token }, body: JSON.stringify({ message: text, lang: S.lang, clock: S.clock }) });
     if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
     const reader = res.body.getReader(), dec = new TextDecoder(); let buf = '';
     for (;;) {
@@ -778,7 +781,8 @@ function renderSettings() {
     <section class="card span6"><h2>${t('setAccess')}</h2><div class="rule"></div><div class="row between"><span class="t2 small">${t('accessCode')} ••••••••</span><button class="sm" id="signOut">${t('signOut')}</button></div></section>
     <section class="card span6"><h2>${t('setPrefs')}</h2><div class="rule"></div>
       <div class="form cols"><div class="f"><label>${t('language')}</label><select id="langSel"><option value="th" ${S.lang === 'th' ? 'selected' : ''}>ไทย</option><option value="en" ${S.lang === 'en' ? 'selected' : ''}>English</option></select></div>
-      <div class="f"><label>${t('theme')}</label><select id="themeSel">${['system', 'dark', 'light'].map((x) => `<option value="${x}" ${S.theme === x ? 'selected' : ''}>${t('theme' + x[0].toUpperCase() + x.slice(1))}</option>`).join('')}</select></div></div></section>
+      <div class="f"><label>${t('theme')}</label><select id="themeSel">${['system', 'dark', 'light'].map((x) => `<option value="${x}" ${S.theme === x ? 'selected' : ''}>${t('theme' + x[0].toUpperCase() + x.slice(1))}</option>`).join('')}</select></div>
+      <div class="f"><label>${t('clockFmt')}</label><select id="clockSel"><option value="24" ${S.clock === '24' ? 'selected' : ''}>${t('clock24')}</option><option value="12" ${S.clock === '12' ? 'selected' : ''}>${t('clock12')}</option></select></div></div></section>
     <section class="card span6"><h2>${t('setGoogle')}</h2><div class="rule"></div>
       <div class="row between"><div>${s?.connected ? `<span class="badge ${s.needsReconnect ? 'warn' : 'ok'}">${s.needsReconnect ? ICO.warn : ICO.check}${s.needsReconnect ? t('reconnectTitle') : t('connected')}</span><div class="meta" style="margin-top:6px">${t('connectedAt')} ${dt(s.connectedAt)} · ${t('lastRefresh')} ${dt(s.lastRefreshAt)}</div><div class="meta">${t('scopes')}: ${esc((s.scopes || []).map((x) => x.split('googlehealth.')[1] || x).join(', '))}</div>${s.lastError ? `<div class="err">${esc(s.lastError)}</div>` : ''}` : `<span class="badge">${t('notConnected')}</span>`}</div>
       <div class="row"><button class="primary" id="connectBtn">${s?.connected ? t('reconnectBtn') : t('connectBtn')}</button>${s?.connected ? `<button class="ghost sm" id="devBtn">${t('devices')}</button><button class="ghost sm" id="discBtn">${t('disconnect')}</button>` : ''}</div></div></section>
@@ -831,6 +835,7 @@ function bindSettings() {
   $('#signOut').onclick = () => { S.token = ''; try { sessionStorage.removeItem('adminToken'); } catch {} renderGate(); };
   $('#langSel').onchange = (e) => { S.lang = e.target.value; try { localStorage.setItem('lang', S.lang); } catch {} applyTheme(); render(); };
   $('#themeSel').onchange = (e) => { S.theme = e.target.value; try { localStorage.setItem('theme', S.theme); } catch {} applyTheme(); };
+  $('#clockSel').onchange = (e) => { S.clock = e.target.value === '12' ? '12' : '24'; try { localStorage.setItem('clock', S.clock); } catch {} };
   $('#connectBtn').onclick = () => { location.href = `/auth/google/start?token=${encodeURIComponent(S.token)}`; };
   $('#devBtn')?.addEventListener('click', async () => showDiag(await api('/api/devices')));
   $('#discBtn')?.addEventListener('click', async () => { await api('/auth/google/disconnect', { method: 'POST' }); await loadCore(); render(); });

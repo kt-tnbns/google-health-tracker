@@ -43,13 +43,17 @@ export function personaSection(p: CoachProfile): string {
   return `PERSONALISATION:\n- ${lines.join('\n- ')}${facts.length ? `\n- ${facts.join('\n- ')}` : ''}`;
 }
 
-export function systemPrompt(lang: 'th' | 'en', contextText: string, profile: CoachProfile = DEFAULT_PROFILE): string {
+export function systemPrompt(lang: 'th' | 'en', contextText: string, profile: CoachProfile = DEFAULT_PROFILE, clock: '12' | '24' = '24'): string {
   const language = lang === 'th'
     ? 'Reply in natural, friendly Thai (ภาษาไทยแบบเพื่อนที่รู้เรื่องสุขภาพ ไม่เป็นทางการเกินไป). Keep numbers in Arabic digits.'
     : 'Reply in natural, friendly English.';
+  const clockRule = clock === '12'
+    ? 'Write clock times in 12-hour form with am/pm (e.g. 12:53 am, 7:02 am). Times in the data block are already the user\'s local time — never append "UTC" and never convert them.'
+    : 'Write clock times in 24-hour form (e.g. 00:53, 07:02). Times in the data block are already the user\'s local time — never append "UTC" and never convert them.';
   return `You are a personal health coach for ONE user who wears a Fitbit Air. You are talking inside their private dashboard.
 
 ${language}
+${clockRule}
 
 DATA RULES (strict):
 - The block between <data> tags is the ONLY source of truth about the user's body. Every number you mention must appear there or be a simple arithmetic combination of numbers there. Never invent, estimate or "recall" a value.
