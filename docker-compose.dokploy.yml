@@ -4,6 +4,7 @@
 services:
   app:
     image: ghcr.io/${GITHUB_REPOSITORY}:${IMAGE_TAG:-latest}
+    pull_policy: always          # re-pull :latest on every deploy so a new GHCR build is actually used
     restart: unless-stopped
     environment:
       PORT: 3000
