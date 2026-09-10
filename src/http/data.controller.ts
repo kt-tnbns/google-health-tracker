@@ -37,6 +37,14 @@ export class DataController {
     return this.ingest.getRange(addDays(end, -n), end);
   }
 
+  /** Exercise sessions for the last N days (from the exercise data type). */
+  @Get('exercise')
+  exercise(@Query('days') days = '35') {
+    const n = Math.min(Math.max(Number(days) || 35, 1), 365);
+    const end = addDays(todayCivil(config.USER_TIMEZONE), 1);
+    return this.ingest.getExerciseSessions(addDays(end, -n), end);
+  }
+
   /** Raw upstream API responses (inspectable JSON). */
   @Get('raw')
   raw(@Query('limit') limit = '50') {

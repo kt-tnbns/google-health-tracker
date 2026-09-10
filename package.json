@@ -4,7 +4,7 @@
   "private": true,
   "description": "Personal Fitbit Air / Google Health API ingestion + daily coaching backend",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && mkdir -p dist/db/migrations && cp src/db/migrations/*.sql dist/db/migrations/ && mkdir -p dist/http/ui && cp src/http/ui/* dist/http/ui/",
+    "build": "tsc -p tsconfig.build.json && mkdir -p dist/db/migrations && cp src/db/migrations/*.sql dist/db/migrations/ && mkdir -p dist/http/ui && cp src/http/ui/* dist/http/ui/ && mkdir -p dist/http/ui/vendor && cp node_modules/chart.js/dist/chart.umd.js dist/http/ui/vendor/chart.umd.js && for w in 400 500 600; do for sub in thai latin; do cp node_modules/@fontsource/ibm-plex-sans-thai/files/ibm-plex-sans-thai-$sub-$w-normal.woff2 dist/http/ui/vendor/; done; done",
     "start": "node dist/main.js",
     "start:dev": "ts-node-dev --respawn --transpile-only src/main.ts",
     "migrate": "ts-node src/db/migrate.ts",
@@ -12,9 +12,11 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@fontsource/ibm-plex-sans-thai": "^5.3.0",
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
+    "chart.js": "^4.5.1",
     "pg": "^8.13.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",

@@ -31,11 +31,18 @@ const I18N = {
     strength: 'บันทึกการยกน้ำหนัก', strengthSub: 'สิ่งที่ HR อย่างเดียวบอกไม่ได้: โหลด, ปริมาณ, ความใกล้ล้า', tonnage: 'ตันเนจ', hardSets: 'เซ็ตจริง', e1rm: 'e1RM (Epley)', addSession: 'เพิ่มเซสชัน', exercise: 'ท่า', reps: 'ครั้ง', load: 'กก.', rpe: 'RPE', addSet: '+ เซ็ต', warmup: 'วอร์ม', week: 'สัปดาห์', noStrength: 'ยังไม่มีบันทึก', deleteSession: 'ลบ',
     bioAge: 'อายุชีวภาพ', bioAgeSub: 'PhenoAge (Levine 2018) จากผลเลือด 9 ค่า · แยกจากอายุความฟิต ไม่รวมกัน', phenoAge: 'PhenoAge', accel: 'เทียบอายุจริง', older: 'แก่กว่า', younger: 'อ่อนกว่า', years: 'ปี', addPanel: 'เพิ่มผลเลือด', drawnOn: 'วันที่เจาะเลือด', noPanel: 'ยังไม่มีผลเลือด — เพิ่มได้ในตั้งค่า', panelNote: 'ค่าจากประชากร NHANES ไม่ใช่การวินิจฉัย ใช้ผลตอนสุขภาพปกติและงดอาหาร', updated: 'อัปเดต',
     energy: 'Energy Bank (ทดลอง)', energySub: 'ต้องพิสูจน์ก่อนว่ามี heart-rate ระหว่างวันพอ (≥ 85% ของนาที)', probe: 'ทดสอบข้อมูลระหว่างวัน', probing: 'กำลังดึง heart-rate ของเมื่อวาน…', coverage: 'ครอบคลุม', samples: 'ตัวอย่าง', verdict_sufficient: 'เพียงพอ — พร้อมทำโมเดลระหว่างวัน', verdict_partial: 'บางส่วน — ยังไม่พอ', verdict_insufficient: 'ไม่พอ — ใช้ดัชนีการฟื้นตัวรายวันแทน',
-    setAccess: 'การเข้าถึง', setGoogle: 'การเชื่อมต่อ Google Health', setPrefs: 'ภาษาและธีม', setProfile: 'โปรไฟล์สำหรับการคำนวณ', setDiag: 'ข้อมูลและการวินิจฉัย', language: 'ภาษา', theme: 'ธีม', themeSystem: 'ตามระบบ', themeDark: 'มืด', themeLight: 'สว่าง', birthYear: 'ปีเกิด', sex: 'เพศ', male: 'ชาย', female: 'หญิง', hrMax: 'HR สูงสุด (ไม่บังคับ)', heightCm: 'ส่วนสูง (ซม.)',
+    setAccess: 'การเข้าถึง', setGoogle: 'การเชื่อมต่อ Google Health', setPrefs: 'ภาษาและธีม', setProfile: 'โปรไฟล์สำหรับการคำนวณ', setDiag: 'บันทึกข้อมูลและการวินิจฉัย', language: 'ภาษา', theme: 'ธีม', themeSystem: 'ตามระบบ', themeDark: 'มืด', themeLight: 'สว่าง', birthYear: 'ปีเกิด', sex: 'เพศ', male: 'ชาย', female: 'หญิง', hrMax: 'HR สูงสุด (ไม่บังคับ)', heightCm: 'ส่วนสูง (ซม.)',
     connected: 'เชื่อมต่อแล้ว', notConnected: 'ยังไม่เชื่อมต่อ', connectedAt: 'เชื่อมเมื่อ', lastRefresh: 'refresh token ล่าสุด', disconnect: 'ยกเลิกการเชื่อมต่อ', devices: 'อุปกรณ์ในบัญชี', scopes: 'สิทธิ์',
     rawData: 'response ดิบจาก Google', coachContext: 'สิ่งที่โค้ชเห็น', model: 'โมเดล', promptVersion: 'เวอร์ชัน prompt', recompute: 'คำนวณคะแนนวันนี้ใหม่', diagNote: 'ข้อมูลทั้งหมดอยู่บนเซิร์ฟเวอร์ของคุณ — โมเดลภาษาได้รับเฉพาะตัวเลขสรุป',
     fetched: 'ดึงเมื่อ', type: 'ชนิด', status: 'สถานะ', items: 'รายการ', range: 'ช่วง', copy: 'คัดลอก', copied: 'คัดลอกแล้ว', wrap: 'ตัดบรรทัด',
     footer: 'ข้อมูลต้นทางและการตั้งค่า', unitAlt: 'สลับหน่วยห้องแล็บ', unitsLevine: 'หน่วยตามโมเดล (g/L, µmol/L, mmol/L, mg/dL)', unitsUS: 'หน่วยทั่วไป (g/dL, mg/dL, mg/dL, mg/L)',
+    askCoachDay: 'ถามโค้ชเรื่องวันนี้', secSleep: 'การนอนคืนนี้', secVitals: 'สัญญาณร่างกาย เทียบกับช่วงปกติของคุณ', secAct: 'กิจกรรมและโหลด', dataLog: 'บันทึกข้อมูลดิบ (สำหรับตรวจสอบว่าข้อมูลไหนมา/ขาด)', openDataLog: 'ดูบันทึกข้อมูลทั้งหมดในตั้งค่า',
+    storySlept: 'คุณหลับรวม', storyMore: 'มากกว่าค่าเฉลี่ย 7 วันก่อนหน้า', storyLess: 'น้อยกว่าค่าเฉลี่ย 7 วันก่อนหน้า', storyBase: 'ยังไม่มีค่าเฉลี่ยให้เทียบ', effGood: 'ดี', effOk: 'พอใช้', effLow: 'ต่ำ', typical: 'ช่วงที่พบบ่อยในผู้ใหญ่', yourRange: 'ช่วงปกติของคุณ', ofSleep: 'ของเวลาหลับ', awakeFor: 'ตื่นกลางดึกรวม',
+    within: 'อยู่ในช่วงปกติ', above: 'สูงกว่าปกติ', below: 'ต่ำกว่าปกติ', needMore: 'ต้องมีข้อมูลอย่างน้อย 3 วันก่อนเทียบ',
+    hint_hrv_above: 'HRV สูงกว่าช่วงของคุณ — มักสัมพันธ์กับการฟื้นตัวที่ดี', hint_hrv_below: 'HRV ต่ำกว่าช่วงของคุณ — มักพบหลังวันหนัก นอนน้อย ดื่ม หรือเริ่มไม่สบาย',
+    hint_rhr_above: 'ชีพจรขณะพักสูงกว่าปกติ — มักพบหลังดื่ม นอนน้อย เครียด หรือร่างกายกำลังสู้กับอะไรบางอย่าง', hint_rhr_below: 'ชีพจรขณะพักต่ำกว่าปกติ — มักสัมพันธ์กับการพักผ่อนที่ดี',
+    hint_spo2_below: 'SpO₂ ต่ำกว่าช่วงของคุณ — คืนเดียวบอกอะไรไม่ได้มาก ถ้าต่ำต่อเนื่องหลายคืนค่อยสังเกต', hint_rr_above: 'อัตราหายใจสูงกว่าปกติ — มักพบเมื่อเริ่มไม่สบาย เครียด หรือนอนในห้องร้อน',
+    exerciseMin: 'นาทีออกกำลัง', zoneFat: 'Fat burn', zoneCardio: 'Cardio', zonePeak: 'Peak', noSessions: 'ไม่มีเซสชันออกกำลังที่บันทึกวันนี้', avgHr: 'HR เฉลี่ย', loadDay: 'โหลดของวัน', noActivity: 'ยังไม่มีข้อมูลกิจกรรมของวันนี้',
     err_generic: 'เกิดข้อผิดพลาด', partialFetch: 'บางชนิดข้อมูลดึงไม่สำเร็จ',
   },
   en: {
@@ -65,11 +72,18 @@ const I18N = {
     strength: 'Strength log', strengthSub: 'What HR alone can\'t show: load, volume, proximity to failure', tonnage: 'Tonnage', hardSets: 'Hard sets', e1rm: 'e1RM (Epley)', addSession: 'Add session', exercise: 'Exercise', reps: 'Reps', load: 'kg', rpe: 'RPE', addSet: '+ set', warmup: 'warm-up', week: 'Week', noStrength: 'No sessions yet', deleteSession: 'Delete',
     bioAge: 'Biological age', bioAgeSub: 'PhenoAge (Levine 2018) from a 9-marker blood panel · shown apart from fitness age, never blended', phenoAge: 'PhenoAge', accel: 'vs chronological', older: 'older', younger: 'younger', years: 'years', addPanel: 'Add blood panel', drawnOn: 'Drawn on', noPanel: 'No blood panel yet — add one in Settings', panelNote: 'Population-derived (NHANES), not a diagnosis. Use a fasting panel taken while well.', updated: 'updated',
     energy: 'Energy Bank (experimental)', energySub: 'First prove intraday heart-rate coverage is sufficient (≥ 85% of minutes)', probe: 'Test intraday data', probing: 'Fetching yesterday\'s heart-rate samples…', coverage: 'coverage', samples: 'samples', verdict_sufficient: 'Sufficient — ready for an intraday model', verdict_partial: 'Partial — not enough yet', verdict_insufficient: 'Insufficient — use the daily recovery index instead',
-    setAccess: 'Access', setGoogle: 'Google Health connection', setPrefs: 'Language & theme', setProfile: 'Profile for calculations', setDiag: 'Data & diagnostics', language: 'Language', theme: 'Theme', themeSystem: 'System', themeDark: 'Dark', themeLight: 'Light', birthYear: 'Birth year', sex: 'Sex', male: 'Male', female: 'Female', hrMax: 'Max HR (optional)', heightCm: 'Height (cm)',
+    setAccess: 'Access', setGoogle: 'Google Health connection', setPrefs: 'Language & theme', setProfile: 'Profile for calculations', setDiag: 'Data log & diagnostics', language: 'Language', theme: 'Theme', themeSystem: 'System', themeDark: 'Dark', themeLight: 'Light', birthYear: 'Birth year', sex: 'Sex', male: 'Male', female: 'Female', hrMax: 'Max HR (optional)', heightCm: 'Height (cm)',
     connected: 'Connected', notConnected: 'Not connected', connectedAt: 'connected', lastRefresh: 'last token refresh', disconnect: 'Disconnect', devices: 'Devices on account', scopes: 'Scopes',
     rawData: 'Raw Google responses', coachContext: 'What the coach sees', model: 'Model', promptVersion: 'Prompt version', recompute: 'Recompute today\'s scores', diagNote: 'All data stays on your server — the language model only receives summary numbers',
     fetched: 'Fetched', type: 'Type', status: 'Status', items: 'Items', range: 'Range', copy: 'Copy', copied: 'Copied', wrap: 'Wrap',
     footer: 'Source data & settings', unitAlt: 'Switch lab units', unitsLevine: 'Model units (g/L, µmol/L, mmol/L, mg/dL)', unitsUS: 'Common units (g/dL, mg/dL, mg/dL, mg/L)',
+    askCoachDay: 'Ask the coach about this day', secSleep: 'This night\'s sleep', secVitals: 'Vitals against your own usual range', secAct: 'Activity & load', dataLog: 'Raw data log (to check what arrived / what is missing)', openDataLog: 'Open the full data log in Settings',
+    storySlept: 'You slept', storyMore: 'more than your 7-day mean', storyLess: 'less than your 7-day mean', storyBase: 'no baseline to compare yet', effGood: 'good', effOk: 'fair', effLow: 'low', typical: 'common adult range', yourRange: 'your usual range', ofSleep: 'of sleep', awakeFor: 'awake during the night',
+    within: 'within your range', above: 'above usual', below: 'below usual', needMore: 'Needs at least 3 days of data to compare',
+    hint_hrv_above: 'HRV above your range — often goes with good recovery', hint_hrv_below: 'HRV below your range — common after hard days, short sleep, alcohol, or when getting ill',
+    hint_rhr_above: 'Resting HR above usual — common after alcohol, short sleep, stress, or when the body is fighting something', hint_rhr_below: 'Resting HR below usual — often goes with good rest',
+    hint_spo2_below: 'SpO₂ below your range — one night says little; watch it only if it stays low for several nights', hint_rr_above: 'Breathing rate above usual — common when getting ill, stressed, or sleeping in a warm room',
+    exerciseMin: 'Exercise minutes', zoneFat: 'Fat burn', zoneCardio: 'Cardio', zonePeak: 'Peak', noSessions: 'No recorded workout this day', avgHr: 'Avg HR', loadDay: 'Load this day', noActivity: 'No activity data for this day yet',
     err_generic: 'Something went wrong', partialFetch: 'Some data types failed to fetch',
   },
 };
@@ -79,7 +93,7 @@ const S = {
   token: '', lang: 'th', theme: 'system', view: 'today',
   status: null, rows: [], byDay: {}, days: [], scores: null, coachInfo: null, coachHist: [], journalToday: null,
   sleepRange: 7, selectedDay: null, loading: {}, err: {}, lastFetch: null, demo: false, raw: [], ctx: null,
-  insights: null, fitness: null, strength: null, strengthWeekly: null, bio: null, profile: null, coachOpen: false,
+  exercise: [], insights: null, fitness: null, strength: null, strengthWeekly: null, bio: null, profile: null, coachOpen: false,
 };
 try { S.token = sessionStorage.getItem('adminToken') || ''; } catch {}
 try { S.lang = localStorage.getItem('lang') || (navigator.language.startsWith('th') ? 'th' : 'en'); S.theme = localStorage.getItem('theme') || 'system'; } catch {}
@@ -152,89 +166,92 @@ function sparkline(days, m, color) {
   return `<div class="spark" aria-hidden="true"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>${dot(last[0], last[1])}</div>`;
 }
 
-/** Generic line chart: series = [{key,label,color,values:[{day,v}]}], with grid, y labels, crosshair tooltip. */
-function lineChart(el, series, opts = {}) {
-  const svg = el.querySelector('svg'), tip = el.querySelector('.tip');
-  const W = Math.max(320, svg.clientWidth || 640), H = svg.clientHeight || 176, L = 40, R = 12, T = 12, B = 26;
-  const days = series[0].values.map((p) => p.day);
-  const all = series.flatMap((s) => s.values.map((p) => p.v)).filter((v) => v !== null);
-  if (!all.length) { svg.innerHTML = ''; return; }
-  const lo = opts.min ?? Math.min(...all), hi = opts.max ?? Math.max(...all), span = hi - lo || 1;
-  const yPad = opts.min !== undefined || opts.max !== undefined ? 0 : span * 0.1;
-  const fmtY = opts.fmt || ((v) => (span < 10 ? v.toFixed(1) : Math.round(v)));
-  const x = (i) => L + (i / Math.max(1, days.length - 1)) * (W - L - R), y = (v) => T + (H - T - B) * (1 - (v - (lo - yPad)) / (span + 2 * yPad));
-  let out = '';
-  const ticks = 4;
-  for (let k = 0; k <= ticks; k++) { const v = lo - yPad + ((span + 2 * yPad) * k) / ticks; out += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text x="${L - 8}" y="${y(v) + 4}" font-size="11" fill="var(--muted)" text-anchor="end">${fmtY(v)}</text>`; }
-  if (opts.bands) for (const b of opts.bands) out += `<rect x="${L}" y="${y(b[1])}" width="${W - L - R}" height="${Math.max(0, y(b[0]) - y(b[1]))}" fill="${b[2]}" opacity=".18"/>`;
-  for (const s of series) {
-    let d = '', prev = false;
-    s.values.forEach((p, i) => { if (p.v === null) { prev = false; return; } d += `${prev ? 'L' : 'M'}${x(i).toFixed(1)},${y(p.v).toFixed(1)}`; prev = true; });
-    out += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"${s.dash ? ' stroke-dasharray="4 4"' : ''}/>`;
-    if (s.dots) s.values.forEach((p, i) => { if (p.v !== null) out += `<circle cx="${x(i)}" cy="${y(p.v)}" r="3.5" fill="${s.color}" stroke="var(--surface)" stroke-width="2"/>`; });
-  }
-  const step = Math.ceil(days.length / 7);
-  days.forEach((d, i) => { if (i % step === 0 || i === days.length - 1) out += `<text x="${x(i)}" y="${H - 8}" font-size="11" fill="var(--muted)" text-anchor="middle">${+d.slice(8)}/${+d.slice(5, 7)}</text>`; });
-  out += `<line id="xh" x1="0" x2="0" y1="${T}" y2="${H - B}" stroke="var(--baseline)" opacity="0"/>`;
-  days.forEach((d, i) => { const w = (W - L - R) / days.length; out += `<rect x="${L + w * i}" y="${T}" width="${w}" height="${H - T - B}" fill="transparent" data-i="${i}"/>`; });
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.innerHTML = out;
-  const show = (i) => {
-    const xh = svg.querySelector('#xh'); xh.setAttribute('x1', x(i)); xh.setAttribute('x2', x(i)); xh.setAttribute('opacity', '1');
-    tip.innerHTML = `<b>${esc(dateS(days[i]))}</b>` + series.map((s) => `<div class="r"><span><i style="background:${s.color}"></i>${esc(s.label)}</span><span>${s.values[i].v === null ? t('noData') : (opts.fmt ? opts.fmt(s.values[i].v) : num(s.values[i].v, 1)) + (s.unit ? ' ' + s.unit : '')}</span></div>`).join('');
-    const sr = svg.getBoundingClientRect(), er = el.getBoundingClientRect();
-    const px = sr.left - er.left + (x(i) / W) * sr.width, right = i < days.length / 2;
-    tip.style.transform = right ? 'translate(14px,-50%)' : 'translate(calc(-100% - 14px),-50%)';
-    tip.style.left = `${px}px`; tip.style.top = `${sr.top - er.top + sr.height / 2}px`; tip.style.opacity = 1;
+/* ================= Chart.js wrappers (theme-aware) ================= */
+const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const col = (c) => (c && c.startsWith('var(') ? cssVar(c.slice(4, -1)) : c);
+const alpha = (hex, a) => { const h = col(hex).replace('#', ''); if (h.length !== 6) return col(hex); const n = parseInt(h, 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };
+const dayLabel = (d) => `${+d.slice(8)}/${+d.slice(5, 7)}`;
+function chartBase() {
+  const C = window.Chart; if (!C) return null;
+  C.defaults.font.family = '"IBM Plex Sans Thai", "Thonburi", sans-serif'; C.defaults.font.size = 11; C.defaults.color = col('var(--muted)');
+  return {
+    responsive: true, maintainAspectRatio: false, animation: { duration: 500, easing: 'easeOutQuart' },
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: { backgroundColor: col('var(--overlay)'), borderColor: col('var(--border)'), borderWidth: 1, titleColor: col('var(--text)'), bodyColor: col('var(--text-2)'), footerColor: col('var(--text)'), padding: 10, cornerRadius: 12, boxPadding: 4, usePointStyle: true, titleFont: { weight: '600', size: 12 }, bodyFont: { size: 12 } },
+    },
+    scales: {
+      x: { grid: { display: false }, border: { display: false }, ticks: { color: col('var(--muted)'), maxRotation: 0, autoSkipPadding: 12 } },
+      y: { grid: { color: col('var(--grid)') }, border: { display: false, dash: [3, 4] }, ticks: { color: col('var(--muted)'), padding: 6, maxTicksLimit: 5 } },
+    },
   };
-  svg.onmousemove = (ev) => { const i = ev.target.dataset.i; if (i === undefined) return; show(+i); };
-  svg.onmouseleave = () => { tip.style.opacity = 0; svg.querySelector('#xh')?.setAttribute('opacity', '0'); };
-  svg.onclick = (ev) => { const i = ev.target.dataset.i; if (i !== undefined && opts.onSelect) opts.onSelect(days[+i]); };
+}
+function mkChart(box, cfg) {
+  const cv = box.querySelector('canvas'); if (!cv || !window.Chart) return null;
+  if (cv._chart) cv._chart.destroy();
+  cv._chart = new window.Chart(cv, cfg); return cv._chart;
+}
+const gradientFill = (color, top = 0.28) => (ctx) => {
+  const { chart } = ctx; const { ctx: g, chartArea: a } = chart; if (!a) return alpha(color, top);
+  const gr = g.createLinearGradient(0, a.top, 0, a.bottom); gr.addColorStop(0, alpha(color, top)); gr.addColorStop(1, alpha(color, 0)); return gr;
+};
+/** bands: [[lo, hi, color]] drawn behind the data as soft tints */
+const bandsPlugin = { id: 'bands', beforeDatasetsDraw(chart, _a, o) { if (!o?.bands?.length) return; const { ctx, chartArea: a, scales: { y } } = chart; ctx.save(); for (const [lo, hi, c] of o.bands) { ctx.fillStyle = alpha(c, 0.06); const y1 = y.getPixelForValue(hi), y2 = y.getPixelForValue(lo); ctx.fillRect(a.left, y1, a.right - a.left, y2 - y1); } ctx.restore(); } };
+
+/** Vertical crosshair at the hovered index (line charts). */
+const crosshairPlugin = { id: 'crosshair', afterDatasetsDraw(chart) { const act = chart.tooltip?.getActiveElements?.() || []; if (!act.length) return; const { ctx, chartArea: a } = chart; const x = act[0].element.x; ctx.save(); ctx.strokeStyle = alpha('var(--baseline)', 0.6); ctx.setLineDash([3, 4]); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, a.top); ctx.lineTo(x, a.bottom); ctx.stroke(); ctx.restore(); } };
+
+/** Line chart: series = [{label,color,values:[{day,v}],dots,dash,unit,fill}], opts {min,max,fmt,bands,onSelect} */
+function lineChart(el, series, opts = {}) {
+  const base = chartBase(); const box = el.querySelector('.chart-plot'); if (!base || !box) return;
+  const days = series[0].values.map((p) => p.day);
+  const fmt = opts.fmt || ((v) => num(v, 1));
+  const datasets = series.map((s, i) => ({
+    label: s.label, data: s.values.map((p) => p.v), borderColor: col(s.color), borderWidth: 2, tension: 0.35, spanGaps: false,
+    pointRadius: s.dots ? 3 : 0, pointHoverRadius: 5, pointBackgroundColor: col(s.color), pointBorderColor: col('var(--surface)'), pointBorderWidth: 2,
+    borderDash: s.dash ? [5, 5] : undefined, fill: (s.fill ?? i === 0) ? 'origin' : false, backgroundColor: gradientFill(s.color),
+  }));
+  mkChart(box, { type: 'line', data: { labels: days.map(dayLabel), datasets }, plugins: [bandsPlugin, crosshairPlugin], options: {
+    ...base, plugins: { ...base.plugins, bands: { bands: opts.bands || [] }, tooltip: { ...base.plugins.tooltip, callbacks: { title: (it) => dateS(days[it[0].dataIndex]), label: (it) => ` ${it.dataset.label}: ${it.raw === null ? t('noData') : fmt(it.raw) + (series[it.datasetIndex].unit ? ' ' + series[it.datasetIndex].unit : '')}` } } },
+    scales: { ...base.scales, y: { ...base.scales.y, min: opts.min, max: opts.max, ticks: { ...base.scales.y.ticks, callback: (v) => fmt(v) } } },
+    onClick: (e, els, chart) => { if (!opts.onSelect) return; const pts = chart.getElementsAtEventForMode(e, 'index', { intersect: false }, false); if (pts.length) opts.onSelect(days[pts[0].index]); },
+  } });
 }
 
+/** Stacked sleep bars: el = .scrollx wrapper containing .chart-plot > canvas. Clicking a bar selects that day. */
 function sleepBars(el, days) {
-  const svg = el.querySelector('svg'), tip = el.querySelector('.tip');
-  const W = Math.max(days.length * 44, svg.clientWidth || 640), H = svg.clientHeight || 176, L = 48, R = 8, T = 10, B = 26;
+  const base = chartBase(); const box = el.querySelector('.chart-plot'); if (!base || !box) return;
+  box.style.width = `${Math.max(days.length * 44 + 56, el.clientWidth)}px`;
   const stages = [['sleep_deep_minutes', 'var(--deep)', t('deep')], ['sleep_rem_minutes', 'var(--rem)', t('rem')], ['sleep_light_minutes', 'var(--light)', t('light')], ['sleep_minutes_awake', 'var(--awake)', t('awake')]];
   const asleep = days.map((d) => val(d, 'sleep_minutes_asleep'));
-  const totals = days.map((d) => stages.reduce((a, [m]) => a + (val(d, m) ?? 0), 0));
+  const hasStages = days.map((d) => stages.slice(0, 3).some(([m]) => (val(d, m) ?? 0) > 0));
+  const selIdx = days.indexOf(S.selectedDay);
+  const paint = (c) => (ctx) => (selIdx >= 0 && ctx.dataIndex !== selIdx ? alpha(c, 0.35) : col(c));
+  const datasets = stages.map(([m, c, lab]) => ({ label: lab, data: days.map((d, i) => (hasStages[i] ? val(d, m) : m === 'sleep_rem_minutes' ? asleep[i] : null)), backgroundColor: paint(c), hoverBackgroundColor: col(c), borderRadius: 4, borderSkipped: false, maxBarThickness: 34, categoryPercentage: 0.72, barPercentage: 1 }));
+  const totals = days.map((_, i) => stages.reduce((a, [m]) => a + (val(days[i], m) ?? 0), 0));
   const yMax = Math.ceil(Math.max(480, ...totals, ...asleep.map((x) => x ?? 0)) / 120) * 120;
-  const slot = (W - L - R) / days.length, bw = Math.min(24, slot - 8);
-  const y = (v) => T + (H - T - B) * (1 - v / yMax);
-  let out = '';
-  for (let v = 0; v <= yMax; v += 120) out += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text x="${L - 8}" y="${y(v) + 4}" font-size="11" fill="var(--muted)" text-anchor="end">${v / 60}${t('hrs')}</text>`;
-  days.forEach((d, i) => {
-    const cx = L + slot * (i + 0.5), x0 = cx - bw / 2;
-    let acc = 0; const segs = stages.map(([m, c, lab]) => [val(d, m), c, lab]).filter((s) => s[0] !== null && s[0] > 0);
-    if (!segs.length && asleep[i] !== null) segs.push([asleep[i], 'var(--rem)', t('asleepTotal')]);
-    segs.forEach(([v, c], k) => {
-      const yTop = y(acc + v), yBot = y(acc) - (k > 0 ? 2 : 0), r = k === segs.length - 1 ? 3 : 0;
-      out += `<path d="M${x0},${yBot} V${yTop + r} q0,-${r} ${r},-${r} H${x0 + bw - r} q${r},0 ${r},${r} V${yBot} Z" fill="${c}"/>`; acc += v;
-    });
-    if (S.selectedDay === d) out += `<rect x="${x0 - 4}" y="${T}" width="${bw + 8}" height="${H - T - B}" rx="6" fill="none" stroke="var(--accent-ink)" stroke-dasharray="3 3"/>`;
-    out += `<rect x="${L + slot * i}" y="${T}" width="${slot}" height="${H - T - B}" fill="transparent" data-i="${i}" style="cursor:pointer" tabindex="0" role="button" aria-label="${esc(dateS(d))}"/>`;
-    if (slot > 30 || i % 2 === 0) out += `<text x="${cx}" y="${H - 8}" font-size="11" fill="var(--muted)" text-anchor="middle">${+d.slice(8)}/${+d.slice(5, 7)}</text>`;
-  });
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.style.width = `${W}px`; svg.innerHTML = out;
-  const show = (i) => {
-    const d = days[i]; const rows = stages.map(([m, c, lab]) => [val(d, m), c, lab]).filter((s) => s[0] !== null);
-    tip.innerHTML = `<b>${esc(dateS(d))}</b>` + (asleep[i] === null ? `<div class="r"><span>${t('noDay')}</span></div>` : `<div class="r"><span>${t('asleepTotal')}</span><span>${hm(asleep[i])}</span></div>` + rows.map(([v, c, lab]) => `<div class="r"><span><i style="background:${c}"></i>${lab}</span><span>${num(v)} ${t('minutes')}</span></div>`).join('') + (rows.length ? `<div class="r"><span>${t('recorded')}</span><span>${hm(totals[i])}</span></div>` : ''));
-    const sr = svg.getBoundingClientRect(), er = el.getBoundingClientRect(), right = i < days.length / 2;
-    tip.style.transform = right ? 'translate(14px,-50%)' : 'translate(calc(-100% - 14px),-50%)';
-    tip.style.left = `${el.scrollLeft + sr.left - er.left + ((L + slot * (i + 0.5)) / W) * sr.width}px`; tip.style.top = `${sr.top - er.top + sr.height / 2}px`; tip.style.opacity = 1;
-  };
-  svg.onmousemove = (ev) => { const i = ev.target.dataset.i; if (i !== undefined) show(+i); };
-  svg.onmouseleave = () => { tip.style.opacity = 0; };
-  const pick = (ev) => { const i = ev.target.dataset.i; if (i !== undefined) { S.selectedDay = days[+i]; renderToday(); } };
-  svg.onclick = pick; svg.onkeydown = (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); pick(ev); } };
+  mkChart(box, { type: 'bar', data: { labels: days.map(dayLabel), datasets }, options: {
+    ...base, interaction: { mode: 'index', intersect: false },
+    plugins: { ...base.plugins, tooltip: { ...base.plugins.tooltip, filter: (it) => it.raw !== null && it.raw > 0, callbacks: {
+      title: (it) => dateS(days[it[0].dataIndex]),
+      label: (it) => ` ${it.dataset.label}: ${num(it.raw)} ${t('minutes')}`,
+      footer: (it) => { const i = it[0]?.dataIndex; return i === undefined || asleep[i] === null ? t('noDay') : `${t('asleepTotal')} ${hm(asleep[i])}`; },
+    } } },
+    scales: { x: { ...base.scales.x, stacked: true }, y: { ...base.scales.y, stacked: true, min: 0, max: yMax, ticks: { ...base.scales.y.ticks, stepSize: 120, callback: (v) => `${v / 60}${t('hrs')}` } } },
+    onClick: (e, _els, chart) => { const pts = chart.getElementsAtEventForMode(e, 'index', { intersect: false }, false); if (pts.length) { S.selectedDay = days[pts[0].index]; renderToday(); } },
+    onHover: (e, els) => { e.native.target.style.cursor = els.length ? 'pointer' : 'default'; },
+  } });
 }
 
 /* ================= data loading ================= */
 async function loadCore() {
   S.status = await api('/auth/google/status').catch((e) => { if (e.status === 401) throw e; return null; });
-  const [rows, scores, info, hist, raw] = await Promise.all([
+  const [rows, scores, info, hist, raw, ex] = await Promise.all([
     api('/api/days?days=35').catch(() => []), api('/api/scores?days=35').catch(() => null), api('/api/coach/info').catch(() => null),
-    api('/api/coach/messages').catch(() => []), api('/api/raw?limit=5').catch(() => []),
+    api('/api/coach/messages').catch(() => []), api('/api/raw?limit=5').catch(() => []), api('/api/exercise?days=35').catch(() => []),
   ]);
+  S.exercise = Array.isArray(ex) ? ex : [];
   S.rows = rows; S.byDay = {}; for (const r of rows) (S.byDay[r.day.slice(0, 10)] ||= {})[r.metric] = r;
   S.days = Object.keys(S.byDay).sort(); S.scores = scores; S.coachInfo = info; S.coachHist = hist; S.raw = raw;
   S.lastFetch = raw[0]?.fetched_at ?? null;
@@ -328,7 +345,7 @@ function recoveryBlock() {
       <div>
         <div class="row between" style="margin-bottom:8px"><span class="badge ${r.band === 'ready' ? 'ok' : r.band === 'recover' ? 'warn' : ''}">${t('rec_' + r.band)}</span><span class="meta">${t('confidence')} ${Math.round(r.confidence * 100)}% · ${t('rec_' + r.status)}</span></div>
         <div class="scale"><span class="seg a"></span><span class="seg b"></span><i style="left:${pct}%"></i></div>
-        <div class="small t2" style="margin-top:10px">${r.reasons.length ? esc(r.reasons.join(' · ')) : t('recoverySub')}</div>
+        <div class="small t2" style="margin-top:10px">${r.reasons?.length ? esc(r.reasons.join(' · ')) : t('recoverySub')}</div>
       </div>
     </div>
   </section>`;
@@ -398,7 +415,7 @@ function sleepHistory() {
     <div class="section-head"><div><h2>${t('sleepTrend')}</h2><div class="small t2">${t('sleepTrendSub')}</div></div>
       <div class="seg-ctl" role="tablist">${[7, 14, 30].map((n) => `<button role="tab" aria-selected="${S.sleepRange === n}" class="${S.sleepRange === n ? 'on' : ''}" data-range="${n}">${n} ${t('days')}</button>`).join('')}</div></div>
     <div class="legend-inline"><span><i style="background:var(--deep)"></i>${t('deep')}</span><span><i style="background:var(--rem)"></i>${t('rem')}</span><span><i style="background:var(--light)"></i>${t('light')}</span><span><i style="background:var(--awake)"></i>${t('awake')}</span></div>
-    ${empty ? `<div class="empty" style="margin-top:12px">${t('noSleep')}</div>` : `<div class="chart scrollx" id="sleepChart"><svg class="chart-plot" role="img" aria-label="${t('sleepTrend')}"></svg><div class="tip"></div></div>${S.sleepRange > 7 ? `<div class="meta" style="margin-top:4px">${t('scrollHint')}</div>` : ''}${dsel}`}
+    ${empty ? `<div class="empty" style="margin-top:12px">${t('noSleep')}</div>` : `<div class="chart scrollx" id="sleepChart"><div class="chart-plot"><canvas role="img" aria-label="${t('sleepTrend')}"></canvas></div></div>${S.sleepRange > 7 ? `<div class="meta" style="margin-top:4px">${t('scrollHint')}</div>` : ''}${dsel}`}
   </section>`;
 }
 
@@ -473,18 +490,86 @@ async function refreshData() {
 }
 
 /* ================= day detail drawer ================= */
+/* ================= day detail (human-readable) ================= */
+const BASE_FLOOR = { hrv_avg_ms: 3, rhr_bpm: 2, spo2_avg_pct: 0.7, respiratory_rate_bpm: 0.5 };
+function personalBand(day, m) {
+  const xs = S.days.filter((x) => x < day).slice(-14).map((x) => val(x, m)).filter((x) => x !== null);
+  if (xs.length < MIN_BASE) return { n: xs.length };
+  const mu = mean(xs), sd = Math.sqrt(xs.reduce((a, x) => a + (x - mu) ** 2, 0) / xs.length), w = Math.max(sd, BASE_FLOOR[m] ?? 1);
+  return { n: xs.length, mu, lo: mu - w, hi: mu + w };
+}
+/** Range bar: band [lo,hi] tinted, marker at v; scale is padded around both. */
+function rangeBar(v, lo, hi, fmt, opts = {}) {
+  const pad = Math.max((hi - lo) * 0.6, opts.minPad ?? 0.5);
+  const a = Math.min(lo, v) - pad, b = Math.max(hi, v) + pad, pct = (x) => (((x - a) / (b - a)) * 100).toFixed(1);
+  return `<div class="range"><span class="band" style="left:${pct(lo)}%;width:${(((hi - lo) / (b - a)) * 100).toFixed(1)}%"></span><i class="mk" style="left:${pct(v)}%"></i><span class="lab" style="left:${pct(lo)}%">${fmt(lo)}</span><span class="lab" style="left:${pct(hi)}%">${fmt(hi)}</span></div>`;
+}
+function vitalRow(def, day) {
+  const v = val(day, def.m); if (v === null) return '';
+  const b = personalBand(day, def.m); const f = (x) => num(x, def.dec);
+  let status = '', chip = `<span class="badge">${t('collecting')} (${b.n}/${MIN_BASE})</span>`, bar = `<div class="range"><i class="mk" style="left:50%"></i></div>`, hint = t('needMore');
+  if (b.lo !== undefined) {
+    status = v > b.hi ? 'above' : v < b.lo ? 'below' : 'within';
+    chip = `<span class="badge ${status === 'within' ? 'ok' : 'warn'}">${t(status)}</span>`;
+    bar = rangeBar(v, b.lo, b.hi, f, { minPad: BASE_FLOOR[def.m] });
+    hint = status === 'within' ? `${t('yourRange')} ${f(b.lo)}–${f(b.hi)} ${def.unit}` : (I18N[S.lang][`hint_${def.k}_${status}`] || `${t('yourRange')} ${f(b.lo)}–${f(b.hi)} ${def.unit}`);
+  }
+  return `<div class="vrow" style="--mc:${def.c}"><span class="nm">${t(def.k)}</span><span class="vv">${f(v)}<small>${def.unit}</small></span>${bar}<span class="st">${chip}</span><span class="hint">${hint}</span></div>`;
+}
+const STAGE_TYPICAL = { deep: [13, 23], rem: [20, 25], light: [45, 60] };   // % of time asleep, common adult ranges (approximate)
+function sleepStory(day) {
+  const asleep = val(day, 'sleep_minutes_asleep'); if (asleep === null) return `<div class="empty">${t('noDay')}</div>`;
+  const row = S.byDay[day].sleep_minutes_asleep, eff = val(day, 'sleep_efficiency_pct'), awake = val(day, 'sleep_minutes_awake');
+  const deep = val(day, 'sleep_deep_minutes'), rem = val(day, 'sleep_rem_minutes'), light = val(day, 'sleep_light_minutes');
+  const b = base7(day, 'sleep_minutes_asleep'), delta = b === null ? null : asleep - b;
+  const effWord = eff === null ? '' : eff >= 90 ? t('effGood') : eff >= 85 ? t('effOk') : t('effLow');
+  const effCls = eff === null ? '' : eff >= 90 ? 'ok' : eff >= 85 ? '' : 'warn';
+  const stagesTot = [deep, rem, light].filter((x) => x !== null).reduce((a, x) => a + x, 0);
+  const stageRow = (k, v, c) => { if (v === null || !stagesTot) return ''; const pct = (v / stagesTot) * 100, [lo, hi] = STAGE_TYPICAL[k]; const st = pct < lo ? 'below' : pct > hi ? 'above' : 'within';
+    return `<div class="vrow" style="--mc:${c}"><span class="nm">${t(k)}</span><span class="vv">${num(v)}<small>${t('minutes')} · ${pct.toFixed(0)}%</small></span>${rangeBar(pct, lo, hi, (x) => `${Math.round(x)}%`, { minPad: 5 })}<span class="st"><span class="badge ${st === 'within' ? 'ok' : ''}">${t(st)}</span></span><span class="hint">${t('typical')} ${lo}–${hi}% ${t('ofSleep')}</span></div>`; };
+  return `
+    <div class="hero-val" style="font-size:40px;line-height:48px;margin:0">${Math.floor(asleep / 60)}<small>${t('hrs')}</small>${Math.round(asleep % 60)}<small>${t('min')}</small></div>
+    <div class="story">${t('storySlept')} <b>${hm(asleep)}</b> · ${clock(row?.measured_start)} → ${clock(row?.measured_end)}<br>
+      ${delta === null ? t('storyBase') : `<b>${hm(Math.abs(delta))}</b> ${delta >= 0 ? t('storyMore') : t('storyLess')}`}${eff !== null ? ` · ${t('efficiency')} <b>${eff.toFixed(0)}%</b> <span class="badge ${effCls}">${effWord}</span>` : ''}${awake !== null ? ` · ${t('awakeFor')} <b>${num(awake)} ${t('minutes')}</b>` : ''}${row?.status === 'partial' ? ` · ${t('multiSession')}` : ''}</div>
+    ${stagesTot ? `<div class="stage-bar" style="margin:4px 0 0">${[[deep, 'var(--deep)'], [rem, 'var(--rem)'], [light, 'var(--light)'], [awake, 'var(--awake)']].map(([v, c]) => (v ? `<span style="width:${((v / (stagesTot + (awake || 0))) * 100).toFixed(1)}%;background:${c}"></span>` : '')).join('')}</div>
+    ${stageRow('deep', deep, 'var(--deep)')}${stageRow('rem', rem, 'var(--rem)')}${stageRow('light', light, 'var(--light)')}` : `<div class="small muted">${t('noStages')}</div>`}`;
+}
+function activityStory(day) {
+  const steps = val(day, 'steps'), azm = val(day, 'active_zone_minutes'), exm = val(day, 'exercise_minutes');
+  const zones = [['zoneFat', val(day, 'azm_fat_burn_min'), 'var(--c-yellow)'], ['zoneCardio', val(day, 'azm_cardio_min'), 'var(--c-orange)'], ['zonePeak', val(day, 'azm_peak_min'), 'var(--c-red)']].filter((z) => z[1] !== null && z[1] > 0);
+  const zTot = zones.reduce((a, z) => a + z[1], 0);
+  const sess = S.exercise.filter((e) => String(e.day).slice(0, 10) === day);
+  const l = (S.scores?.load || []).find((x) => x.day === day);
+  if (steps === null && azm === null && !sess.length && !l) return `<div class="empty">${t('noActivity')}</div>`;
+  return `
+    <div class="kpi3"><div><b style="color:var(--c-yellow)">${steps === null ? '—' : num(steps)}</b><span>${t('steps')}</span></div><div><b style="color:var(--c-orange)">${azm === null ? '—' : num(azm)}</b><span>${t('azm')}</span></div><div><b style="color:var(--c-teal)">${exm === null ? (sess.length ? num(sess.reduce((a, e) => a + (+e.active_min || 0), 0)) : '—') : num(exm)}</b><span>${t('exerciseMin')}</span></div></div>
+    ${zTot ? `<div class="zones">${zones.map((z) => `<span style="width:${((z[1] / zTot) * 100).toFixed(1)}%;background:${z[2]}"></span>`).join('')}</div><div class="legend-inline" style="margin-top:6px">${zones.map((z) => `<span><i style="background:${z[2]}"></i>${t(z[0])} ${num(z[1])} ${t('minutes')}</span>`).join('')}</div>` : ''}
+    ${sess.length ? sess.map((e) => `<div class="sess"><span class="ic">${ICO.pulse}</span><b>${esc(e.display_name || e.exercise_type || '—')}</b><span class="meta">${clock(e.started_at)} · ${e.active_min ?? '—'} ${t('minutes')}${e.avg_hr ? ` · ${t('avgHr')} ${e.avg_hr}` : ''}${e.azm ? ` · ${e.azm} AZM` : ''}</span></div>`).join('') : `<div class="small muted">${t('noSessions')}</div>`}
+    ${l ? `<div class="vrow" style="--mc:var(--c-purple)"><span class="nm">${t('loadDay')}</span><span class="vv">${l.load === null ? '—' : num(l.load)}<small>${esc(l.source || '')}</small></span><div class="small t2" style="grid-column:2">${t('acute')} ${num(l.acute, 1) ?? '—'} · ${t('chronic')} ${num(l.chronic, 1) ?? '—'}</div><span class="st">${l.acwr !== null ? `<span class="badge ${l.acwrBand === 'spike' ? 'warn' : ''}">${t('band_' + l.acwrBand)} · ${l.acwr}</span>` : `<span class="badge">${t('needs28')}</span>`}</span></div>` : ''}`;
+}
 async function openDay(day) {
-  const d = await api(`/api/days/${day}`).catch((e) => ({ error: e.message, metrics: [], missing: [] }));
   const dr = $('#drawer');
-  dr.innerHTML = `<div class="head"><button class="icon-btn ghost" id="drClose" aria-label="${t('close')}">${ICO.back}</button><div class="grow"><b>${t('dayDetail')}</b><span class="meta">${dateS(day, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span></div></div>
-    <div class="msgs" style="gap:12px">
-      <div class="small">${d.missing?.length ? `${t('missing')} ${d.missing.length}: <span class="t2">${esc(d.missing.join(', '))}</span>` : `<span class="badge ok">${ICO.check}${t('all')}</span>`}</div>
-      <div class="tbl"><table><thead><tr><th>metric</th><th class="num">value</th><th>${t('status')}</th><th>${t('measured')}</th><th>${t('sourceData')}</th></tr></thead><tbody>
-      ${(d.metrics || []).map((m) => `<tr><td>${esc(m.metric)}</td><td class="num">${m.unit === 'iso8601' ? esc(dt(m.details?.iso)) : m.status === 'missing' || m.value === null ? '—' : `${num(m.value, 1)} <span class="muted">${esc(m.unit)}</span>`}</td><td class="${m.status === 'ok' ? '' : 'muted'}">${esc(m.status)}${m.status_reason ? ` <span class="meta">(${esc(m.status_reason)})</span>` : ''}</td><td class="muted">${esc(dt(m.measured_start))}${m.measured_end ? ' → ' + esc(clock(m.measured_end)) : ''}</td><td>${(m.source_response_ids || []).slice(0, 3).map((id) => `<a href="#" data-raw="${id}">#${id}</a>`).join(' ')}</td></tr>`).join('')}
-      </tbody></table></div><pre id="rawView" hidden></pre></div>`;
+  const sec = (k, color, inner) => `<section class="sec" style="--sc:${color}"><h3><i></i>${t(k)}</h3>${inner}</section>`;
+  dr.innerHTML = `<div class="head"><button class="icon-btn ghost" id="drClose" aria-label="${t('close')}">${ICO.back}</button><div class="grow"><b>${t('dayDetail')}</b><span class="meta">${dateS(day, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span></div><button class="sm primary" id="askDay">${t('askCoachDay')}</button></div>
+    <div class="msgs det">
+      ${sec('secSleep', 'var(--deep)', sleepStory(day))}
+      ${sec('secVitals', 'var(--c-teal)', VITALS.map((v) => vitalRow(v, day)).join('') || `<div class="small muted">${t('noData')}</div>`)}
+      ${sec('secAct', 'var(--c-orange)', activityStory(day))}
+      <details class="raw" id="rawDet"><summary>${t('dataLog')}</summary><div id="rawBody" class="small muted">…</div></details>
+    </div>`;
   openDrawer(true);
   $('#drClose').onclick = () => openDrawer(false);
-  dr.querySelectorAll('a[data-raw]').forEach((a) => (a.onclick = async (e) => { e.preventDefault(); const r = await api(`/api/raw/${a.dataset.raw}`); const pre = $('#rawView'); pre.hidden = false; pre.textContent = JSON.stringify(r, null, 2); pre.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }));
+  $('#askDay').onclick = () => { openCoach(true); sendChat(S.lang === 'th' ? `สรุปข้อมูลของวันที่ ${dateS(day, { day: 'numeric', month: 'long' })} ให้หน่อย` : `Summarise my data for ${dateS(day, { day: 'numeric', month: 'long' })}`); };
+  $('#rawDet').addEventListener('toggle', async () => {
+    if (!$('#rawDet').open || $('#rawBody').dataset.loaded) return;
+    const d = await api(`/api/days/${day}`).catch((e) => ({ error: e.message, metrics: [], missing: [] }));
+    $('#rawBody').dataset.loaded = '1';
+    $('#rawBody').innerHTML = `<div style="margin-bottom:8px">${d.missing?.length ? `${t('missing')} ${d.missing.length}: <span class="t2">${esc(d.missing.join(', '))}</span>` : `<span class="badge ok">${ICO.check}${t('all')}</span>`}</div>
+      <div class="tbl"><table><thead><tr><th>metric</th><th class="num">value</th><th>${t('status')}</th><th>${t('measured')}</th></tr></thead><tbody>
+      ${(d.metrics || []).map((m) => `<tr><td>${esc(m.metric)}</td><td class="num">${m.unit === 'iso8601' ? esc(dt(m.details?.iso)) : m.status === 'missing' || m.value === null ? '—' : `${num(m.value, 1)} <span class="muted">${esc(m.unit)}</span>`}</td><td class="${m.status === 'ok' ? '' : 'muted'}">${esc(m.status)}${m.status_reason ? ` · ${esc(m.status_reason)}` : ''}</td><td class="muted">${m.measured_start ? `${clock(m.measured_start)}–${clock(m.measured_end)}` : ''}</td></tr>`).join('')}
+      </tbody></table></div><div style="margin-top:8px"><a href="#" id="toLog" class="small">${t('openDataLog')} →</a></div>`;
+    $('#toLog').onclick = (e) => { e.preventDefault(); openDrawer(false); go('settings'); };
+  });
 }
 
 let lastFocus = null;
@@ -591,9 +676,9 @@ function renderTrends() {
   <div class="greet"><div><h1>${t('trends')}</h1><div class="t2">${S.days[0] ? `${dateS(S.days[0])} → ${dateS(S.days[S.days.length - 1])}` : ''}</div></div>${freshnessRow()}</div>
   <div class="grid12">
     <section class="card span6 chart" id="recChart"><div class="section-head"><div><h2>${t('recovery')}</h2><div class="small t2">${t('recoverySub')}</div></div>${S.scores?.versions ? `<span class="meta">${S.scores.versions.recovery}</span>` : ''}</div>
-      ${rec.some((r) => r.score !== null) ? `<svg class="chart-plot sm" role="img"></svg><div class="tip"></div>` : `<div class="empty">${t('rec_insufficient')} · ${t('needNights')}${rec.length ? ` · ${t('have')} ${rec[rec.length - 1].baselineDays}` : ''}</div>`}</section>
+      ${rec.some((r) => r.score !== null) ? `<div class="chart-plot sm"><canvas role="img"></canvas></div>` : `<div class="empty">${t('rec_insufficient')} · ${t('needNights')}${rec.length ? ` · ${t('have')} ${rec[rec.length - 1].baselineDays}` : ''}</div>`}</section>
     <section class="card span6 chart" id="loadChart"><div class="section-head"><div><h2>${t('cardioLoad')}</h2><div class="small t2">${t('loadNote')}</div></div>${S.scores?.versions ? `<span class="meta">${S.scores.versions.load}</span>` : ''}</div>
-      ${load.some((l) => l.acute !== null) ? `<svg class="chart-plot sm" role="img"></svg><div class="tip"></div><div class="legend-inline"><span><i style="background:var(--trend)"></i>${t('acute')}</span><span><i style="background:var(--baseline)"></i>${t('chronic')}</span></div>` : `<div class="empty">${t('noData')}</div>`}</section>
+      ${load.some((l) => l.acute !== null) ? `<div class="chart-plot sm"><canvas role="img"></canvas></div><div class="legend-inline"><span><i style="background:var(--trend)"></i>${t('acute')}</span><span><i style="background:var(--baseline)"></i>${t('chronic')}</span></div>` : `<div class="empty">${t('noData')}</div>`}</section>
 
     <section class="card span7"><div class="section-head"><div><h2>${t('weeklyInsights')}</h2><div class="small t2">${t('insightsSub')}</div></div>${ins ? `<span class="meta">${ins.version}</span>` : ''}</div>
       ${surfaced.length ? `<div class="list">${surfaced.slice(0, 3).map((i) => `<div class="item"><span>${insightText(i)}</span><span class="meta">${t('assoc')}</span></div>`).join('')}</div>` : `<div class="empty">${t('insightNone')}</div>`}
@@ -603,11 +688,11 @@ function renderTrends() {
       <div class="form" style="margin-top:12px"><input id="jnote" placeholder="${t('note')}" value="${esc(S.journalToday?.note || '')}"><div class="row"><button class="primary sm" id="jsave">${t('save')}</button><span class="meta" id="jstatus"></span></div></div></section>
 
     <section class="card span6 chart" id="vo2Chart"><div class="section-head"><div><h2>${t('fitness')}</h2><div class="small t2">${t('vo2')}</div></div>${fit?.latestVo2max ? `<span class="badge">${num(fit.latestVo2max.value, 1)} ml/kg/min</span>` : ''}</div>
-      ${fit?.vo2max?.length ? `<svg class="chart-plot sm" role="img"></svg><div class="tip"></div>` : `<div class="empty">${t('noVo2')}</div>`}
+      ${fit?.vo2max?.length ? `<div class="chart-plot sm"><canvas role="img"></canvas></div>` : `<div class="empty">${t('noVo2')}</div>`}
       <div class="rule"></div><div class="row between"><div><div class="label">${t('fitnessAge')}</div><div class="small t2">${t('fitnessAgeSub')}</div></div><div style="font-size:28px;font-weight:600">${fit?.fitnessAge ?? '—'}${fit?.fitnessAge ? `<small class="small t2"> ${t('years')}</small>` : ''}</div></div>
       ${fit?.needsProfile ? `<div class="meta" style="margin-top:6px"><a href="#" data-view="settings">${t('needProfile')}</a></div>` : ''}
       ${fit?.sessions?.length ? `<div class="meta" style="margin-top:8px">${t('sessions')}: ${fit.sessions.length}</div>` : ''}</section>
-    <section class="card span6"><div class="section-head"><div><h2>${t('bioAge')}</h2><div class="small t2">${t('bioAgeSub')}</div></div>${bio ? `<span class="meta">${bio.phenoAgeVersion}</span>` : ''}</div>
+    <section class="card span6"><div class="section-head"><div><h2>${t('bioAge')}</h2><div class="small t2">${t('bioAgeSub')}</div></div>${bio?.phenoAgeVersion ? `<span class="meta">${bio.phenoAgeVersion}</span>` : ''}</div>
       ${bio?.phenoAge?.length && bio.phenoAge[0].phenoAge !== null ? (() => { const p = bio.phenoAge[0]; return `<div class="row between"><div><div class="label">${t('phenoAge')}</div><div style="font-size:32px;font-weight:600">${p.phenoAge}<small class="small t2"> ${t('years')}</small></div></div><div><div class="label">${t('accel')}</div><div class="small">${p.accel > 0 ? `+${p.accel} ${t('years')} ${t('older')}` : `${Math.abs(p.accel)} ${t('years')} ${t('younger')}`}</div></div><div class="meta">${t('drawnOn')} ${dateS(p.drawnOn)}</div></div>`; })() : `<div class="empty">${bio?.needsProfile ? t('needProfile') : t('noPanel')}</div>`}
       <div class="meta" style="margin-top:12px">${t('panelNote')}</div></section>
 
@@ -620,9 +705,9 @@ function renderTrends() {
 function bindTrends(rec, load) {
   document.querySelectorAll('#main [data-view]').forEach((b) => (b.onclick = (e) => { e.preventDefault(); go(b.dataset.view); }));
   $('#refreshBtn')?.addEventListener('click', refreshData);
-  const rc = $('#recChart'); if (rc?.querySelector('svg')) lineChart(rc, [{ label: t('recovery'), color: 'var(--c-teal)', values: rec.map((r) => ({ day: r.day, v: r.score })), dots: true }], { min: 0, max: 100, bands: [[0, 33, 'var(--awake)'], [33, 67, 'var(--grid)']] });
-  const lc = $('#loadChart'); if (lc?.querySelector('svg')) lineChart(lc, [{ label: t('acute'), color: 'var(--c-orange)', values: load.map((l) => ({ day: l.day, v: l.acute })) }, { label: t('chronic'), color: 'var(--baseline)', dash: true, values: load.map((l) => ({ day: l.day, v: l.chronic })) }], { min: 0, fmt: (v) => Math.round(v) });
-  const vc = $('#vo2Chart'); if (vc?.querySelector('svg') && S.fitness?.vo2max?.length) lineChart(vc, [{ label: 'VO₂max', color: 'var(--c-blue)', unit: 'ml/kg/min', values: S.fitness.vo2max.map((p) => ({ day: p.day, v: p.value })), dots: true }], { fmt: (v) => v.toFixed(0) });
+  const rc = $('#recChart'); if (rc?.querySelector('canvas')) lineChart(rc, [{ label: t('recovery'), color: 'var(--c-teal)', values: rec.map((r) => ({ day: r.day, v: r.score })), dots: true }], { min: 0, max: 100, bands: [[0, 33, 'var(--c-red)'], [33, 67, 'var(--c-yellow)'], [67, 100, 'var(--c-teal)']] });
+  const lc = $('#loadChart'); if (lc?.querySelector('canvas')) lineChart(lc, [{ label: t('acute'), color: 'var(--c-orange)', values: load.map((l) => ({ day: l.day, v: l.acute })) }, { label: t('chronic'), color: 'var(--baseline)', dash: true, values: load.map((l) => ({ day: l.day, v: l.chronic })) }], { min: 0, fmt: (v) => Math.round(v) });
+  const vc = $('#vo2Chart'); if (vc?.querySelector('canvas') && S.fitness?.vo2max?.length) lineChart(vc, [{ label: 'VO₂max', color: 'var(--c-blue)', unit: 'ml/kg/min', values: S.fitness.vo2max.map((p) => ({ day: p.day, v: p.value })), dots: true }], { fmt: (v) => v.toFixed(0) });
   // journal
   const selected = new Set(S.journalToday?.tags || []);
   document.querySelectorAll('#tagChips .chip').forEach((b) => (b.onclick = () => { const g = b.dataset.tag; selected.has(g) ? selected.delete(g) : selected.add(g); b.classList.toggle('on'); b.setAttribute('aria-pressed', selected.has(g)); }));

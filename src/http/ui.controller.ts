@@ -8,18 +8,20 @@ import { join } from 'node:path';
  * Files are read once at boot (restart to pick up changes in production; start:dev restarts on save).
  */
 const UI_DIR = join(__dirname, 'ui');
-const TYPES: Record<string, string> = { html: 'text/html; charset=utf-8', js: 'application/javascript; charset=utf-8', css: 'text/css; charset=utf-8', svg: 'image/svg+xml' };
+const TYPES: Record<string, string> = { html: 'text/html; charset=utf-8', js: 'application/javascript; charset=utf-8', css: 'text/css; charset=utf-8', svg: 'image/svg+xml', woff2: 'font/woff2' };
+const BINARY = new Set(['woff2']);
 
 @Controller('ui')
 export class UiController {
-  private cache = new Map<string, string>();
+  private cache = new Map<string, string | Buffer>();
 
-  private file(name: string): string {
+  private file(name: string, sub = ''): string | Buffer {
     if (!/^[a-z0-9._-]+$/i.test(name)) throw new NotFoundException();
-    const p = join(UI_DIR, name);
+    const p = join(UI_DIR, sub, name);
     if (!this.cache.has(p)) {
       if (!existsSync(p)) throw new NotFoundException();
-      this.cache.set(p, readFileSync(p, 'utf8'));
+      const ext = name.split('.').pop() ?? '';
+      this.cache.set(p, BINARY.has(ext) ? readFileSync(p) : readFileSync(p, 'utf8'));
     }
     return this.cache.get(p)!;
   }
@@ -33,5 +35,14 @@ export class UiController {
     if (!TYPES[ext]) throw new NotFoundException();
     res.setHeader('cache-control', 'no-cache');
     res.type(TYPES[ext]).send(this.file(name));
+  }
+
+  /** Third-party bundles and fonts copied at build time (dist/http/ui/vendor) — versioned files, so cache for a day. */
+  @Get('vendor/:name')
+  vendor(@Param('name') name: string, @Res() res: Response) {
+    const ext = name.split('.').pop() ?? '';
+    if (ext !== 'js' && ext !== 'woff2') throw new NotFoundException();
+    res.setHeader('cache-control', 'public, max-age=86400');
+    res.type(TYPES[ext]).send(this.file(name, 'vendor'));
   }
 }
