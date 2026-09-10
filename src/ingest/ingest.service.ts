@@ -35,6 +35,7 @@ export class IngestService {
     const summary: RefreshSummary = { batchId, range: { startDate, endDate }, perType: [] };
 
     for (const spec of DATA_TYPES) {
+      if (spec.derived) continue;   // handled after the main pass (needs sleep intervals)
       try {
         const r = await this.fetchOne(spec, startDate, endDate, tz);
         const ids = await this.storeRaw(batchId, spec, r, startDate, endDate, tz);
@@ -53,7 +54,51 @@ export class IngestService {
         if (/not connected|Token refresh failed/i.test(msg)) break; // no point continuing without auth
       }
     }
+    if (summary.perType.some((t) => t.ok)) {
+      try {
+        summary.perType.push(await this.refreshSleepingHr(batchId, startDate, endDate, tz));
+      } catch (e) {
+        this.log.error(`sleeping-hr: ${(e as Error).message}`);
+        summary.perType.push({ dataType: 'heart-rate', ok: false, httpStatus: 0, items: 0, pages: 0, upserted: 0, error: (e as Error).message });
+      }
+    }
     return summary;
+  }
+
+  /**
+   * Sleeping heart rate = mean of heart-rate samples inside each night's main-sleep interval, with minute coverage.
+   * One request per night; nights that already have ≥85% coverage and ended more than 2 days ago are not refetched.
+   */
+  private async refreshSleepingHr(batchId: string, startDate: string, endDate: string, tz: string) {
+    const spec = DATA_TYPES.find((d) => d.derived === 'sleeping-hr')!;
+    const { rows: nights } = await this.pool.query<{ day: string; measured_start: string; measured_end: string; details: any }>(
+      `SELECT s.day, s.measured_start, s.measured_end, h.details
+       FROM daily_metrics s LEFT JOIN daily_metrics h ON h.day = s.day AND h.metric = 'sleeping_hr_bpm'
+       WHERE s.metric = 'sleep_minutes_asleep' AND s.day >= $1 AND s.day < $2 AND s.measured_start IS NOT NULL AND s.measured_end IS NOT NULL
+       ORDER BY s.day DESC LIMIT 14`, [startDate, endDate]);
+    const recentCutoff = Date.now() - 2 * 86_400_000;
+    let items = 0, pages = 0, upserted = 0, ok = true, lastStatus = 200, lastError: string | undefined;
+    for (const n of nights) {
+      if (n.details?.coveragePct >= 85 && Date.parse(n.measured_end) < recentCutoff) continue;
+      const startIso = new Date(n.measured_start).toISOString(), endIso = new Date(n.measured_end).toISOString();
+      const filter = `${spec.filterField} >= "${startIso}" AND ${spec.filterField} < "${endIso}"`;
+      const r = await this.api.read(spec.dataType, 'list', filter, { pageSize: 5000, maxPages: 3 });
+      const ids = await this.storeRaw(batchId, spec, r, n.day, n.day, tz);
+      pages += r.pages.length; items += r.items.length; lastStatus = r.pages[r.pages.length - 1]?.status ?? 0;
+      if (!r.ok) { ok = false; lastError = r.pages[r.pages.length - 1]?.errorText; if (/40[13]/.test(String(lastStatus))) break; continue; }
+      const samples = (r.items as any[]).map((x) => ({ t: Date.parse(x.heartRate?.sampleTime?.physicalTime), bpm: Number(x.heartRate?.beatsPerMinute ?? x.heartRate?.bpm) })).filter((x) => Number.isFinite(x.t) && Number.isFinite(x.bpm) && x.bpm > 0);
+      const intervalMin = Math.max(1, Math.round((Date.parse(endIso) - Date.parse(startIso)) / 60_000));
+      const minutes = new Set(samples.map((x) => Math.floor(x.t / 60_000))).size;
+      const coveragePct = Math.round((minutes / intervalMin) * 1000) / 10;
+      const mean = samples.length ? Math.round(samples.reduce((a, x) => a + x.bpm, 0) / samples.length) : null;
+      const status = mean === null ? 'missing' : coveragePct >= 50 ? 'ok' : 'partial';
+      upserted += await this.upsertMetrics([{
+        day: n.day, metric: 'sleeping_hr_bpm', value: mean, unit: 'bpm', status,
+        statusReason: mean === null ? 'no heart-rate samples inside the sleep interval' : coveragePct < 50 ? `only ${coveragePct}% of sleep minutes have a sample` : undefined,
+        measuredStart: startIso, measuredEnd: endIso, details: { samples: samples.length, minutesCovered: minutes, intervalMin, coveragePct, formula: 'mean(bpm) of samples within main-sleep interval' },
+      }], ids);
+    }
+    return { dataType: spec.dataType, ok, httpStatus: lastStatus, items, pages, upserted, error: lastError };
   }
 
   private fetchOne(spec: DataTypeSpec, startDate: string, endDate: string, tz: string): Promise<FetchResult> {
@@ -162,7 +207,7 @@ export class IngestService {
 
   async getRange(startDate: string, endDate: string) {
     const { rows } = await this.pool.query(
-      `SELECT day, metric, value, unit, status, measured_start, measured_end FROM daily_metrics WHERE day >= $1 AND day < $2 ORDER BY day, metric`,
+      `SELECT day, metric, value, unit, status, measured_start, measured_end, details FROM daily_metrics WHERE day >= $1 AND day < $2 ORDER BY day, metric`,
       [startDate, endDate],
     );
     return rows;

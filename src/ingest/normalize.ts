@@ -32,21 +32,32 @@ interface SleepPoint {
 
 /**
  * Sleep attribution rule: a session belongs to the civil day on which it ENDED (the wake-up day),
- * matching the Fitbit app's "dateOfSleep" convention. Naps are excluded from the main-sleep metrics.
- * If several non-nap sessions end on the same day, the longest one is used and status = 'partial'.
+ * matching the Fitbit app's "dateOfSleep" convention. Non-nap sessions feed the main-sleep metrics;
+ * if several end on the same day, the longest one is "main" and status = 'partial'. Naps are summed
+ * separately (sleep_nap_minutes) and included in sleep_total_asleep_minutes, never in the main metrics.
  */
 export function normalizeSleep(points: unknown[], tz: string): NormalizedMetric[] {
-  const byDay = new Map<string, SleepPoint[]>();
+  const byDay = new Map<string, { main: SleepPoint[]; naps: SleepPoint[] }>();
   for (const raw of points as SleepPoint[]) {
     const s = raw.sleep;
     const end = s?.interval?.endTime;
     if (!s || !end) continue;
-    if (s.metadata?.nap) continue;
     const day = civilDate(new Date(end), tz);
-    byDay.set(day, [...(byDay.get(day) ?? []), raw]);
+    const e = byDay.get(day) ?? { main: [], naps: [] };
+    (s.metadata?.nap ? e.naps : e.main).push(raw);
+    byDay.set(day, e);
   }
   const out: NormalizedMetric[] = [];
-  for (const [day, sessions] of byDay) {
+  for (const [day, { main: sessions, naps }] of byDay) {
+    const napMin = naps.reduce((a, n) => a + num(n.sleep!.summary?.minutesAsleep), 0);
+    if (!sessions.length) {
+      // naps only — main-sleep metrics stay missing for this day, but the naps are still recorded
+      const base = { day, status: 'ok' as const, statusReason: 'naps only, no main sleep ended on this day', sourcePointName: naps[0].name };
+      out.push(m(base, 'sleep_nap_minutes', napMin, { naps: naps.length }));
+      out.push(m(base, 'sleep_total_asleep_minutes', napMin));
+      out.push(m(base, 'sleep_sessions_count', naps.length));
+      continue;
+    }
     const sorted = [...sessions].sort((a, b) => num(b.sleep!.summary?.minutesAsleep) - num(a.sleep!.summary?.minutesAsleep));
     const main = sorted[0];
     const s = main.sleep!;
@@ -70,19 +81,26 @@ export function normalizeSleep(points: unknown[], tz: string): NormalizedMetric[
     };
     const asleep = optNum(sum.minutesAsleep);
     const awake = optNum(sum.minutesAwake);
-    const inPeriod = optNum(sum.minutesInSleepPeriod);
-    // Efficiency here = asleep / (asleep + awake). This is OUR formula, not the Fitbit app's score.
-    const efficiency = asleep !== null && awake !== null && asleep + awake > 0 ? round1((asleep / (asleep + awake)) * 100) : null;
+    const inPeriod = optNum(sum.minutesInSleepPeriod);     // = time in bed (Google Health's minutesInSleepPeriod)
+    const latency = optNum(sum.minutesToFallAsleep);
+    // Efficiency follows Google Health / Fitbit: asleep ÷ time in bed × 100. Falls back to asleep ÷ (asleep + awake) when minutesInSleepPeriod is absent.
+    let efficiency: number | null = null, formula = 'asleep/minutesInSleepPeriod*100';
+    if (asleep !== null && inPeriod !== null && inPeriod > 0) efficiency = round1((asleep / inPeriod) * 100);
+    else if (asleep !== null && awake !== null && asleep + awake > 0) { efficiency = round1((asleep / (asleep + awake)) * 100); formula = 'asleep/(asleep+awake)*100 (fallback: minutesInSleepPeriod absent)'; }
 
     out.push(m(base, 'sleep_minutes_asleep', asleep, { sleepType: s.type, stagesStatus: s.metadata?.stagesStatus, processed: s.metadata?.processed }));
     out.push(m(base, 'sleep_minutes_awake', awake));
-    out.push(m(base, 'sleep_minutes_in_period', inPeriod));
-    out.push(m(base, 'sleep_efficiency_pct', efficiency, { formula: 'asleep/(asleep+awake)*100' }));
+    out.push(m(base, 'sleep_minutes_in_period', inPeriod, { meaning: 'time in bed' }));
+    out.push(m(base, 'sleep_efficiency_pct', efficiency, { formula }));
+    out.push(m(base, 'sleep_latency_min', latency, { meaning: 'minutesToFallAsleep from the source summary' }));
     out.push(m(base, 'sleep_deep_minutes', stageMin('DEEP')));
     out.push(m(base, 'sleep_rem_minutes', stageMin('REM')));
     out.push(m(base, 'sleep_light_minutes', stageMin('LIGHT')));
     out.push(m(base, 'sleep_start', s.interval?.startTime ? Date.parse(s.interval.startTime) : null, { iso: s.interval?.startTime }));
     out.push(m(base, 'sleep_end', s.interval?.endTime ? Date.parse(s.interval.endTime) : null, { iso: s.interval?.endTime }));
+    out.push(m({ ...base, status: 'ok', statusReason: undefined }, 'sleep_nap_minutes', napMin, { naps: naps.length }));
+    out.push(m({ ...base, status: 'ok', statusReason: undefined }, 'sleep_total_asleep_minutes', asleep === null ? null : asleep + napMin, { main: asleep, naps: napMin }));
+    out.push(m({ ...base, status: 'ok', statusReason: undefined }, 'sleep_sessions_count', sessions.length + naps.length, { main: sessions.length, naps: naps.length }));
   }
   return out;
 }

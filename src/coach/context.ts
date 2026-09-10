@@ -29,7 +29,7 @@ export interface CoachContext {
   timezone: string;
   today: string;
   windowDays: string[];
-  sleepLatest: null | { day: string; start: string | null; end: string | null; asleepMin: number | null; awakeMin: number | null; efficiencyPct: number | null; deepMin: number | null; remMin: number | null; lightMin: number | null; partial: boolean };
+  sleepLatest: null | { day: string; start: string | null; end: string | null; asleepMin: number | null; awakeMin: number | null; efficiencyPct: number | null; deepMin: number | null; remMin: number | null; lightMin: number | null; timeInBedMin: number | null; latencyMin: number | null; napMin: number | null; totalAsleepMin: number | null; sleepingHrBpm: number | null; partial: boolean };
   metrics: MetricSummary[];
   dataQuality: { daysWithAnySleep: number; daysWithHrv: number; daysWithRhr: number; notes: string[] };
   /** Deterministic scores supplied by the backend (never computed by the model). */
@@ -44,6 +44,7 @@ const TRACKED: { metric: MetricId; upIsGood: boolean | null }[] = [
   { metric: 'sleep_efficiency_pct', upIsGood: true },
   { metric: 'sleep_deep_minutes', upIsGood: true },
   { metric: 'sleep_rem_minutes', upIsGood: true },
+  { metric: 'sleeping_hr_bpm', upIsGood: false },
   { metric: 'hrv_avg_ms', upIsGood: true },
   { metric: 'rhr_bpm', upIsGood: false },
   { metric: 'respiratory_rate_bpm', upIsGood: null },
@@ -95,6 +96,11 @@ export function buildContext(rows: MetricRow[], today: string, timezone: string,
       deepMin: val(sleepDay, 'sleep_deep_minutes'),
       remMin: val(sleepDay, 'sleep_rem_minutes'),
       lightMin: val(sleepDay, 'sleep_light_minutes'),
+      timeInBedMin: val(sleepDay, 'sleep_minutes_in_period'),
+      latencyMin: val(sleepDay, 'sleep_latency_min'),
+      napMin: val(sleepDay, 'sleep_nap_minutes'),
+      totalAsleepMin: val(sleepDay, 'sleep_total_asleep_minutes'),
+      sleepingHrBpm: val(sleepDay, 'sleeping_hr_bpm'),
       partial: r.status === 'partial',
     };
   }
@@ -124,7 +130,7 @@ export function renderContextForPrompt(ctx: CoachContext): string {
   lines.push(`today=${ctx.today} tz=${ctx.timezone} context_version=${ctx.version}`);
   if (ctx.sleepLatest) {
     const s = ctx.sleepLatest;
-    lines.push(`LATEST SLEEP (wake day ${s.day}${s.partial ? ', partial: several sessions' : ''}): asleep=${fmt(s.asleepMin)}min awake=${fmt(s.awakeMin)}min efficiency=${fmt(s.efficiencyPct)}% deep=${fmt(s.deepMin)} rem=${fmt(s.remMin)} light=${fmt(s.lightMin)} start=${s.start ?? '?'} end=${s.end ?? '?'}`);
+    lines.push(`LATEST SLEEP (wake day ${s.day}${s.partial ? ', partial: several sessions' : ''}): asleep=${fmt(s.asleepMin)}min awake=${fmt(s.awakeMin)}min efficiency=${fmt(s.efficiencyPct)}% deep=${fmt(s.deepMin)} rem=${fmt(s.remMin)} light=${fmt(s.lightMin)} timeInBed=${fmt(s.timeInBedMin)}min fellAsleepIn=${fmt(s.latencyMin)}min naps=${fmt(s.napMin)}min totalAsleepInclNaps=${fmt(s.totalAsleepMin)}min sleepingHR=${fmt(s.sleepingHrBpm)}bpm start=${s.start ?? '?'} end=${s.end ?? '?'} (efficiency = asleep ÷ time in bed, Google's definition)`);
   } else lines.push('LATEST SLEEP: none');
   lines.push('METRICS (latest vs mean of up to 7 prior days):');
   for (const m of ctx.metrics) {

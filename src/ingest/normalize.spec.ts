@@ -71,11 +71,50 @@ describe('normalizeSleep', () => {
   it('marks missing summary values as missing, not zero', () => {
     const p = sleep('2026-09-08T16:30:00Z', '2026-09-08T23:40:00Z', 400, 30);
     delete (p.sleep.summary as any).minutesAwake;
+    delete (p.sleep.summary as any).minutesInSleepPeriod;
     const rows = normalizeSleep([p], TZ);
     const awake = rows.find((r) => r.metric === 'sleep_minutes_awake')!;
     expect(awake.value).toBeNull();
     expect(awake.status).toBe('missing');
     expect(rows.find((r) => r.metric === 'sleep_efficiency_pct')!.value).toBeNull();
+  });
+
+  it('computes efficiency as asleep ÷ time in bed (Google definition) — 359/369 → 97.3', () => {
+    const p = sleep('2026-09-09T17:53:00Z', '2026-09-10T00:02:00Z', 359, 10);
+    (p.sleep.summary as any).minutesInSleepPeriod = 369; (p.sleep.summary as any).minutesToFallAsleep = 0;
+    const rows = normalizeSleep([p], TZ);
+    expect(rows.find((r) => r.metric === 'sleep_efficiency_pct')!.value).toBeCloseTo(97.3, 1);
+    expect(rows.find((r) => r.metric === 'sleep_minutes_in_period')!.value).toBe(369);
+    expect(rows.find((r) => r.metric === 'sleep_latency_min')!.value).toBe(0);
+  });
+
+  it('falls back to asleep ÷ (asleep + awake) only when minutesInSleepPeriod is absent', () => {
+    const p = sleep('2026-09-08T16:30:00Z', '2026-09-08T23:40:00Z', 400, 30);
+    delete (p.sleep.summary as any).minutesInSleepPeriod;
+    const eff = normalizeSleep([p], TZ).find((r) => r.metric === 'sleep_efficiency_pct')!;
+    expect(eff.value).toBeCloseTo(93.0, 1);
+    expect(String(eff.details?.formula)).toMatch(/fallback/);
+  });
+
+  it('sums naps separately and reports total incl. naps; naps-only day keeps main sleep missing', () => {
+    const rows = normalizeSleep(
+      [
+        sleep('2026-09-08T16:30:00Z', '2026-09-08T23:40:00Z', 400, 30),
+        sleep('2026-09-09T07:00:00Z', '2026-09-09T07:30:00Z', 25, 5, { metadata: { nap: true } }),     // nap same wake day
+        sleep('2026-09-10T07:00:00Z', '2026-09-10T07:40:00Z', 35, 5, { metadata: { nap: true } }),     // next day: nap only
+      ],
+      TZ,
+    );
+    const d9 = (m: string) => rows.find((r) => r.day === '2026-09-09' && r.metric === m)!;
+    expect(d9('sleep_minutes_asleep').value).toBe(400);
+    expect(d9('sleep_minutes_asleep').status).toBe('ok');            // nap does not make the day partial
+    expect(d9('sleep_nap_minutes').value).toBe(25);
+    expect(d9('sleep_total_asleep_minutes').value).toBe(425);
+    expect(d9('sleep_sessions_count').value).toBe(2);
+    const d10 = rows.filter((r) => r.day === '2026-09-10');
+    expect(d10.find((r) => r.metric === 'sleep_minutes_asleep')).toBeUndefined();
+    expect(d10.find((r) => r.metric === 'sleep_nap_minutes')!.value).toBe(35);
+    expect(d10.find((r) => r.metric === 'sleep_total_asleep_minutes')!.value).toBe(35);
   });
 });
 

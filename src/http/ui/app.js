@@ -46,6 +46,7 @@ const I18N = {
     setCoach: 'โค้ชของคุณ', setCoachSub: 'ปรับสไตล์และบริบทที่โค้ชใช้ตอบ — ทุกอย่างในนี้ถูกส่งให้โมเดลอ่านเป็นข้อมูล ไม่ใช่คำสั่งเหนือกฎความปลอดภัย', tone: 'สไตล์โค้ช', tone_relaxed: 'สบายๆ', tone_balanced: 'สมดุล', tone_strict: 'จริงจัง', toneHint_relaxed: 'เน้นพักผ่อน อลุ่มอล่วย เตือนไม่เกิน 1 เรื่องต่อครั้ง', toneHint_balanced: 'เป็นกันเอง ชี้ 1–2 เรื่องที่สำคัญที่สุด', toneHint_strict: 'ตรงไปตรงมา ชี้ทุกจุดที่หลุดจาก baseline/เป้าหมาย',
     verbosity: 'ความยาวคำตอบ', verb_brief: 'สั้น', verb_normal: 'ปกติ', occupation: 'อาชีพ / ลักษณะงาน', occupationPh: 'เช่น Software engineer นั่งหน้าจอทั้งวัน', lifestyle: 'ไลฟ์สไตล์', lifestylePh: 'เช่น นอนดึกช่วงปล่อยงาน ดื่มกาแฟ 2 แก้ว/วัน ว่ายน้ำสัปดาห์ละครั้ง', healthNotes: 'สุขภาพที่โค้ชควรรู้', healthPh: 'เช่น ปวดหลังล่างเป็นๆ หายๆ ห้ามแนะนำท่า deadlift หนัก · ข้อมูลนี้อยู่บนเซิร์ฟเวอร์ของคุณเท่านั้น', exercisePurpose: 'ออกกำลังเพื่ออะไร', purposePh: 'เช่น สุขภาพทั่วไปและนอนหลับดีขึ้น / ลดไขมัน / เพิ่มกล้าม / วิ่ง 10K', customInstr: 'สิ่งที่อยากให้โค้ชทำ/ไม่ทำ', customPh: 'เช่น อย่าพูดเรื่องแคลอรี · ใช้ภาษาผู้ชายๆ ห้วนๆ · ถ้านอนน้อยกว่า 6 ชม. ให้เตือนเรื่องขับรถ',
     goals: 'เป้าหมายของคุณ', goalSleep: 'นอนต่อคืน (ชม.)', goalSteps: 'ก้าว/วัน', goalAzm: 'นาทีในโซนหัวใจ/สัปดาห์', chatNotes: 'สิ่งที่บอกโค้ชผ่านแชท', chatNotesHint: 'พิมพ์ในแชทว่า “จำไว้ว่า …” หรือ “/remember …” โค้ชจะเก็บไว้ที่นี่', removeNote: 'ลบ', rememberHint: 'พิมพ์ “จำไว้ว่า …” เพื่อบอกเรื่องตัวคุณให้โค้ชจำ',
+    timeInBed: 'อยู่บนเตียง', fellAsleepIn: 'หลับภายใน', napsLabel: 'งีบ', totalInclNaps: 'รวมงีบ', sleepHr: 'HR ขณะหลับ', effDef: 'ประสิทธิภาพ = เวลาหลับ ÷ เวลาอยู่บนเตียง (นิยามเดียวกับ Google Health)', prevDay: 'วันก่อนหน้า', nextDay: 'วันถัดไป', sleepHrHint: 'ค่าเฉลี่ยชีพจรตลอดช่วงหลับ · ต่างจากชีพจรขณะพักรายวัน', coverageOf: 'ครอบคลุม',
     err_generic: 'เกิดข้อผิดพลาด', partialFetch: 'บางชนิดข้อมูลดึงไม่สำเร็จ',
   },
   en: {
@@ -90,6 +91,7 @@ const I18N = {
     setCoach: 'Your coach', setCoachSub: 'Tune the style and context the coach uses — everything here is shown to the model as data, never as instructions that override the safety rules', tone: 'Coaching style', tone_relaxed: 'Relaxed', tone_balanced: 'Balanced', tone_strict: 'Strict', toneHint_relaxed: 'Rest first, forgiving, at most one caution per reply', toneHint_balanced: 'Friendly, points out the 1–2 things that matter most', toneHint_strict: 'Direct, calls out every miss against baseline/goals',
     verbosity: 'Reply length', verb_brief: 'Brief', verb_normal: 'Normal', occupation: 'Occupation / kind of work', occupationPh: 'e.g. Software engineer, desk work all day', lifestyle: 'Lifestyle', lifestylePh: 'e.g. late nights around releases, 2 coffees a day, swim once a week', healthNotes: 'Health context the coach should know', healthPh: 'e.g. recurring lower-back pain, no heavy deadlifts · stays on your server only', exercisePurpose: 'Why you exercise', purposePh: 'e.g. general health and better sleep / fat loss / muscle / a 10K', customInstr: 'What the coach should or should not do', customPh: 'e.g. never talk about calories · blunt tone · if I sleep < 6 h, warn me about driving',
     goals: 'Your goals', goalSleep: 'Sleep per night (h)', goalSteps: 'Steps / day', goalAzm: 'Zone minutes / week', chatNotes: 'Things you told the coach in chat', chatNotesHint: 'Type “remember that …” or “/remember …” in the chat and it lands here', removeNote: 'Remove', rememberHint: 'Type “remember that …” to tell the coach something about you',
+    timeInBed: 'Time in bed', fellAsleepIn: 'fell asleep in', napsLabel: 'naps', totalInclNaps: 'total incl. naps', sleepHr: 'Sleeping HR', effDef: 'Efficiency = time asleep ÷ time in bed (same definition as Google Health)', prevDay: 'Previous day', nextDay: 'Next day', sleepHrHint: 'Mean heart rate across the sleep interval · distinct from daily resting HR', coverageOf: 'coverage',
     err_generic: 'Something went wrong', partialFetch: 'Some data types failed to fetch',
   },
 };
@@ -112,6 +114,7 @@ const clock = (iso) => (iso ? new Date(iso).toLocaleTimeString(LOC(), { hour: '2
 const dateS = (d, o = { weekday: 'short', day: 'numeric', month: 'short' }) => new Date(d + 'T00:00:00').toLocaleDateString(LOC(), o);
 const dt = (iso) => (iso ? new Date(iso).toLocaleString(LOC(), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—');
 const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const det = (day, m) => S.byDay[day]?.[m]?.details || null;
 const val = (day, m) => { const r = S.byDay[day]?.[m]; return r && r.status !== 'missing' && r.value !== null ? Number(r.value) : null; };
 const mean = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
 const latestDayWith = (m) => { for (let i = S.days.length - 1; i >= 0; i--) if (val(S.days[i], m) !== null) return S.days[i]; return null; };
@@ -364,6 +367,7 @@ function sleepSummary() {
   const deep = val(d, 'sleep_deep_minutes'), rem = val(d, 'sleep_rem_minutes'), light = val(d, 'sleep_light_minutes'), awake = val(d, 'sleep_minutes_awake');
   const row = S.byDay[d].sleep_minutes_asleep; const b = base7(d, 'sleep_minutes_asleep');
   const delta = b !== null && asleep !== null ? asleep - b : null;
+  const tib = val(d, 'sleep_minutes_in_period'), nap = val(d, 'sleep_nap_minutes') || 0, tot2 = val(d, 'sleep_total_asleep_minutes'), shr = val(d, 'sleeping_hr_bpm');
   const hasStages = [deep, rem, light].some((x) => x !== null);
   const tot = hasStages ? [deep, rem, light, awake].filter((x) => x !== null).reduce((a, x) => a + x, 0) : 0;
   const seg = (v, c) => (v === null || !tot ? '' : `<span style="width:${((v / tot) * 100).toFixed(1)}%;background:${c}"></span>`);
@@ -373,7 +377,8 @@ function sleepSummary() {
     <div class="hero-val">${asleep === null ? '—' : `${Math.floor(asleep / 60)}<small>${t('hrs')}</small>${Math.round(asleep % 60)}<small>${t('min')}</small>`}</div>
     <div class="small t2">${delta === null ? `${t('noBaseline')} (${priorVals(d, 'sleep_minutes_asleep').length}/7)` : `${t('vs7')} · ${delta >= 0 ? t('more') : t('less')} ${hm(Math.abs(delta))}`}${row?.status === 'partial' ? ` · ${t('multiSession')}` : ''}</div>
     ${tot ? `<div class="stage-bar" role="img" aria-label="${t('recorded')} ${hm(tot)}">${seg(deep, 'var(--deep)')}${seg(rem, 'var(--rem)')}${seg(light, 'var(--light)')}${seg(awake, 'var(--awake)')}</div>` : `<div class="small muted" style="margin-top:12px">${t('noStages')}</div>`}
-    <div class="kv"><div><span>${t('interval')}</span><b>${clock(row?.measured_start)} → ${clock(row?.measured_end)}</b></div><div><span>${t('efficiency')}</span><b>${eff === null ? '—' : eff.toFixed(0) + '%'}</b></div></div>
+    <div class="kv kv3"><div><span>${t('interval')}</span><b>${clock(row?.measured_start)} → ${clock(row?.measured_end)}</b></div><div><span>${t('timeInBed')}</span><b>${tib === null ? '—' : hm(tib)}</b></div><div title="${t('effDef')}"><span>${t('efficiency')}</span><b>${eff === null ? '—' : eff.toFixed(0) + '%'}</b></div></div>
+    ${nap || shr !== null ? `<div class="small t2" style="margin-top:8px">${[nap ? `${t('napsLabel')} ${hm(nap)} · ${t('totalInclNaps')} ${hm(tot2)}` : '', shr !== null ? `${t('sleepHr')} ${num(shr)} bpm` : ''].filter(Boolean).join(' · ')}</div>` : ''}
     ${tot ? `<div class="legend"><span><i style="background:var(--deep)"></i>${t('deep')} ${n0(deep)}</span><span><i style="background:var(--rem)"></i>${t('rem')} ${n0(rem)}</span><span><i style="background:var(--light)"></i>${t('light')} ${n0(light)}</span><span><i style="background:var(--awake)"></i>${t('awake')} ${n0(awake)}</span></div>` : ''}
     <div style="margin-top:12px"><a href="#" data-day="${d}" class="small">${t('details')} →</a></div>
   </section>`;
@@ -497,7 +502,7 @@ async function refreshData() {
 
 /* ================= day detail drawer ================= */
 /* ================= day detail (human-readable) ================= */
-const BASE_FLOOR = { hrv_avg_ms: 3, rhr_bpm: 2, spo2_avg_pct: 0.7, respiratory_rate_bpm: 0.5 };
+const BASE_FLOOR = { hrv_avg_ms: 3, rhr_bpm: 2, spo2_avg_pct: 0.7, respiratory_rate_bpm: 0.5, sleeping_hr_bpm: 2 };
 function personalBand(day, m) {
   const xs = S.days.filter((x) => x < day).slice(-14).map((x) => val(x, m)).filter((x) => x !== null);
   if (xs.length < MIN_BASE) return { n: xs.length };
@@ -520,12 +525,14 @@ function vitalRow(def, day) {
     bar = rangeBar(v, b.lo, b.hi, f, { minPad: BASE_FLOOR[def.m] });
     hint = status === 'within' ? `${t('yourRange')} ${f(b.lo)}–${f(b.hi)} ${def.unit}` : (I18N[S.lang][`hint_${def.k}_${status}`] || `${t('yourRange')} ${f(b.lo)}–${f(b.hi)} ${def.unit}`);
   }
+  if (def.hint) hint = `${def.hint(day)}${b.lo !== undefined ? ` · ${t('yourRange')} ${f(b.lo)}–${f(b.hi)} ${def.unit}` : ''}`;
   return `<div class="vrow" style="--mc:${def.c}"><span class="nm">${t(def.k)}</span><span class="vv">${f(v)}<small>${def.unit}</small></span>${bar}<span class="st">${chip}</span><span class="hint">${hint}</span></div>`;
 }
 const STAGE_TYPICAL = { deep: [13, 23], rem: [20, 25], light: [45, 60] };   // % of time asleep, common adult ranges (approximate)
 function sleepStory(day) {
   const asleep = val(day, 'sleep_minutes_asleep'); if (asleep === null) return `<div class="empty">${t('noDay')}</div>`;
   const row = S.byDay[day].sleep_minutes_asleep, eff = val(day, 'sleep_efficiency_pct'), awake = val(day, 'sleep_minutes_awake');
+  const tib = val(day, 'sleep_minutes_in_period'), lat = val(day, 'sleep_latency_min'), nap = val(day, 'sleep_nap_minutes') || 0, tot2 = val(day, 'sleep_total_asleep_minutes');
   const deep = val(day, 'sleep_deep_minutes'), rem = val(day, 'sleep_rem_minutes'), light = val(day, 'sleep_light_minutes');
   const b = base7(day, 'sleep_minutes_asleep'), delta = b === null ? null : asleep - b;
   const effWord = eff === null ? '' : eff >= 90 ? t('effGood') : eff >= 85 ? t('effOk') : t('effLow');
@@ -536,7 +543,8 @@ function sleepStory(day) {
   return `
     <div class="hero-val" style="font-size:40px;line-height:48px;margin:0">${Math.floor(asleep / 60)}<small>${t('hrs')}</small>${Math.round(asleep % 60)}<small>${t('min')}</small></div>
     <div class="story">${t('storySlept')} <b>${hm(asleep)}</b> · ${clock(row?.measured_start)} → ${clock(row?.measured_end)}<br>
-      ${delta === null ? t('storyBase') : `<b>${hm(Math.abs(delta))}</b> ${delta >= 0 ? t('storyMore') : t('storyLess')}`}${eff !== null ? ` · ${t('efficiency')} <b>${eff.toFixed(0)}%</b> <span class="badge ${effCls}">${effWord}</span>` : ''}${awake !== null ? ` · ${t('awakeFor')} <b>${num(awake)} ${t('minutes')}</b>` : ''}${row?.status === 'partial' ? ` · ${t('multiSession')}` : ''}</div>
+      ${delta === null ? t('storyBase') : `<b>${hm(Math.abs(delta))}</b> ${delta >= 0 ? t('storyMore') : t('storyLess')}`}${eff !== null ? ` · ${t('efficiency')} <b title="${t('effDef')}">${eff.toFixed(0)}%</b> <span class="badge ${effCls}">${effWord}</span>` : ''}${awake !== null ? ` · ${t('awakeFor')} <b>${num(awake)} ${t('minutes')}</b>` : ''}${row?.status === 'partial' ? ` · ${t('multiSession')}` : ''}<br>
+      ${[tib !== null ? `${t('timeInBed')} <b>${hm(tib)}</b>` : '', lat !== null ? `${t('fellAsleepIn')} <b>${num(lat)} ${t('minutes')}</b>` : '', nap ? `${t('napsLabel')} <b>${hm(nap)}</b> · ${t('totalInclNaps')} <b>${hm(tot2)}</b>` : ''].filter(Boolean).join(' · ')}</div>
     ${stagesTot ? `<div class="stage-bar" style="margin:4px 0 0">${[[deep, 'var(--deep)'], [rem, 'var(--rem)'], [light, 'var(--light)'], [awake, 'var(--awake)']].map(([v, c]) => (v ? `<span style="width:${((v / (stagesTot + (awake || 0))) * 100).toFixed(1)}%;background:${c}"></span>` : '')).join('')}</div>
     ${stageRow('deep', deep, 'var(--deep)')}${stageRow('rem', rem, 'var(--rem)')}${stageRow('light', light, 'var(--light)')}` : `<div class="small muted">${t('noStages')}</div>`}`;
 }
@@ -556,15 +564,18 @@ function activityStory(day) {
 async function openDay(day) {
   const dr = $('#drawer');
   const sec = (k, color, inner) => `<section class="sec" style="--sc:${color}"><h3><i></i>${t(k)}</h3>${inner}</section>`;
-  dr.innerHTML = `<div class="head"><button class="icon-btn ghost" id="drClose" aria-label="${t('close')}">${ICO.back}</button><div class="grow"><b>${t('dayDetail')}</b><span class="meta">${dateS(day, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span></div><button class="sm primary" id="askDay">${t('askCoachDay')}</button></div>
+  const idx = S.days.indexOf(day), prev = idx > 0 ? S.days[idx - 1] : null, next = idx >= 0 && idx < S.days.length - 1 ? S.days[idx + 1] : null;
+  dr.innerHTML = `<div class="head"><button class="icon-btn ghost" id="drClose" aria-label="${t('close')}">${ICO.back}</button><div class="grow"><b>${t('dayDetail')}</b><span class="meta">${dateS(day, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span></div>
+      <div class="seg-ctl daynav"><button id="dPrev" ${prev ? '' : 'disabled'} aria-label="${t('prevDay')}" title="${prev ? dateS(prev) : ''}">‹</button><button id="dNext" ${next ? '' : 'disabled'} aria-label="${t('nextDay')}" title="${next ? dateS(next) : ''}">›</button></div><button class="sm primary" id="askDay">${t('askCoachDay')}</button></div>
     <div class="msgs det">
       ${sec('secSleep', 'var(--deep)', sleepStory(day))}
-      ${sec('secVitals', 'var(--c-teal)', VITALS.map((v) => vitalRow(v, day)).join('') || `<div class="small muted">${t('noData')}</div>`)}
+      ${sec('secVitals', 'var(--c-teal)', ([{ m: 'sleeping_hr_bpm', k: 'sleepHr', unit: 'bpm', dec: 0, c: 'var(--c-orange)', hint: (dd) => { const x = det(dd, 'sleeping_hr_bpm'); return x?.coveragePct !== undefined ? `${t('sleepHrHint')} · ${t('coverageOf')} ${x.coveragePct}%` : t('sleepHrHint'); } }, ...VITALS]).map((v) => vitalRow(v, day)).join('') || `<div class="small muted">${t('noData')}</div>`)}
       ${sec('secAct', 'var(--c-orange)', activityStory(day))}
       <details class="raw" id="rawDet"><summary>${t('dataLog')}</summary><div id="rawBody" class="small muted">…</div></details>
     </div>`;
-  openDrawer(true);
+  if (!dr.classList.contains('on')) openDrawer(true);
   $('#drClose').onclick = () => openDrawer(false);
+  $('#dPrev').onclick = () => prev && openDay(prev); $('#dNext').onclick = () => next && openDay(next);
   $('#askDay').onclick = () => { openCoach(true); sendChat(S.lang === 'th' ? `สรุปข้อมูลของวันที่ ${dateS(day, { day: 'numeric', month: 'long' })} ให้หน่อย` : `Summarise my data for ${dateS(day, { day: 'numeric', month: 'long' })}`); };
   $('#rawDet').addEventListener('toggle', async () => {
     if (!$('#rawDet').open || $('#rawBody').dataset.loaded) return;

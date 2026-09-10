@@ -147,3 +147,13 @@ PhenoAge = 141.50225 + ln(−0.0055305 · ln(1 − M)) / 0.090165
 - NTNU CERG fitness numbers (HUNT3) — https://www.ntnu.edu/cerg/fitness-numbers
 - Firstbeat stress & recovery — https://www.firstbeat.com/en/blog/at-the-heart-of-stress-and-recovery/
 - Google Health API REST reference — https://developers.google.com/health/reference/rest
+
+
+## Sleep definitions (v2, Sep 2026)
+
+- **Time in bed** = `summary.minutesInSleepPeriod` from the sleep data point (metric `sleep_minutes_in_period`).
+- **Efficiency** = asleep ÷ time in bed × 100 — the same definition Google Health / Fitbit use. Falls back to asleep ÷ (asleep + awake) only when `minutesInSleepPeriod` is absent; the formula used is recorded in `details.formula`.
+- **Latency** (`sleep_latency_min`) = `summary.minutesToFallAsleep`, taken from the source, never derived.
+- **Main sleep vs naps**: a session belongs to the civil day it *ended* on. Non-nap sessions feed the main-sleep metrics (longest wins, status `partial` if several). Naps (`metadata.nap = true`) are summed into `sleep_nap_minutes`; `sleep_total_asleep_minutes` = main + naps; `sleep_sessions_count` counts both. A naps-only day keeps main-sleep metrics missing.
+- **Sleeping HR** (`sleeping_hr_bpm`) = mean of `heart-rate` samples whose `sampleTime.physicalTime` falls inside the main-sleep interval. One request per night after the main pass; `details.coveragePct` = minutes with ≥1 sample ÷ interval minutes. Status `ok` when coverage ≥ 50%, `partial` below, `missing` when no samples. Nights ≥ 2 days old with ≥ 85% coverage are not refetched. Distinct from daily resting HR (`rhr_bpm`, Google's own daily value).
+- Not derived (no field in the API, definition not published): sleep score, restlessness, sound sleep, time to sound sleep, full awakenings, interruptions. Read those in the Google Health app.
