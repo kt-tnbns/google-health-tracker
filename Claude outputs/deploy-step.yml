@@ -1,0 +1,9 @@
+# วางต่อท้าย job "image" ใน .github/workflows/build.yml (ต่อจาก docker/build-push-action)
+# ต้องเพิ่ม GitHub secret: DOKPLOY_WEBHOOK = URL จาก Dokploy → Compose service → Deployments → "Webhook URL"
+      - name: Trigger Dokploy redeploy (image is on GHCR now)
+        if: github.ref == 'refs/heads/main'
+        env:
+          HOOK: ${{ secrets.DOKPLOY_WEBHOOK }}
+        run: |
+          test -n "$HOOK" || { echo "DOKPLOY_WEBHOOK secret not set"; exit 1; }
+          curl -fsS -X POST "$HOOK" -H 'content-type: application/json' -d '{}' && echo "redeploy requested"
