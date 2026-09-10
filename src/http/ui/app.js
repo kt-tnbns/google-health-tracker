@@ -357,19 +357,19 @@ function sleepSummary() {
 }
 
 const VITALS = [
-  { m: 'hrv_avg_ms', k: 'hrv', unit: 'ms', dec: 0 }, { m: 'rhr_bpm', k: 'rhr', unit: 'bpm', dec: 0 },
-  { m: 'spo2_avg_pct', k: 'spo2', unit: '%', dec: 1 }, { m: 'respiratory_rate_bpm', k: 'rr', unit: '/min', dec: 1 },
+  { m: 'hrv_avg_ms', k: 'hrv', unit: 'ms', dec: 0, c: 'var(--c-teal)' }, { m: 'rhr_bpm', k: 'rhr', unit: 'bpm', dec: 0, c: 'var(--c-red)' },
+  { m: 'spo2_avg_pct', k: 'spo2', unit: '%', dec: 1, c: 'var(--c-cyan)' }, { m: 'respiratory_rate_bpm', k: 'rr', unit: '/min', dec: 1, c: 'var(--c-magenta)' },
 ];
 function metricCard(def, latestOverall) {
   const d = latestDayWith(def.m); const v = d ? val(d, def.m) : null; const b = d ? base7(d, def.m) : null;
   let cmp = d ? baseInfo(d, def.m) : `<span class="muted">${t('collecting')}</span>`;
   if (v !== null && b !== null) { const diff = v - b; cmp = `${diff >= 0 ? '+' : '−'}${num(Math.abs(diff), def.dec)} ${def.unit} <span class="muted">${t('vs7')}</span>`; }
   const stale = d && latestOverall && d !== latestOverall;
-  return `<button class="metric" data-metric="${def.m}" aria-label="${t(def.k)}">
+  return `<button class="metric" data-metric="${def.m}" aria-label="${t(def.k)}" style="--mc:${def.c || 'var(--trend)'}">
     <div class="label">${t(def.k)}</div>
     <div class="val">${v === null ? `<span class="dash">—</span>` : `${num(v, def.dec)}<small>${def.unit}</small>`}</div>
     <div class="cmp">${v === null ? `<span class="muted">${t('noData')}</span>` : cmp}</div>
-    ${sparkline(S.days.slice(-14), def.m, 'var(--trend)')}
+    ${sparkline(S.days.slice(-14), def.m, def.c || 'var(--trend)')}
     ${stale ? `<div class="foot">${t('dataOf')} ${dateS(d)}</div>` : v === null ? `<div class="foot">${t('incomplete')}</div>` : ''}
   </button>`;
 }
@@ -378,15 +378,15 @@ function activityBlock() {
   const l = S.scores?.load?.[S.scores.load.length - 1];
   const sd = latestDayWith('steps'), ad = latestDayWith('active_zone_minutes');
   const dayLabel = sd && sd !== todayStr() ? ` · ${t('dataOfDay')} ${dateS(sd)}` : '';
-  const card = (k, d, m, unit) => { const v = d ? val(d, m) : null; return `<div class="metric" style="min-height:0"><div class="label">${t(k)}</div><div class="val">${v === null ? '<span class="dash">—</span>' : `${num(v)}<small>${unit}</small>`}</div>${sparkline(S.days.slice(-14), m, 'var(--trend)')}</div>`; };
-  const loadCard = l ? `<div class="metric" style="min-height:0">
+  const card = (k, d, m, unit, c) => { const v = d ? val(d, m) : null; return `<div class="metric" style="min-height:0;--mc:${c}"><div class="label">${t(k)}</div><div class="val">${v === null ? '<span class="dash">—</span>' : `${num(v)}<small>${unit}</small>`}</div>${sparkline(S.days.slice(-14), m, c)}</div>`; };
+  const loadCard = l ? `<div class="metric" style="min-height:0;--mc:var(--c-purple)">
       <div class="label">${t('cardioLoad')}</div>
       <div class="val">${l.load === null ? '<span class="dash">—</span>' : `${num(l.load)}<small>${l.source}</small>`}</div>
       <div class="cmp">${t('acute')} ${num(l.acute, 1) ?? '—'} · ${t('chronic')} ${num(l.chronic, 1) ?? '—'}</div>
       <div class="cmp">${l.acwr !== null ? `${t('acwr')} ${l.acwr} <span class="badge ${l.acwrBand === 'spike' ? 'warn' : ''}">${t('band_' + l.acwrBand)}</span>` : `<span class="muted">${t('needs28')} (${l.history}/28)</span>`}</div>
       <div class="foot">${t('loadNote')}</div></div>` : '';
   return `<section><div class="section-head"><h2>${t('activity')}<span class="small t2" style="font-weight:400">${dayLabel}</span></h2></div>
-    <div class="metrics" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">${card('steps', sd, 'steps', '')}${card('azm', ad, 'active_zone_minutes', 'min')}${loadCard}</div></section>`;
+    <div class="metrics" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">${card('steps', sd, 'steps', '', 'var(--c-yellow)')}${card('azm', ad, 'active_zone_minutes', 'min', 'var(--c-orange)')}${loadCard}</div></section>`;
 }
 
 function sleepHistory() {
@@ -620,9 +620,9 @@ function renderTrends() {
 function bindTrends(rec, load) {
   document.querySelectorAll('#main [data-view]').forEach((b) => (b.onclick = (e) => { e.preventDefault(); go(b.dataset.view); }));
   $('#refreshBtn')?.addEventListener('click', refreshData);
-  const rc = $('#recChart'); if (rc?.querySelector('svg')) lineChart(rc, [{ label: t('recovery'), color: 'var(--trend)', values: rec.map((r) => ({ day: r.day, v: r.score })), dots: true }], { min: 0, max: 100, bands: [[0, 33, 'var(--awake)'], [33, 67, 'var(--grid)']] });
-  const lc = $('#loadChart'); if (lc?.querySelector('svg')) lineChart(lc, [{ label: t('acute'), color: 'var(--trend)', values: load.map((l) => ({ day: l.day, v: l.acute })) }, { label: t('chronic'), color: 'var(--baseline)', dash: true, values: load.map((l) => ({ day: l.day, v: l.chronic })) }], { min: 0, fmt: (v) => Math.round(v) });
-  const vc = $('#vo2Chart'); if (vc?.querySelector('svg') && S.fitness?.vo2max?.length) lineChart(vc, [{ label: 'VO₂max', color: 'var(--trend)', unit: 'ml/kg/min', values: S.fitness.vo2max.map((p) => ({ day: p.day, v: p.value })), dots: true }], { fmt: (v) => v.toFixed(0) });
+  const rc = $('#recChart'); if (rc?.querySelector('svg')) lineChart(rc, [{ label: t('recovery'), color: 'var(--c-teal)', values: rec.map((r) => ({ day: r.day, v: r.score })), dots: true }], { min: 0, max: 100, bands: [[0, 33, 'var(--awake)'], [33, 67, 'var(--grid)']] });
+  const lc = $('#loadChart'); if (lc?.querySelector('svg')) lineChart(lc, [{ label: t('acute'), color: 'var(--c-orange)', values: load.map((l) => ({ day: l.day, v: l.acute })) }, { label: t('chronic'), color: 'var(--baseline)', dash: true, values: load.map((l) => ({ day: l.day, v: l.chronic })) }], { min: 0, fmt: (v) => Math.round(v) });
+  const vc = $('#vo2Chart'); if (vc?.querySelector('svg') && S.fitness?.vo2max?.length) lineChart(vc, [{ label: 'VO₂max', color: 'var(--c-blue)', unit: 'ml/kg/min', values: S.fitness.vo2max.map((p) => ({ day: p.day, v: p.value })), dots: true }], { fmt: (v) => v.toFixed(0) });
   // journal
   const selected = new Set(S.journalToday?.tags || []);
   document.querySelectorAll('#tagChips .chip').forEach((b) => (b.onclick = () => { const g = b.dataset.tag; selected.has(g) ? selected.delete(g) : selected.add(g); b.classList.toggle('on'); b.setAttribute('aria-pressed', selected.has(g)); }));

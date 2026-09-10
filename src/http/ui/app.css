@@ -6,7 +6,8 @@
   --accent:#2e7de9; --accent-ink:#2e7de9; --on-accent:#ffffff; --accent-subtle:color-mix(in srgb, #2e7de9 14%, #e1e2e7); --focus:#007197;
   --positive:#587539; --warning:#8c6c3e; --danger:#f52a65;
   --positive-bg:color-mix(in srgb, #587539 14%, #e1e2e7); --warning-bg:color-mix(in srgb, #8c6c3e 16%, #e1e2e7); --danger-bg:color-mix(in srgb, #f52a65 14%, #e1e2e7);
-  --deep:#3760bf; --rem:#2e7de9; --light:#9fb4ea; --awake:#a8aecb; --trend:#b15c00; --baseline:#848cb5; --grid:#c4c8da;
+  --c-red:#f52a65; --c-orange:#b15c00; --c-yellow:#8c6c3e; --c-green:#587539; --c-teal:#118c74; --c-cyan:#007197; --c-blue:#2e7de9; --c-purple:#7847bd; --c-magenta:#9854f1;
+  --deep:#7847bd; --rem:#2e7de9; --light:#007197; --awake:#8c6c3e; --trend:#b15c00; --baseline:#848cb5; --grid:#c4c8da;
   --shadow-card:0 1px 2px rgba(55,96,191,.06), 0 8px 24px -16px rgba(55,96,191,.18); --shadow-overlay:0 20px 64px rgba(30,40,80,.22);
   --r-card:20px; --r-ctl:12px;
   color-scheme: light;
@@ -20,7 +21,8 @@
   --accent:#3d59a1; --accent-ink:#7aa2f7; --on-accent:#ffffff; --accent-subtle:#3d59a144; --focus:#545c7e;
   --positive:#73daca; --warning:#e0af68; --danger:#f7768e;
   --positive-bg:#41a6b520; --warning-bg:#e0af6820; --danger-bg:#db4b4b22;
-  --deep:#3d59a1; --rem:#7aa2f7; --light:#7dcfff; --awake:#545c7e; --trend:#ff9e64; --baseline:#545c7e; --grid:#232433;
+  --c-red:#f7768e; --c-orange:#ff9e64; --c-yellow:#e0af68; --c-green:#9ece6a; --c-teal:#73daca; --c-cyan:#7dcfff; --c-blue:#7aa2f7; --c-purple:#9d7cd8; --c-magenta:#bb9af7;
+  --deep:#9d7cd8; --rem:#7aa2f7; --light:#7dcfff; --awake:#e0af68; --trend:#ff9e64; --baseline:#545c7e; --grid:#232433;
   --shadow-card:none; --shadow-overlay:0 8px 24px rgba(0,0,0,.35);
   color-scheme: dark;
 }
@@ -83,7 +85,7 @@ h1 { font-size:28px; line-height:38px; font-weight:600; margin:0; } h2 { font-si
 .chip.on { background:var(--accent-subtle); color:var(--accent-ink); border-color:var(--accent-ink); } .chip:hover { border-color:var(--border); }
 
 /* ===== Sleep summary ===== */
-.sleep-card { border-top:3px solid var(--rem); height:100%; display:flex; flex-direction:column; } .sleep-card .stage-bar { margin-top:auto; } .sleep-card .legend { margin-top:16px; }
+.sleep-card { border-top:3px solid var(--deep); height:100%; display:flex; flex-direction:column; } .sleep-card .stage-bar { margin-top:auto; } .sleep-card .legend { margin-top:16px; }
 .hero-val { font-size:56px; line-height:64px; font-weight:600; margin:8px 0 4px; letter-spacing:0; } .hero-val small { font-size:16px; line-height:24px; font-weight:500; color:var(--text-2); margin:0 8px 0 4px; }
 .stage-bar { display:flex; height:10px; border-radius:4px; overflow:hidden; gap:2px; margin:16px 0 12px; } .stage-bar span { display:block; height:100%; }
 .kv { display:grid; grid-template-columns:1fr 1fr; gap:0 16px; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); } .kv > div + div { border-left:1px solid var(--border); padding-left:16px; } .kv b { display:block; font-weight:600; font-size:15px; line-height:22px; } .kv span { display:block; font-size:12px; color:var(--muted); line-height:18px; }
@@ -94,7 +96,8 @@ h1 { font-size:28px; line-height:38px; font-weight:600; margin:0; } h2 { font-si
 /* ===== Metric cards ===== */
 .metrics { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; }
 .metric { background:var(--surface); border:1px solid var(--card-border); border-radius:var(--r-card); padding:16px; min-height:156px; display:flex; flex-direction:column; gap:4px; box-shadow:var(--shadow-card); text-align:left; }
-.metric .val { font-size:32px; line-height:40px; font-weight:600; } .metric .val small { font-size:14px; font-weight:500; color:var(--text-2); margin-left:4px; }
+.metric .label::before { content:''; display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--mc, var(--trend)); margin-right:8px; vertical-align:1px; }
+.metric .val { font-size:32px; line-height:40px; font-weight:600; color:var(--mc, var(--text)); } .metric .val small { font-size:14px; font-weight:500; color:var(--text-2); margin-left:4px; }
 .metric .cmp { font-size:13px; line-height:20px; color:var(--text-2); } .metric .spark { position:relative; width:100%; height:36px; margin-top:auto; } .spark svg { width:100%; height:100%; display:block; overflow:visible; }
 .spark .dot { position:absolute; width:8px; height:8px; border-radius:50%; border:2px solid var(--surface); transform:translate(-50%,-50%); box-sizing:content-box; }
 .metric .foot { font-size:12px; line-height:18px; color:var(--muted); }
