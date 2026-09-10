@@ -5,7 +5,7 @@ import { PG_POOL } from '../db/db.module';
 import { addDays, todayCivil } from '../ingest/time';
 import { buildContext, CoachContext, MetricRow, renderContextForPrompt } from './context';
 import { ChatMessage, GlmClient } from './glm.client';
-import { PROMPT_VERSION, systemPrompt } from './prompt';
+import { CoachProfile, DEFAULT_PROFILE, PROMPT_VERSION, systemPrompt } from './prompt';
 import { ScoresService } from '../scores/scores.service';
 import { LOAD_VERSION } from '../scores/load';
 
@@ -42,6 +42,37 @@ export class CoachService {
     return ctx;
   }
 
+  /* ---------- personalisation ---------- */
+  async profile(): Promise<CoachProfile> {
+    const { rows } = await this.pool.query(`SELECT tone, verbosity, occupation, lifestyle, health_notes, exercise_purpose, custom_instructions, chat_notes, goal_sleep_min, goal_steps, goal_azm_week, updated_at FROM coach_profile WHERE id = 1`);
+    return rows[0] ? { ...DEFAULT_PROFILE, ...rows[0], chat_notes: Array.isArray(rows[0].chat_notes) ? rows[0].chat_notes : [] } : DEFAULT_PROFILE;
+  }
+
+  async updateProfile(patch: Partial<CoachProfile>): Promise<CoachProfile> {
+    const str = (v: unknown, max: number) => (v === undefined ? undefined : v === null || v === '' ? null : String(v).slice(0, max));
+    const int = (v: unknown) => (v === undefined ? undefined : v === null || v === '' ? null : Number.isFinite(Number(v)) ? Math.round(Number(v)) : null);
+    const tone = patch.tone && ['relaxed', 'balanced', 'strict'].includes(patch.tone) ? patch.tone : undefined;
+    const verbosity = patch.verbosity && ['brief', 'normal'].includes(patch.verbosity) ? patch.verbosity : undefined;
+    const fields: Record<string, unknown> = {
+      tone, verbosity, occupation: str(patch.occupation, 120), lifestyle: str(patch.lifestyle, 800), health_notes: str(patch.health_notes, 800),
+      exercise_purpose: str(patch.exercise_purpose, 300), custom_instructions: str(patch.custom_instructions, 1500),
+      goal_sleep_min: int(patch.goal_sleep_min), goal_steps: int(patch.goal_steps), goal_azm_week: int(patch.goal_azm_week),
+      chat_notes: patch.chat_notes === undefined ? undefined : JSON.stringify((patch.chat_notes || []).slice(-50)),
+    };
+    const keys = Object.keys(fields).filter((k) => fields[k] !== undefined);
+    if (keys.length) {
+      const sets = keys.map((k, i) => `${k} = $${i + 1}${k === 'chat_notes' ? '::jsonb' : ''}`).join(', ');
+      await this.pool.query(`UPDATE coach_profile SET ${sets}, updated_at = now() WHERE id = 1`, keys.map((k) => fields[k]));
+    }
+    return this.profile();
+  }
+
+  /** "จำไว้ว่า …" / "/remember …" typed in chat → stored as a note the coach sees from now on. Returns null when the text is not such a command. */
+  private rememberCommand(text: string): string | null {
+    const m = text.match(/^\s*(?:\/remember|\/note|\/จำ|จำไว้ว่า|จำไว้:|จำไว้ด้วยว่า|remember that|remember:)\s*(.+)$/is);
+    return m && m[1].trim() ? m[1].trim().slice(0, 300) : null;
+  }
+
   async history(limit = 40) {
     const { rows } = await this.pool.query(
       `SELECT id, created_at, role, content, lang, model, error FROM coach_messages ORDER BY id DESC LIMIT $1`, [limit],
@@ -60,10 +91,21 @@ export class CoachService {
     if (!text) throw new Error('empty message');
     await this.pool.query(`INSERT INTO coach_messages (role, content, lang) VALUES ('user', $1, $2)`, [text, lang]);
 
+    const note = this.rememberCommand(text);
+    if (note) {
+      const p = await this.profile();
+      await this.updateProfile({ chat_notes: [...p.chat_notes, { at: new Date().toISOString(), text: note }] });
+      const reply = lang === 'th' ? `จำไว้แล้ว: "${note}" — โค้ชจะใช้เรื่องนี้ในคำแนะนำต่อจากนี้ (แก้หรือลบได้ในตั้งค่า → โค้ชของคุณ)` : `Noted: "${note}" — the coach will take this into account from now on (edit or remove it in Settings → Your coach).`;
+      onDelta(reply);
+      const { rows } = await this.pool.query<{ id: string }>(`INSERT INTO coach_messages (role, content, lang, model, prompt_version) VALUES ('assistant', $1, $2, 'app', $3) RETURNING id`, [reply, lang, PROMPT_VERSION]);
+      return { id: Number(rows[0].id), text: reply };
+    }
+
     const ctx = await this.context();
+    const profile = await this.profile().catch(() => DEFAULT_PROFILE);
     const prior = await this.history(16);
     const messages: ChatMessage[] = [
-      { role: 'system', content: systemPrompt(lang, renderContextForPrompt(ctx)) },
+      { role: 'system', content: systemPrompt(lang, renderContextForPrompt(ctx), profile) },
       ...prior.filter((m) => !m.error).map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content as string })),
     ];
     // history() already includes the user turn we just inserted (it is the last row)

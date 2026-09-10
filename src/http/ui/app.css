@@ -159,7 +159,7 @@ pre { background:var(--raised); border-radius:12px; padding:16px; overflow:auto;
 .callout { padding:14px 16px; border-radius:14px; background:var(--accent-subtle); color:var(--text); } .callout.warn { background:var(--warning-bg); } .callout.bad { background:var(--danger-bg); }
 .empty { padding:24px; text-align:center; color:var(--muted); border:1px dashed var(--border); border-radius:14px; min-height:96px; display:grid; place-items:center; }
 .form { display:grid; gap:12px; } .form .f { display:grid; gap:4px; } .form label { font-size:13px; line-height:20px; color:var(--text-2); font-weight:500; } .form input, .form select, .form textarea { width:100%; }
-.form.cols { grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); }
+.form.cols { grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); } .form .f > .seg-ctl { justify-self:start; align-self:start; }
 .setrow { display:grid; grid-template-columns:2fr 1fr 1fr 1fr auto; gap:8px; align-items:end; }
 
 /* ===== Access gate ===== */

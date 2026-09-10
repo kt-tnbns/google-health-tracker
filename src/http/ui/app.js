@@ -43,6 +43,9 @@ const I18N = {
     hint_rhr_above: 'ชีพจรขณะพักสูงกว่าปกติ — มักพบหลังดื่ม นอนน้อย เครียด หรือร่างกายกำลังสู้กับอะไรบางอย่าง', hint_rhr_below: 'ชีพจรขณะพักต่ำกว่าปกติ — มักสัมพันธ์กับการพักผ่อนที่ดี',
     hint_spo2_below: 'SpO₂ ต่ำกว่าช่วงของคุณ — คืนเดียวบอกอะไรไม่ได้มาก ถ้าต่ำต่อเนื่องหลายคืนค่อยสังเกต', hint_rr_above: 'อัตราหายใจสูงกว่าปกติ — มักพบเมื่อเริ่มไม่สบาย เครียด หรือนอนในห้องร้อน',
     exerciseMin: 'นาทีออกกำลัง', zoneFat: 'Fat burn', zoneCardio: 'Cardio', zonePeak: 'Peak', noSessions: 'ไม่มีเซสชันออกกำลังที่บันทึกวันนี้', avgHr: 'HR เฉลี่ย', loadDay: 'โหลดของวัน', noActivity: 'ยังไม่มีข้อมูลกิจกรรมของวันนี้',
+    setCoach: 'โค้ชของคุณ', setCoachSub: 'ปรับสไตล์และบริบทที่โค้ชใช้ตอบ — ทุกอย่างในนี้ถูกส่งให้โมเดลอ่านเป็นข้อมูล ไม่ใช่คำสั่งเหนือกฎความปลอดภัย', tone: 'สไตล์โค้ช', tone_relaxed: 'สบายๆ', tone_balanced: 'สมดุล', tone_strict: 'จริงจัง', toneHint_relaxed: 'เน้นพักผ่อน อลุ่มอล่วย เตือนไม่เกิน 1 เรื่องต่อครั้ง', toneHint_balanced: 'เป็นกันเอง ชี้ 1–2 เรื่องที่สำคัญที่สุด', toneHint_strict: 'ตรงไปตรงมา ชี้ทุกจุดที่หลุดจาก baseline/เป้าหมาย',
+    verbosity: 'ความยาวคำตอบ', verb_brief: 'สั้น', verb_normal: 'ปกติ', occupation: 'อาชีพ / ลักษณะงาน', occupationPh: 'เช่น Software engineer นั่งหน้าจอทั้งวัน', lifestyle: 'ไลฟ์สไตล์', lifestylePh: 'เช่น นอนดึกช่วงปล่อยงาน ดื่มกาแฟ 2 แก้ว/วัน ว่ายน้ำสัปดาห์ละครั้ง', healthNotes: 'สุขภาพที่โค้ชควรรู้', healthPh: 'เช่น ปวดหลังล่างเป็นๆ หายๆ ห้ามแนะนำท่า deadlift หนัก · ข้อมูลนี้อยู่บนเซิร์ฟเวอร์ของคุณเท่านั้น', exercisePurpose: 'ออกกำลังเพื่ออะไร', purposePh: 'เช่น สุขภาพทั่วไปและนอนหลับดีขึ้น / ลดไขมัน / เพิ่มกล้าม / วิ่ง 10K', customInstr: 'สิ่งที่อยากให้โค้ชทำ/ไม่ทำ', customPh: 'เช่น อย่าพูดเรื่องแคลอรี · ใช้ภาษาผู้ชายๆ ห้วนๆ · ถ้านอนน้อยกว่า 6 ชม. ให้เตือนเรื่องขับรถ',
+    goals: 'เป้าหมายของคุณ', goalSleep: 'นอนต่อคืน (ชม.)', goalSteps: 'ก้าว/วัน', goalAzm: 'นาทีในโซนหัวใจ/สัปดาห์', chatNotes: 'สิ่งที่บอกโค้ชผ่านแชท', chatNotesHint: 'พิมพ์ในแชทว่า “จำไว้ว่า …” หรือ “/remember …” โค้ชจะเก็บไว้ที่นี่', removeNote: 'ลบ', rememberHint: 'พิมพ์ “จำไว้ว่า …” เพื่อบอกเรื่องตัวคุณให้โค้ชจำ',
     err_generic: 'เกิดข้อผิดพลาด', partialFetch: 'บางชนิดข้อมูลดึงไม่สำเร็จ',
   },
   en: {
@@ -84,6 +87,9 @@ const I18N = {
     hint_rhr_above: 'Resting HR above usual — common after alcohol, short sleep, stress, or when the body is fighting something', hint_rhr_below: 'Resting HR below usual — often goes with good rest',
     hint_spo2_below: 'SpO₂ below your range — one night says little; watch it only if it stays low for several nights', hint_rr_above: 'Breathing rate above usual — common when getting ill, stressed, or sleeping in a warm room',
     exerciseMin: 'Exercise minutes', zoneFat: 'Fat burn', zoneCardio: 'Cardio', zonePeak: 'Peak', noSessions: 'No recorded workout this day', avgHr: 'Avg HR', loadDay: 'Load this day', noActivity: 'No activity data for this day yet',
+    setCoach: 'Your coach', setCoachSub: 'Tune the style and context the coach uses — everything here is shown to the model as data, never as instructions that override the safety rules', tone: 'Coaching style', tone_relaxed: 'Relaxed', tone_balanced: 'Balanced', tone_strict: 'Strict', toneHint_relaxed: 'Rest first, forgiving, at most one caution per reply', toneHint_balanced: 'Friendly, points out the 1–2 things that matter most', toneHint_strict: 'Direct, calls out every miss against baseline/goals',
+    verbosity: 'Reply length', verb_brief: 'Brief', verb_normal: 'Normal', occupation: 'Occupation / kind of work', occupationPh: 'e.g. Software engineer, desk work all day', lifestyle: 'Lifestyle', lifestylePh: 'e.g. late nights around releases, 2 coffees a day, swim once a week', healthNotes: 'Health context the coach should know', healthPh: 'e.g. recurring lower-back pain, no heavy deadlifts · stays on your server only', exercisePurpose: 'Why you exercise', purposePh: 'e.g. general health and better sleep / fat loss / muscle / a 10K', customInstr: 'What the coach should or should not do', customPh: 'e.g. never talk about calories · blunt tone · if I sleep < 6 h, warn me about driving',
+    goals: 'Your goals', goalSleep: 'Sleep per night (h)', goalSteps: 'Steps / day', goalAzm: 'Zone minutes / week', chatNotes: 'Things you told the coach in chat', chatNotesHint: 'Type “remember that …” or “/remember …” in the chat and it lands here', removeNote: 'Remove', rememberHint: 'Type “remember that …” to tell the coach something about you',
     err_generic: 'Something went wrong', partialFetch: 'Some data types failed to fetch',
   },
 };
@@ -93,7 +99,7 @@ const S = {
   token: '', lang: 'th', theme: 'system', view: 'today',
   status: null, rows: [], byDay: {}, days: [], scores: null, coachInfo: null, coachHist: [], journalToday: null,
   sleepRange: 7, selectedDay: null, loading: {}, err: {}, lastFetch: null, demo: false, raw: [], ctx: null,
-  exercise: [], insights: null, fitness: null, strength: null, strengthWeekly: null, bio: null, profile: null, coachOpen: false,
+  exercise: [], coachProfile: null, insights: null, fitness: null, strength: null, strengthWeekly: null, bio: null, profile: null, coachOpen: false,
 };
 try { S.token = sessionStorage.getItem('adminToken') || ''; } catch {}
 try { S.lang = localStorage.getItem('lang') || (navigator.language.startsWith('th') ? 'th' : 'en'); S.theme = localStorage.getItem('theme') || 'system'; } catch {}
@@ -616,7 +622,7 @@ function openCoach(on) {
       <div class="menu" id="menu" hidden role="menu"><button role="menuitem" id="clearBtn">${t('clearChat')}</button></div>
     </div>
     <div class="msgs" id="msgs"></div>
-    <div class="sugg" id="sugg">${t('sugg').map((s) => `<button class="chip">${esc(s)}</button>`).join('')}</div>
+    <div class="sugg" id="sugg">${t('sugg').map((s) => `<button class="chip">${esc(s)}</button>`).join('')}<span class="meta" style="align-self:center">${t('rememberHint')}</span></div>
     <div class="compose"><textarea id="chatIn" rows="1" placeholder="${t('askPh')}" aria-label="${t('askPh')}"></textarea><button class="primary icon-btn" id="sendBtn" aria-label="${t('send')}">${ICO.send}</button></div>`;
   const box = $('#msgs');
   if (!S.coachHist.length) box.innerHTML = `<div class="empty">${t('coachEmpty')}</div>`;
@@ -745,6 +751,21 @@ function renderSettings() {
       <div class="row between" style="margin-bottom:12px"><div class="seg-ctl"><button class="on" data-units="levine">${t('unitsLevine')}</button><button data-units="us">${t('unitsUS')}</button></div><div class="f"><label class="small">${t('drawnOn')}</label><input id="bdate" type="date" value="${todayStr()}"></div></div>
       <div class="form cols" id="panelForm"></div>
       <div class="row" style="margin-top:12px"><button class="primary sm" id="bsave">${t('save')}</button><span class="meta" id="bstatus"></span></div></section>
+    <section class="card span12" id="coachCard"><h2>${t('setCoach')}</h2><div class="small t2">${t('setCoachSub')}</div><div class="rule"></div>
+      ${(() => { const c = S.coachProfile || {}; const seg = (name, opts, cur, pre) => `<div class="seg-ctl" data-seg="${name}">${opts.map((o) => `<button class="${cur === o ? 'on' : ''}" data-v="${o}">${t(pre + o)}</button>`).join('')}</div>`;
+        return `<div class="form cols" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">
+          <div class="f"><label>${t('tone')}</label>${seg('tone', ['relaxed', 'balanced', 'strict'], c.tone || 'balanced', 'tone_')}<div class="meta" id="toneHint">${t('toneHint_' + (c.tone || 'balanced'))}</div></div>
+          <div class="f"><label>${t('verbosity')}</label>${seg('verbosity', ['brief', 'normal'], c.verbosity || 'normal', 'verb_')}</div></div>
+        <div class="form cols" style="margin-top:12px"><div class="f"><label>${t('occupation')}</label><input id="cpOcc" maxlength="120" placeholder="${t('occupationPh')}" value="${esc(c.occupation || '')}"></div><div class="f"><label>${t('exercisePurpose')}</label><input id="cpPurpose" maxlength="300" placeholder="${t('purposePh')}" value="${esc(c.exercise_purpose || '')}"></div></div>
+        <div class="form" style="margin-top:12px"><div class="f"><label>${t('lifestyle')}</label><textarea id="cpLife" rows="2" maxlength="800" placeholder="${t('lifestylePh')}">${esc(c.lifestyle || '')}</textarea></div>
+          <div class="f"><label>${t('healthNotes')}</label><textarea id="cpHealth" rows="2" maxlength="800" placeholder="${t('healthPh')}">${esc(c.health_notes || '')}</textarea></div>
+          <div class="f"><label>${t('customInstr')}</label><textarea id="cpCustom" rows="2" maxlength="1500" placeholder="${t('customPh')}">${esc(c.custom_instructions || '')}</textarea></div></div>
+        <div class="label" style="margin-top:16px">${t('goals')}</div>
+        <div class="form cols"><div class="f"><label>${t('goalSleep')}</label><input id="cpGSleep" type="number" min="3" max="12" step="0.25" value="${c.goal_sleep_min ? (c.goal_sleep_min / 60).toFixed(2).replace(/\.?0+$/, '') : ''}"></div><div class="f"><label>${t('goalSteps')}</label><input id="cpGSteps" type="number" min="1000" max="50000" step="500" value="${c.goal_steps ?? ''}"></div><div class="f"><label>${t('goalAzm')}</label><input id="cpGAzm" type="number" min="30" max="2000" step="10" value="${c.goal_azm_week ?? ''}"></div></div>
+        <div class="row" style="margin-top:12px"><button class="primary sm" id="cpSave">${t('save')}</button><span class="meta" id="cpStatus"></span></div>
+        <div class="rule"></div><div class="label">${t('chatNotes')}</div><div class="meta" style="margin-bottom:8px">${t('chatNotesHint')}</div>
+        <div class="list" id="cpNotes">${(c.chat_notes || []).length ? c.chat_notes.map((n, i) => `<div class="item" style="display:flex;justify-content:space-between;align-items:center;gap:12px"><span class="small">${esc(n.text)}<span class="meta" style="margin-left:8px">${dt(n.at)}</span></span><button class="sm ghost" data-rm="${i}">${t('removeNote')}</button></div>`).join('') : `<div class="meta">—</div>`}</div>`; })()}
+    </section>
     <section class="card span12"><h2>${t('setDiag')}</h2><div class="small t2">${t('diagNote')}</div><div class="rule"></div>
       <div class="row" style="margin-bottom:12px"><span class="badge">${t('model')}: ${esc(info?.model || '—')}</span><span class="badge">${t('promptVersion')}: ${esc(info?.promptVersion || '—')}</span>${info && !info.configured ? `<span class="badge warn">${t('coachOff')}</span>` : ''}${S.demo ? `<span class="badge warn">${t('demo')}</span>` : ''}</div>
       <div class="row"><button class="sm" id="ctxBtn">${t('coachContext')}</button><button class="sm" id="recomputeBtn">${t('recompute')}</button><button class="sm" id="probeBtn">${t('probe')}</button><span class="meta" id="probeStatus"></span></div>
@@ -783,6 +804,16 @@ function bindSettings() {
     for (const f of PANEL_FIELDS) { const v = parseFloat($(`#panelForm [data-k="${f.k}"]`).value); body[f.k] = panelUnits === 'levine' ? v : f.conv(v); }
     try { await api('/api/bioage/panels', { method: 'POST', body: JSON.stringify(body) }); $('#bstatus').textContent = t('saved'); S.bio = await api('/api/bioage').catch(() => null); } catch (e) { $('#bstatus').textContent = e.message; }
   };
+  // coach personalisation
+  const cpSel = { tone: S.coachProfile?.tone || 'balanced', verbosity: S.coachProfile?.verbosity || 'normal' };
+  document.querySelectorAll('#coachCard [data-seg] button').forEach((b) => (b.onclick = () => { const name = b.closest('[data-seg]').dataset.seg; cpSel[name] = b.dataset.v; b.parentElement.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); if (name === 'tone') $('#toneHint').textContent = t('toneHint_' + b.dataset.v); }));
+  const saveCp = async (extra = {}) => { const st = $('#cpStatus'); try {
+      const hrs = parseFloat($('#cpGSleep').value);
+      S.coachProfile = await api('/api/coach/profile', { method: 'PUT', body: JSON.stringify({ ...cpSel, occupation: $('#cpOcc').value, exercise_purpose: $('#cpPurpose').value, lifestyle: $('#cpLife').value, health_notes: $('#cpHealth').value, custom_instructions: $('#cpCustom').value,
+        goal_sleep_min: Number.isFinite(hrs) ? Math.round(hrs * 60) : null, goal_steps: $('#cpGSteps').value || null, goal_azm_week: $('#cpGAzm').value || null, ...extra }) });
+      st.textContent = t('saved'); setTimeout(() => (st.textContent = ''), 2000); } catch (e) { st.textContent = e.message; } };
+  $('#cpSave').onclick = () => saveCp();
+  document.querySelectorAll('#cpNotes [data-rm]').forEach((b) => (b.onclick = async () => { const notes = [...(S.coachProfile?.chat_notes || [])]; notes.splice(+b.dataset.rm, 1); await saveCp({ chat_notes: notes }); renderSettings(); }));
   $('#ctxBtn').onclick = async () => showDiag(await api('/api/coach/context'));
   $('#recomputeBtn').onclick = async () => showDiag(await api('/api/scores/recompute', { method: 'POST' }));
   $('#probeBtn').onclick = async () => { $('#probeStatus').textContent = t('probing'); try { const r = await api('/api/energy/probe', { method: 'POST' }); $('#probeStatus').textContent = r.ok ? `${t('coverage')} ${r.coveragePct}% · ${r.samples} ${t('samples')} · ${t('verdict_' + r.verdict)}` : r.error || t('err_generic'); showDiag(r); } catch (e) { $('#probeStatus').textContent = e.message; } };
@@ -799,7 +830,7 @@ function render() {
   if (!$('#main')) { app().innerHTML = shell(''); bindShell(); }
   else { document.querySelectorAll('[data-view]').forEach((b) => b.classList.toggle('on', b.dataset.view === S.view && (b.closest('.tabs') || b.closest('.nav')))); }
   if (S.view === 'trends') { if (!S.insights) { $('#main').innerHTML = `<div class="empty">…</div>`; loadTrends().then(renderTrends); } else renderTrends(); }
-  else if (S.view === 'settings') { if (!S.profile) api('/api/profile').then((p) => { S.profile = p || {}; renderSettings(); }).catch(() => renderSettings()); else renderSettings(); }
+  else if (S.view === 'settings') { if (!S.profile || !S.coachProfile) Promise.all([api('/api/profile').catch(() => ({})), api('/api/coach/profile').catch(() => null)]).then(([p, cp]) => { S.profile = p || {}; S.coachProfile = cp; renderSettings(); }); else renderSettings(); }
   else renderToday();
 }
 async function boot() {

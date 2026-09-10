@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { CoachService, Lang } from '../coach/coach.service';
 import { AdminGuard } from './admin.guard';
@@ -14,6 +14,13 @@ export class CoachController {
   /** Exactly what the coach is shown — for transparency. */
   @Get('context')
   context() { return this.coach.context(); }
+
+  /** Personalisation: tone, length, occupation, health context, exercise purpose, goals, notes. */
+  @Get('profile')
+  profile() { return this.coach.profile(); }
+
+  @Put('profile')
+  updateProfile(@Body() body: Record<string, unknown>) { return this.coach.updateProfile(body as any); }
 
   @Get('messages')
   messages() { return this.coach.history(60); }
