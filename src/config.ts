@@ -13,6 +13,7 @@ const schema = z.object({
   GLM_API_KEY: z.string().default(''),
   GLM_BASE_URL: z.string().default('https://api.z.ai/api/paas/v4'),
   GLM_MODEL: z.string().default('glm-5.3'),
+  GLM_THINKING: z.enum(['enabled', 'disabled']).default('disabled'),
 });
 
 export type AppConfig = z.infer<typeof schema> & { googleRedirectUri: string };

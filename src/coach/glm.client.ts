@@ -20,7 +20,11 @@ export class GlmClient {
     const res = await fetch(`${config.GLM_BASE_URL.replace(/\/$/, '')}/chat/completions`, {
       method: 'POST',
       headers: { authorization: `Bearer ${config.GLM_API_KEY}`, 'content-type': 'application/json', accept: 'text/event-stream' },
-      body: JSON.stringify({ model: config.GLM_MODEL, messages, stream: true, temperature: opts.temperature ?? 0.5, max_tokens: opts.maxTokens ?? 1200 }),
+      body: JSON.stringify({
+        model: config.GLM_MODEL, messages, stream: true, temperature: opts.temperature ?? 0.5, max_tokens: opts.maxTokens ?? 1200,
+        // GLM-5.x reasons by default; coaching replies are short, so keep thinking off unless GLM_THINKING=enabled
+        thinking: { type: config.GLM_THINKING === 'enabled' ? 'enabled' : 'disabled' },
+      }),
       signal: opts.signal,
     });
     if (!res.ok || !res.body) {
