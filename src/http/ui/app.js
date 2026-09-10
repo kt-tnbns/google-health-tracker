@@ -137,19 +137,19 @@ const ICO = {
 
 /* ================= charts ================= */
 function sparkline(days, m, color) {
+  // The path SVG is stretched (preserveAspectRatio=none) so it fills the card; dots are HTML elements placed by percentage so they stay round.
   const pts = days.map((d, i) => [i, val(d, m)]);
   const have = pts.filter((p) => p[1] !== null);
-  if (!have.length) return '<svg viewBox="0 0 100 36" aria-hidden="true"></svg>';
+  if (!have.length) return '<div class="spark" aria-hidden="true"></div>';
   const W = 100, H = 36, pad = 4;
   const ys = have.map((p) => p[1]), lo = Math.min(...ys), hi = Math.max(...ys), span = hi - lo || 1;
   const x = (i) => pad + (i / Math.max(1, days.length - 1)) * (W - 2 * pad), y = (v) => H - pad - ((v - lo) / span) * (H - 2 * pad);
-  if (have.length < 3) {   // too few points for a trend line — show the points only, no misleading slope
-    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${have.map((p) => `<circle cx="${x(p[0]).toFixed(1)}" cy="${(H / 2).toFixed(1)}" r="3.5" fill="${color}" stroke="var(--surface)" stroke-width="2" vector-effect="non-scaling-stroke"/>`).join('')}</svg>`;
-  }
+  const dot = (i, v, cls = '') => `<i class="dot ${cls}" style="left:${x(i).toFixed(1)}%;top:${((y(v) / H) * 100).toFixed(1)}%;background:${color}"></i>`;
+  if (have.length < 3) return `<div class="spark" aria-hidden="true">${have.map((p) => dot(p[0], (lo + hi) / 2)).join('')}</div>`;   // too few points for a trend line
   let d = '', prev = false;
   for (const [i, v] of pts) { if (v === null) { prev = false; continue; } d += `${prev ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`; prev = true; }   // no interpolation across gaps
   const last = have[have.length - 1];
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/><circle cx="${x(last[0]).toFixed(1)}" cy="${y(last[1]).toFixed(1)}" r="3.5" fill="${color}" stroke="var(--surface)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+  return `<div class="spark" aria-hidden="true"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>${dot(last[0], last[1])}</div>`;
 }
 
 /** Generic line chart: series = [{key,label,color,values:[{day,v}]}], with grid, y labels, crosshair tooltip. */
@@ -428,7 +428,7 @@ function renderToday() {
   } else {
     const latestOverall = S.days[S.days.length - 1];
     body += recoveryBlock();
-    body += `<div class="grid12"><div class="span5">${sleepSummary()}</div><div class="span7"><div class="section-head"><h2>${t('vitals')}</h2><span class="pop-wrap"><button class="icon-btn ghost" id="vitalsInfo" aria-label="${t('vitalsInfo')}" aria-expanded="false">${ICO.info}</button><div class="popover" role="tooltip" hidden>${t('vitalsInfo')}</div></span></div><div class="metrics">${VITALS.map((v) => metricCard(v, latestOverall)).join('')}</div></div></div>`;
+    body += `<div class="grid12 equal"><div class="span5">${sleepSummary()}</div><div class="span7"><div class="section-head"><h2>${t('vitals')}</h2><span class="pop-wrap"><button class="icon-btn ghost" id="vitalsInfo" aria-label="${t('vitalsInfo')}" aria-expanded="false">${ICO.info}</button><div class="popover" role="tooltip" hidden>${t('vitalsInfo')}</div></span></div><div class="metrics">${VITALS.map((v) => metricCard(v, latestOverall)).join('')}</div></div></div>`;
     body += sleepHistory();
     body += activityBlock();
   }

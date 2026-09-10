@@ -1,28 +1,27 @@
-/* ===== Design tokens — palette supplied by kt (light-first); dark theme derived from primary/ink ===== */
+/* ===== Design tokens — Tokyo Night (dark = Enkia's VS Code theme, light = Tokyo Night Day) ===== */
 :root {
-  /* palette */
-  --p-primary:#17171c; --p-black:#000000; --p-ink:#212121; --p-deep-green:#003c33; --p-dark-navy:#071829; --p-canvas:#ffffff; --p-soft-stone:#eeece7;
-  --p-pale-green:#edfce9; --p-pale-blue:#f1f5ff; --p-hairline:#d9d9dd; --p-border-light:#e5e7eb; --p-card-border:#f2f2f2; --p-muted:#93939f; --p-slate:#75758a;
-  --p-body-muted:#616161; --p-action-blue:#1863dc; --p-focus-blue:#4c6ee6; --p-coral:#ff7759; --p-coral-soft:#ffad9b; --p-form-focus:#9b60aa; --p-on-primary:#ffffff; --p-on-dark:#ffffff; --p-error:#b30000;
-  /* semantic (light) */
-  --canvas:var(--p-canvas); --surface:var(--p-canvas); --raised:var(--p-soft-stone); --overlay:var(--p-canvas); --border:var(--p-border-light); --card-border:var(--p-card-border);
-  --text:var(--p-primary); --text-2:var(--p-body-muted); --muted:var(--p-muted);
-  --accent:var(--p-action-blue); --accent-ink:var(--p-action-blue); --on-accent:var(--p-on-primary); --accent-subtle:var(--p-pale-blue); --focus:var(--p-focus-blue);
-  --positive:var(--p-deep-green); --warning:#8a3a22; --danger:var(--p-error);
-  --positive-bg:var(--p-pale-green); --warning-bg:color-mix(in srgb, var(--p-coral-soft) 35%, var(--p-canvas)); --danger-bg:color-mix(in srgb, var(--p-coral-soft) 45%, var(--p-canvas));
-  --deep:var(--p-dark-navy); --rem:var(--p-action-blue); --light:#a9bff2; --awake:var(--p-muted); --trend:var(--p-coral); --baseline:var(--p-slate); --grid:var(--p-border-light);
-  --shadow-card:0 1px 2px rgba(23,23,28,.04), 0 8px 24px -16px rgba(23,23,28,.12); --shadow-overlay:0 20px 64px rgba(0,0,0,.18);
+  /* Tokyo Night Day */
+  --canvas:#e1e2e7; --surface:#f2f3f7; --raised:#d5d9e6; --overlay:#f2f3f7; --border:#b9bfd9; --card-border:#c9cee0;
+  --text:#3760bf; --text-2:#6172b0; --muted:#848cb5;
+  --accent:#2e7de9; --accent-ink:#2e7de9; --on-accent:#ffffff; --accent-subtle:color-mix(in srgb, #2e7de9 14%, #e1e2e7); --focus:#007197;
+  --positive:#587539; --warning:#8c6c3e; --danger:#f52a65;
+  --positive-bg:color-mix(in srgb, #587539 14%, #e1e2e7); --warning-bg:color-mix(in srgb, #8c6c3e 16%, #e1e2e7); --danger-bg:color-mix(in srgb, #f52a65 14%, #e1e2e7);
+  --deep:#3760bf; --rem:#2e7de9; --light:#9fb4ea; --awake:#a8aecb; --trend:#b15c00; --baseline:#848cb5; --grid:#c4c8da;
+  --shadow-card:0 1px 2px rgba(55,96,191,.06), 0 8px 24px -16px rgba(55,96,191,.18); --shadow-overlay:0 20px 64px rgba(30,40,80,.22);
   --r-card:20px; --r-ctl:12px;
   color-scheme: light;
 }
 :root[data-theme="dark"] {
-  --canvas:var(--p-primary); --surface:var(--p-ink); --raised:#2b2b32; --overlay:var(--p-ink); --border:#34343c; --card-border:#2e2e35;
-  --text:var(--p-on-dark); --text-2:#c9c9d1; --muted:var(--p-muted);
-  --accent:var(--p-action-blue); --accent-ink:#9fb8f0; --on-accent:var(--p-on-primary); --accent-subtle:#1c2a45; --focus:var(--p-focus-blue);
-  --positive:#8fd6b8; --warning:var(--p-coral-soft); --danger:#ff9b9b;
-  --positive-bg:#0f2f28; --warning-bg:#3d241d; --danger-bg:#3d1c1c;
-  --deep:#4c6ee6; --rem:#7f9ff0; --light:#b9c8f3; --awake:#6f6f7c; --trend:var(--p-coral); --baseline:var(--p-slate); --grid:#2e2e36;
-  --shadow-card:none; --shadow-overlay:0 20px 64px rgba(0,0,0,.4);
+  /* Tokyo Night (Enkia) — mapped from the VS Code theme: canvas = sideBar/panel #16161e, cards = editor.background #1a1b26,
+     borders = *.border #101014, hover = list.hover/lineHighlight, text = variable/editor.foreground/foreground, accent = button.background #3d59a1,
+     links = textLink #6183bb, charts.* for series, diff/inputValidation for status tints */
+  --canvas:#16161e; --surface:#1a1b26; --raised:#1e202e; --overlay:#16161e; --border:#2b2b3b; --card-border:#101014;
+  --text:#c0caf5; --text-2:#a9b1d6; --muted:#787c99;
+  --accent:#3d59a1; --accent-ink:#7aa2f7; --on-accent:#ffffff; --accent-subtle:#3d59a144; --focus:#545c7e;
+  --positive:#73daca; --warning:#e0af68; --danger:#f7768e;
+  --positive-bg:#41a6b520; --warning-bg:#e0af6820; --danger-bg:#db4b4b22;
+  --deep:#3d59a1; --rem:#7aa2f7; --light:#7dcfff; --awake:#545c7e; --trend:#ff9e64; --baseline:#545c7e; --grid:#232433;
+  --shadow-card:none; --shadow-overlay:0 8px 24px rgba(0,0,0,.35);
   color-scheme: dark;
 }
 
@@ -59,7 +58,7 @@ h1 { font-size:28px; line-height:38px; font-weight:600; margin:0; } h2 { font-si
 .tabs { display:flex; gap:4px; margin-left:16px; } .tabs button { min-height:36px; padding:6px 12px; border:0; background:transparent; color:var(--muted); font-weight:500; border-radius:10px; } .tabs button.on { color:var(--accent-ink); background:var(--accent-subtle); }
 .header .right { margin-left:auto; display:flex; align-items:center; gap:8px; }
 .page { max-width:1240px; margin:0 auto; padding:24px 32px 64px; display:grid; gap:24px; }
-.grid12 { display:grid; grid-template-columns:repeat(12, minmax(0,1fr)); gap:24px; align-items:start; }
+.grid12 { display:grid; grid-template-columns:repeat(12, minmax(0,1fr)); gap:24px; align-items:start; } .grid12.equal { align-items:stretch; }
 .span5 { grid-column:span 5; } .span7 { grid-column:span 7; } .span12 { grid-column:span 12; } .span6 { grid-column:span 6; } .span4 { grid-column:span 4; } .span8 { grid-column:span 8; }
 .card { background:var(--surface); border:1px solid var(--card-border); border-radius:var(--r-card); padding:24px; box-shadow:var(--shadow-card); min-width:0; }
 .card.quiet { background:transparent; border-style:dashed; }
@@ -84,7 +83,7 @@ h1 { font-size:28px; line-height:38px; font-weight:600; margin:0; } h2 { font-si
 .chip.on { background:var(--accent-subtle); color:var(--accent-ink); border-color:var(--accent-ink); } .chip:hover { border-color:var(--border); }
 
 /* ===== Sleep summary ===== */
-.sleep-card { border-top:3px solid var(--rem); }
+.sleep-card { border-top:3px solid var(--rem); height:100%; display:flex; flex-direction:column; } .sleep-card .stage-bar { margin-top:auto; } .sleep-card .legend { margin-top:16px; }
 .hero-val { font-size:56px; line-height:64px; font-weight:600; margin:8px 0 4px; letter-spacing:0; } .hero-val small { font-size:16px; line-height:24px; font-weight:500; color:var(--text-2); margin:0 8px 0 4px; }
 .stage-bar { display:flex; height:10px; border-radius:4px; overflow:hidden; gap:2px; margin:16px 0 12px; } .stage-bar span { display:block; height:100%; }
 .kv { display:grid; grid-template-columns:1fr 1fr; gap:0 16px; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); } .kv > div + div { border-left:1px solid var(--border); padding-left:16px; } .kv b { display:block; font-weight:600; font-size:15px; line-height:22px; } .kv span { display:block; font-size:12px; color:var(--muted); line-height:18px; }
@@ -96,7 +95,8 @@ h1 { font-size:28px; line-height:38px; font-weight:600; margin:0; } h2 { font-si
 .metrics { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; }
 .metric { background:var(--surface); border:1px solid var(--card-border); border-radius:var(--r-card); padding:16px; min-height:156px; display:flex; flex-direction:column; gap:4px; box-shadow:var(--shadow-card); text-align:left; }
 .metric .val { font-size:32px; line-height:40px; font-weight:600; } .metric .val small { font-size:14px; font-weight:500; color:var(--text-2); margin-left:4px; }
-.metric .cmp { font-size:13px; line-height:20px; color:var(--text-2); } .metric svg { width:100%; height:36px; margin-top:auto; overflow:visible; display:block; }
+.metric .cmp { font-size:13px; line-height:20px; color:var(--text-2); } .metric .spark { position:relative; width:100%; height:36px; margin-top:auto; } .spark svg { width:100%; height:100%; display:block; overflow:visible; }
+.spark .dot { position:absolute; width:8px; height:8px; border-radius:50%; border:2px solid var(--surface); transform:translate(-50%,-50%); box-sizing:content-box; }
 .metric .foot { font-size:12px; line-height:18px; color:var(--muted); }
 .metric .dash { color:var(--muted); font-weight:500; font-size:24px; }
 
