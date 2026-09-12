@@ -271,3 +271,45 @@ summary:focus-visible { outline:2px solid var(--focus); outline-offset:4px; bord
 }
 @media(max-width:359px) { .monitor-grid { grid-template-columns:1fr; } }
 @media(prefers-reduced-motion:reduce) { .recovery-card *, .monitor-metric *, .coverage-panel * { transition:none; animation:none; } }
+
+/* Today: one glance, with the measurements one tap away. */
+.grid12 > *, .page > *, .section-head > *, .greet > * { min-width:0; }
+.today-overview { padding:28px 24px 0; }
+.day-rings { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; }
+.day-ring { display:flex; flex-direction:column; align-items:center; min-width:0; padding:0 8px 24px; border:0; background:transparent; box-shadow:none; color:var(--text); white-space:normal; }
+.day-ring:hover { background:var(--raised); }
+.ring-face { width:min(100%,180px); aspect-ratio:1; position:relative; display:grid; place-items:center; margin-bottom:12px; }
+.ring-face svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; transform:rotate(-90deg); fill:none; stroke-width:8; }
+.ring-track { stroke:var(--border); }
+.ring-progress { stroke:var(--ring-color); stroke-linecap:round; }
+.ring-value { position:relative; font-size:32px; font-weight:600; font-variant-numeric:tabular-nums; letter-spacing:-.03em; }
+.ring-value small { font-size:13px; font-weight:400; margin:0 3px; letter-spacing:0; }
+.day-ring strong { font-size:18px; }
+.ring-note { font-size:13px; color:var(--text-2); margin-top:4px; }
+.readiness-line { border-top:1px solid var(--border); padding:18px 0; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px 16px; font-size:14px; }
+.readiness-line a { flex-shrink:0; }
+.readiness-source { display:block; color:var(--text-2); font-size:12px; margin-top:3px; }
+.today-vitals { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; height:100%; }
+.today-vitals .metric { min-width:0; }
+.coach-preview .msg-preview { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+.metric.monitor-metric { background:linear-gradient(145deg,var(--surface),var(--raised)); border:1px solid var(--card-border); box-shadow:var(--shadow-card); border-radius:var(--r-card); }
+.trend-recovery > summary { cursor:pointer; min-height:44px; padding:10px 0; font-weight:500; }
+.section-head { flex-wrap:wrap; }
+@media(max-width:599px) {
+  .today-overview { padding:18px 10px 0; }
+  .day-rings { gap:2px; }
+  .day-ring { padding:0 2px 18px; }
+  .ring-face { margin-bottom:8px; }
+  .ring-value { font-size:22px; }
+  .ring-value small { font-size:10px; margin:0 1px; }
+  .day-ring strong { font-size:15px; }
+  .ring-note { font-size:11px; }
+  .readiness-line { padding:14px 4px; font-size:12px; }
+  .today-vitals { gap:12px; }
+  .today-vitals .metric { padding:14px; }
+  .today-vitals .val { font-size:28px; }
+  .recovery { grid-template-columns:1fr; }
+  .greet .freshness { max-width:100%; }
+  .coach-preview .row { flex-wrap:wrap; }
+}
+@media(max-width:359px) { .ring-value { font-size:19px; } .ring-value small { font-size:9px; } }

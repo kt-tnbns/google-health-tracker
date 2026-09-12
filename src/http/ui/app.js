@@ -102,6 +102,7 @@ const I18N = {
 
 
 Object.assign(I18N.en, {
+  sleep: 'Sleep',
   healthMonitor: 'Health Monitor', monitorNote: 'Today against your own recent readings. Your usual range is descriptive, not a health target.',
   coverageTitle: 'Data coverage', coverageNote: 'Complete daily readings in the previous 60 days, excluding today. Missing may mean not fetched, not recorded, or a sync gap. This is not wear-time coverage.',
   completeReadings: 'complete', partialReadings: 'partial', missingReadings: 'missing', fetchHistory: 'Fetch 60 days from Google',
@@ -121,6 +122,7 @@ Object.assign(I18N.en, {
   monitorDetails: 'View today’s details', noRecovery: 'Recovery data could not be loaded', dayIncomplete: 'Day still in progress',
 });
 Object.assign(I18N.th, {
+  sleep: 'การนอน',
   healthMonitor: 'ภาพรวมสุขภาพ', monitorNote: 'ค่าของวันนี้เทียบกับข้อมูลล่าสุดของคุณ ช่วงปกติส่วนตัวไม่ใช่เป้าหมายสุขภาพ',
   coverageTitle: 'ความครบถ้วนของข้อมูล', coverageNote: 'ค่ารายวันที่ครบถ้วนใน 60 วันก่อนหน้า ไม่รวมวันนี้ ข้อมูลที่ขาดอาจยังไม่ได้ดึง ไม่ได้บันทึก หรือยังไม่ซิงก์ ไม่ใช่สัดส่วนเวลาที่สวมอุปกรณ์',
   completeReadings: 'ครบถ้วน', partialReadings: 'บางส่วน', missingReadings: 'ขาด', fetchHistory: 'ดึงข้อมูล 60 วันจาก Google',
@@ -298,7 +300,7 @@ function sleepBars(el, days) {
       footer: (it) => { const i = it[0]?.dataIndex; return i === undefined || asleep[i] === null ? t('noDay') : `${t('asleepTotal')} ${hm(asleep[i])}`; },
     } } },
     scales: { x: { ...base.scales.x, stacked: true }, y: { ...base.scales.y, stacked: true, min: 0, max: yMax, ticks: { ...base.scales.y.ticks, stepSize: 120, callback: (v) => `${v / 60}${t('hrs')}` } } },
-    onClick: (e, _els, chart) => { const pts = chart.getElementsAtEventForMode(e, 'index', { intersect: false }, false); if (pts.length) { S.selectedDay = days[pts[0].index]; renderToday(); } },
+    onClick: (e, _els, chart) => { const pts = chart.getElementsAtEventForMode(e, 'index', { intersect: false }, false); if (pts.length) { S.selectedDay = days[pts[0].index]; render(); } },
     onHover: (e, els) => { e.native.target.style.cursor = els.length ? 'pointer' : 'default'; },
   } });
 }
@@ -354,7 +356,7 @@ function bindShell() {
 
 function go(view) {
   if (view === 'coach') { openCoach(true); return; }
-  S.view = view; location.hash = view; render();
+  S.view = view; location.hash = view; render(); window.scrollTo({top:0, behavior:'instant'});
 }
 
 /* ================= gate ================= */
@@ -385,8 +387,8 @@ function freshnessRow() {
   const stale = sd && sd !== todayStr();
   return `<div class="fresh">
     ${conn ? `<span class="badge ${S.status.needsReconnect ? 'warn' : 'ok'}">${S.status.needsReconnect ? ICO.warn : ICO.check}${S.status.needsReconnect ? t('reconnectTitle') : t('connected')}</span>` : `<span class="badge">${t('notConnected')}</span>`}
-    <span class="small t2">${t('latestData')}: ${sd ? `${t('dataOf')} ${dateS(sd)}` : t('noData')}${stale ? ` <span class="badge warn">${t('usingOlder')}</span>` : ''} · ${t('fetchedAt')} ${S.lastFetch ? dt(S.lastFetch) : t('neverFetched')}</span>
-    <button class="ghost sm ${S.loading.refresh ? 'is-loading' : ''}" id="refreshBtn" title="${S.loading.refresh ? t('refreshing') : t('refresh')}" aria-busy="${S.loading.refresh}" ${S.loading.refresh ? 'disabled' : ''}>${S.loading.refresh ? '<span class="spinner" aria-hidden="true"></span> ' + t('refreshing') : '↻ ' + t('refresh')}</button>
+    <span class="small t2">${S.view === 'today' ? (stale ? `${t('usingOlder')} · ${dateS(sd)}` : S.lastFetch ? dt(S.lastFetch) : '') : `${t('latestData')}: ${sd ? `${t('dataOf')} ${dateS(sd)}` : t('noData')} · ${t('fetchedAt')} ${S.lastFetch ? dt(S.lastFetch) : t('neverFetched')}`}</span>
+    <button class="ghost sm ${S.loading.refresh ? 'is-loading' : ''}" id="refreshBtn" title="${S.loading.refresh ? t('refreshing') : t('refresh')}" aria-busy="${!!S.loading.refresh}" ${S.loading.refresh ? 'disabled' : ''}>${S.loading.refresh ? '<span class="spinner" aria-hidden="true"></span> ' + t('refreshing') : S.view === 'today' ? (S.lang === 'th' ? 'ดึงข้อมูล' : 'Fetch data') : '↻ ' + t('refresh')}</button>
     ${S.err.refresh ? `<span class="err">${esc(S.err.refresh)}</span>` : ''}
   </div>`;
 }
@@ -438,7 +440,7 @@ function healthMonitor() {
       const position = m.position === 'collecting' ? 'collecting' : m.position === 'partial' ? 'partialReadings' : m.position === 'missing' ? 'todayMissing' : m.position;
       const range = m.range ? `${measurement(def.m, m.range.lo)}–${measurement(def.m, m.range.hi)} ${def.unit}` : t('rangeNotReady');
       const old = m.value === null && m.lastReading ? `<p class="small t2">${t('previousReading')}: ${measurement(def.m, m.lastReading.value)} ${def.unit} · ${dateS(m.lastReading.day)}</p>` : '';
-      return `<article class="monitor-metric" style="--mc:${def.c}"><h3>${t(def.k)}</h3><div class="monitor-value">${measurement(def.m, m.value)}<small>${def.unit}</small></div>
+      return `<article class="metric monitor-metric" style="--mc:${def.c}"><h3 class="label">${t(def.k)}</h3><div class="monitor-value">${measurement(def.m, m.value)}<small>${def.unit}</small></div>
         <span class="badge">${t(position)}</span><p class="small t2">${m.range ? t('yourRange') + ': ' : ''}${range}</p>
         ${m.range ? `<span class="small t2">${m.range.n}/${m.baselineWindow} ${t('readings')}${m.range.n < 14 ? ' · ' + t('earlyRange') : ''}</span>` : ''}${old}
         <dl class="monitor-means">${[7,28].map(n => `<div><dt>${t('mean'+n)}</dt><dd>${measurement(def.m,m['mean'+n].value)} <small>(${m['mean'+n].n}/${n})</small></dd></div>`).join('')}</dl></article>`;
@@ -557,6 +559,21 @@ function connectPanel(kind) {
   return `<section class="card" style="max-width:640px"><h2>${t('connectTitle')}</h2><p class="t2" style="margin:8px 0 16px">${t('connectSub')}</p><button class="primary" id="connectBtn">${t('connectBtn')}</button></section>`;
 }
 
+function todayOverview() {
+  const day = todayStr(), r = S.scores?.recovery?.find(x => x.day === day);
+  const load = S.scores?.load?.find(x => x.day === day), sleep = val(day, 'sleep_minutes_asleep');
+  const th = S.lang === 'th', score = r?.score ?? null, target = chk(day, 'goal.sleep')?.target;
+  const readiness = ['ready', 'moderate', 'recover'].includes(r?.band) ? t('rec_' + r.band) : t('noData');
+  const ring = (label, value, unit, color, progress, note, action) => `<button class="day-ring" ${action} style="--ring-color:${color}">
+    <span class="ring-face"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="ring-track" cx="60" cy="60" r="51"/>${progress !== null ? `<circle class="ring-progress" cx="60" cy="60" r="51" pathLength="100" stroke-dasharray="${Math.min(100, Math.max(0, progress))} 100"/>` : ''}</svg><span class="ring-value">${value}<small>${unit}</small></span></span>
+    <strong>${label}</strong><span class="ring-note">${note}</span></button>`;
+  return `<section class="card today-overview"><div class="day-rings">
+    ${ring(th ? 'การนอน' : 'Sleep', sleep === null ? '—' : `${Math.floor(sleep / 60)}<small>${t('hrs')}</small>${Math.round(sleep % 60)}`, sleep === null ? '' : t('min'), 'var(--c-purple)', sleep !== null && target > 0 ? sleep / target * 100 : null, sleep === null ? t('todayMissing') : target > 0 ? `${th ? 'เป้าหมาย' : 'Goal'} ${hm(target)}` : dateS(day), `data-health-day="${day}"`)}
+    ${ring('Recovery', score ?? '—', score === null ? '' : '/100', 'var(--c-teal)', score, score === null ? (r?.baselineDays >= 14 ? t('todayMissing') : `${th ? 'สะสมข้อมูล' : 'Building baseline'} ${r?.baselineDays ?? 0}/14 ${t('nights')}`) : readiness, `data-health-day="${day}"`)}
+    ${ring(th ? 'ภาระกิจกรรม' : 'Activity load', load?.load == null ? '—' : num(load.load), load?.load == null ? '' : 'AZM', 'var(--c-orange)', null, load?.load == null ? t('todayMissing') : t('loadSoFar'), 'data-view="trends"')}
+    </div><div class="readiness-line"><span><b>${th ? 'ความพร้อม' : 'Readiness'}</b> · ${score === null ? (th ? 'รอข้อมูลเพิ่มเติม' : 'Waiting for enough data') : readiness}<small class="readiness-source">${th ? 'แอปประเมินจาก Recovery' : 'Estimated by this app from Recovery'}</small></span><a href="#trends" data-view="trends">${t('details')} →</a></div></section>`;
+}
+
 function renderToday() {
   const conn = S.status?.connected, hasData = S.days.length > 0;
   let body = `<div class="greet"><div><h1>${greeting()}</h1><div class="t2">${new Date().toLocaleDateString(LOC(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div></div>${freshnessRow()}</div>`;
@@ -565,11 +582,8 @@ function renderToday() {
   if (!hasData) {
     body += conn ? `<section class="card"><h2>${t('noRecords')}</h2><p class="t2" style="margin:8px 0 16px">${t('noRecordsSub')}</p><button class="primary" id="fetchAgain" ${S.loading.refresh ? 'disabled' : ''}>${S.loading.refresh ? t('refreshing') : t('fetchAgain')}</button></section>` : '';
   } else {
-    body += recoveryBlock();
-    body += healthMonitor();
-    body += coverageBlock();
-    body += `<div class="grid12"><div class="span5">${sleepSummary()}</div><div class="span7">${sleepHistory()}</div></div>`;
-    body += activityBlock();
+    body += todayOverview();
+    body += `<div class="grid12 today-details"><div class="span5">${sleepSummary()}</div><div class="span7"><div class="today-vitals">${VITALS.map(def => metricCard(def, todayStr())).join('')}</div></div></div>`;
   }
   body += coachPreview();
   body += `<div class="footer"><a href="#" data-view="settings" class="small muted">${t('footer')} →</a></div>`;
@@ -585,7 +599,7 @@ function bindToday() {
   $('#openCoach')?.addEventListener('click', () => openCoach(true));
   $('#summBtn')?.addEventListener('click', () => { openCoach(true); sendChat(t('sugg')[0]); });
   document.querySelectorAll('#main [data-view]').forEach((b) => (b.onclick = (e) => { e.preventDefault(); go(b.dataset.view); }));
-  document.querySelectorAll('#main [data-range]').forEach((b) => (b.onclick = () => { S.sleepRange = +b.dataset.range; renderToday(); }));
+  document.querySelectorAll('#main [data-range]').forEach((b) => (b.onclick = () => { S.sleepRange = +b.dataset.range; render(); }));
   document.querySelectorAll('#main a[data-day]').forEach((a) => (a.onclick = (e) => { e.preventDefault(); openDay(a.dataset.day); }));
   document.querySelectorAll('#main .metric[data-metric]').forEach((b) => (b.onclick = () => openDay(latestDayWith(b.dataset.metric) || S.days[S.days.length - 1])));
   const vi = $('#vitalsInfo');
@@ -820,6 +834,10 @@ function renderTrends() {
   const insightText = (i) => `${t('onDays')} <b>${t('tag_' + i.tag)}</b> (${i.nTagged}) — ${t('nextMorning')} ${esc(i.label)} ${Math.abs(i.diff) >= 0 ? (i.diff >= 0 ? t('higher') : t('lower')) : ''} <b>${num(Math.abs(i.diff), 1)} ${esc(i.unit)}</b> vs ${i.nUntagged} ${t('otherDays')} <span class="meta">(g ${i.g}, 95% CI ${i.ci ? `${i.ci.lo}…${i.ci.hi}` : '—'})</span>`;
   $('#main').innerHTML = `
   <div class="greet"><div><h1>${t('trends')}</h1><div class="t2">${S.days[0] ? `${dateS(S.days[0])} → ${dateS(S.days[S.days.length - 1])}` : ''}</div></div>${freshnessRow()}</div>
+  ${healthMonitor()}
+  <details class="trend-recovery"><summary>${t('recoveryDetails')}</summary>${recoveryBlock(todayStr())}</details>
+  ${sleepHistory()}
+  ${activityBlock()}
   <div class="grid12">
     <section class="card span6 chart" id="recChart"><div class="section-head"><div><h2>${t('recovery')}</h2><div class="small t2">${t('recoverySub')}</div></div>${S.scores?.versions ? `<span class="meta">${S.scores.versions.recovery}</span>` : ''}</div>
       ${rec.some((r) => r.score !== null) ? `<div class="chart-plot sm"><canvas role="img"></canvas></div>` : `<div class="empty">${t('rec_insufficient')} · ${t('needNights')}${rec.length ? ` · ${t('have')} ${rec[rec.length - 1].baselineDays}` : ''}</div>`}</section>
@@ -849,6 +867,10 @@ function renderTrends() {
   bindTrends(rec, load);
 }
 function bindTrends(rec, load) {
+  bindHealth();
+  document.querySelectorAll('#main [data-range]').forEach(b => b.onclick = () => { S.sleepRange = +b.dataset.range; render(); });
+  document.querySelectorAll('#main a[data-day]').forEach(a => a.onclick = e => { e.preventDefault(); openDay(a.dataset.day); });
+  const sc = $('#sleepChart'); if (sc) { sleepBars(sc, S.days.slice(-S.sleepRange)); sc.scrollLeft = sc.scrollWidth; }
   document.querySelectorAll('#main [data-view]').forEach((b) => (b.onclick = (e) => { e.preventDefault(); go(b.dataset.view); }));
   $('#refreshBtn')?.addEventListener('click', refreshData);
   const rc = $('#recChart'); if (rc?.querySelector('canvas')) lineChart(rc, [{ label: t('recovery'), color: 'var(--c-teal)', values: rec.map((r) => ({ day: r.day, v: r.score })), dots: true }], { min: 0, max: 100, bands: [[0, 33, 'var(--c-red)'], [33, 67, 'var(--c-yellow)'], [67, 100, 'var(--c-teal)']] });
@@ -978,6 +1000,8 @@ function render() {
   if (!S.token) { renderGate(); return; }
   if (!$('#main')) { app().innerHTML = shell(''); bindShell(); }
   else { document.querySelectorAll('[data-view]').forEach((b) => b.classList.toggle('on', b.dataset.view === S.view && (b.closest('.tabs') || b.closest('.nav')))); }
+  const sync = $('#syncBtn');
+  if (sync) { const busy = !!S.loading.refresh; sync.disabled = busy; sync.classList.toggle('is-loading', busy); sync.setAttribute('aria-busy', String(busy)); sync.title = t(busy ? 'refreshing' : 'refresh'); sync.setAttribute('aria-label', sync.title); sync.innerHTML = busy ? '<span class="spinner" aria-hidden="true"></span>' : ICO.sync; }
   if (S.view === 'trends') { if (!S.insights) { $('#main').innerHTML = `<div class="empty">…</div>`; loadTrends().then(renderTrends); } else renderTrends(); }
   else if (S.view === 'settings') { if (!S.profile || !S.coachProfile) Promise.all([api('/api/profile').catch(() => ({})), api('/api/coach/profile').catch(() => null)]).then(([p, cp]) => { S.profile = p || {}; S.coachProfile = cp; renderSettings(); }); else renderSettings(); }
   else renderToday();
