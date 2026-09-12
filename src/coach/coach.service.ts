@@ -1,5 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Pool } from 'pg';
+import { repairLoadRow } from '../ingest/normalize';
 import { config } from '../config';
 import { PG_POOL } from '../db/db.module';
 import { addDays, todayCivil } from '../ingest/time';
@@ -24,10 +25,10 @@ export class CoachService {
   async context(): Promise<CoachContext> {
     const today = todayCivil(config.USER_TIMEZONE);
     const { rows } = await this.pool.query<MetricRow>(
-      `SELECT day, metric, value, unit, status, measured_start, measured_end FROM daily_metrics WHERE day >= $1 AND day <= $2 ORDER BY day, metric`,
+      `SELECT day, metric, value, unit, status, details, measured_start, measured_end FROM daily_metrics WHERE day >= $1 AND day <= $2 ORDER BY day, metric`,
       [addDays(today, -21), today],
     );
-    const ctx = buildContext(rows, today, config.USER_TIMEZONE);
+    const ctx = buildContext(rows.map(repairLoadRow), today, config.USER_TIMEZONE);
     try {
       const { recovery, load } = await this.scores.daily(1);
       const r = recovery[recovery.length - 1], l = load[load.length - 1];

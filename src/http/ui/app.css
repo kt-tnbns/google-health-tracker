@@ -55,6 +55,10 @@ button.primary { background:linear-gradient(180deg, var(--accent) 0%, color-mix(
 button.ghost { background:transparent; border-color:transparent; box-shadow:none; } button.ghost:hover { background:var(--raised); transform:none; box-shadow:none; border-color:transparent; }
 button.sm { min-height:36px; padding:6px 14px; font-size:13px; line-height:20px; border-radius:10px; }
 button:disabled { opacity:.5; cursor:default; transform:none !important; }
+.is-loading { cursor:wait; }
+.spinner { display:inline-block; width:15px; height:15px; border:2px solid currentColor; border-right-color:transparent; border-radius:50%; vertical-align:-2px; animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+@media(prefers-reduced-motion:reduce) { .spinner { animation:none; border-right-color:currentColor; opacity:.65; } }
 :focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
 .icon-btn { width:44px; height:44px; padding:0; display:inline-grid; place-items:center; border-radius:var(--r-ctl); } .icon-btn.ghost:hover { color:var(--accent-ink); }
 .icon-btn svg, .nav svg { width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
@@ -215,3 +219,55 @@ pre { background:var(--raised); border-radius:12px; padding:16px; overflow:auto;
   .gate { min-height:calc(100vh - 56px); }
 }
 @media (max-width:359px) { .hero-val { font-size:32px; line-height:40px; } .metric .val { font-size:24px; line-height:32px; } }
+
+/* Health Monitor and transparent recovery details — incumbent Tokyo Night palette. */
+.health-monitor { min-width:0; }
+.monitor-intro { margin:0 0 16px; max-width:75ch; }
+.monitor-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+.monitor-metric { display:flex; flex-direction:column; align-items:flex-start; padding:20px; border:1px solid var(--card-border); border-radius:var(--r-card); background:var(--surface); min-width:0; }
+.monitor-metric h3 { font-size:15px; line-height:1.5; margin:0; color:var(--text); }
+.monitor-value { font-size:30px; line-height:1.6; font-weight:600; font-variant-numeric:tabular-nums; color:var(--text); }
+.monitor-value small { font-size:14px; margin-left:5px; font-weight:400; }
+.monitor-metric p { margin:10px 0 4px; }
+.monitor-means { width:100%; display:grid; grid-template-columns:1fr 1fr; gap:8px; padding-top:14px; margin:14px 0 0; border-top:1px solid var(--border); }
+.monitor-means dt { font-size:12px; color:var(--text-2); }
+.monitor-means dd { margin:4px 0 0; font-size:14px; font-variant-numeric:tabular-nums; }
+.monitor-means small { font-size:11px; color:var(--text-2); white-space:nowrap; }
+.recovery-card p { margin:12px 0; max-width:75ch; }
+.recovery-scale { margin-top:12px; }
+.recovery-trends { display:flex; flex-wrap:wrap; gap:12px 28px; margin:16px 0; font-size:14px; }
+.recovery-explain { border-top:1px solid var(--border); padding-top:8px; }
+.recovery-explain > summary, .coverage-panel > summary { cursor:pointer; padding:12px 0; font-weight:500; min-height:44px; }
+.recovery-meta { margin-top:12px; font-size:14px; }
+.contributor { display:grid; grid-template-columns:1fr 1fr auto; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid var(--border); }
+.contributor > div:first-child { display:grid; gap:4px; }
+.contributor .badge { white-space:normal; }
+.coverage-panel { margin:0; }
+.coverage-panel > summary { padding:0; }
+.coverage-panel[open] > summary { margin-bottom:14px; }
+.coverage-panel p { max-width:75ch; }
+.coverage-list { margin:16px 0; }
+.coverage-row { border-top:1px solid var(--border); }
+.coverage-row > summary { display:grid; grid-template-columns:minmax(0,1fr) auto 100px; align-items:center; gap:12px; min-height:48px; padding:10px 0; cursor:pointer; font-size:14px; }
+.coverage-row > summary::before { content:none; }
+.coverage-row > summary > span:first-child::before { content:'+'; margin-right:8px; }
+.coverage-row[open] > summary > span:first-child::before { content:'−'; }
+.coverage-track { height:6px; background:var(--raised); border-radius:3px; overflow:hidden; }
+.coverage-track i { display:block; height:100%; background:var(--accent); }
+.health-monitor .t2, .recovery-card .t2, .coverage-panel .t2 { color:var(--text); opacity:.85; }
+summary:focus-visible { outline:2px solid var(--focus); outline-offset:4px; border-radius:4px; }
+@media(max-width:900px) { .monitor-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:520px) {
+  .monitor-grid { gap:12px; }
+  .monitor-metric { padding:14px; }
+  .monitor-value { font-size:24px; }
+  .monitor-means { grid-template-columns:1fr; gap:8px; }
+  .monitor-means > div { display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px; }
+  .monitor-means dd { margin:0; }
+  .contributor { grid-template-columns:1fr 1fr; }
+  .contributor > .badge { grid-column:1/-1; justify-self:start; }
+  .coverage-row > summary { grid-template-columns:minmax(0,1fr) auto; }
+  .coverage-track { grid-column:1/-1; width:100%; }
+}
+@media(max-width:359px) { .monitor-grid { grid-template-columns:1fr; } }
+@media(prefers-reduced-motion:reduce) { .recovery-card *, .monitor-metric *, .coverage-panel * { transition:none; animation:none; } }

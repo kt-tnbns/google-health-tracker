@@ -35,13 +35,14 @@ export function baselineStats(xs: number[]): { center: number; scale: number; n:
   return { center: c, scale: s > 0 ? s : floor(c), n: xs.length, robust: false };
 }
 
-/** EWMA with λ = 2/(N+1). Leading nulls stay null; once started, a missing day counts as zero load (documented choice). */
+/** EWMA with λ = 2/(N+1). Missing days remain gaps and restart the estimate. */
 export function ewma(values: (number | null)[], n: number): (number | null)[] {
   const lambda = 2 / (n + 1);
   let prev: number | null = null;
   return values.map((v) => {
-    if (prev === null) { if (v === null) return null; prev = v; return prev; }
-    prev = lambda * (v ?? 0) + (1 - lambda) * prev;
+    if (v === null || !Number.isFinite(v)) { prev = null; return null; }
+    if (prev === null) { prev = v; return prev; }
+    prev = lambda * v + (1 - lambda) * prev;
     return prev;
   });
 }

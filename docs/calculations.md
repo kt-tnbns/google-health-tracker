@@ -42,14 +42,14 @@ score   = clamp(50 + 16.7·S, 0, 100)       ระดับ: ready ≥ 67, moder
 
 ---
 
-## 2. Cardiovascular load (`load-v0.1`, `src/scores/load.ts`)
+## 2. Cardiovascular load (`load-v0.2`, `src/scores/load.ts`)
 
 **แต้มโหลดรายวัน — เลือกแหล่งที่ละเอียดสุดที่มี**
-1. `trimp` — Banister TRIMP ต่อ session = นาที × HRR × y, HRR = (HRavg − HRrest)/(HRmax − HRrest), y = 0.64·e^(1.92·HRR) (ชาย) / 0.86·e^(1.67·HRR) (หญิง). ต้องมี avg HR ของ session + RHR วันนั้น + HRmax (โปรไฟล์ หรือ 211 − 0.64·อายุ ตาม HUNT)
-2. `hr-zones` — จาก `time-in-heart-rate-zone`: 1×moderate + 2×vigorous + 3×peak นาที (Lucia-style, น้ำหนักเป็น heuristic)
-3. `azm-zones` — จาก AZM รายโซน: fat-burn 1/นาที, cardio 2, peak 3 (AZM ของ Fitbit ให้เครดิต 2× สำหรับ cardio/peak อยู่แล้ว จึงหาร 2 กลับเป็นนาทีก่อน)
-4. `azm-total` — AZM รวม
-5. มีก้าวแต่ไม่มีโซน → โหลด 0 จริง · ไม่มีอะไรเลย → `null` (ไม่ใช่ 0)
+1. `azm-total` — AZM รวม เมื่อ Google supplies it.
+2. `azm-zones` — sum of complete fat-burn/cardio/peak fields (the source already credits intensity).
+3. `hr-zones` — moderate + 2×vigorous + 2×peak minutes from complete heart-rate-zone fields.
+4. Workout `trimp` remains a separate diagnostic value and is never mixed with all-day AZM.
+5. Incomplete zones, missing days and invalid values remain `null`; steps alone do not imply zero cardiovascular load.
 
 **แนวโน้ม**
 ```
@@ -59,7 +59,7 @@ ACWR    = acute / chronic  (chronic ต้อง ≥ 20% ของ median โห
 ระดับ: < 0.8 low · 0.8–1.3 steady · 1.3–1.5 building · > 1.5 spike
 Monotony = mean(7 วัน)/SD(7 วัน);  Strain = Σ7 วัน × monotony  (Foster)
 ```
-(Williams et al. 2017 สำหรับ EWMA; วันที่ไม่มีข้อมูลหลังเริ่มนับ = โหลด 0)
+(Williams et al. 2017 สำหรับ EWMA; วันที่ไม่มีข้อมูลหรือเปลี่ยนตระกูลแหล่งข้อมูลจะหยุดและเริ่มแนวโน้มใหม่; วันนี้แสดงเป็น provisional)
 
 **คำเตือนที่ต้องแสดงคู่กัน (Impellizzeri et al. 2020):** ACWR ไม่มีหลักฐานเชิงสาเหตุกับการบาดเจ็บ, "sweet spot" มาจากข้อมูลแบบ bin, ratio ไม่เสถียรเมื่อ chronic ต่ำ — ใช้เป็น "โหลดเปลี่ยนเร็วแค่ไหน" เท่านั้น แสดง acute/chronic แบบ absolute เสมอ
 

@@ -1,11 +1,12 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
+import { healthOverview } from '../scores/health';
 import { config } from '../config';
 import { PG_POOL } from '../db/db.module';
 import { FetchResult, HealthApiClient } from '../google/health-api.client';
 import { buildFilter, DATA_TYPES, DataTypeSpec } from './metrics';
-import { ExerciseSession, normalizeDaily, normalizeExercise, normalizeRollup, normalizeSleep, NormalizedMetric, NORMALIZER_VERSION } from './normalize';
+import { ExerciseSession, normalizeDaily, normalizeExercise, normalizeRollup, normalizeSleep, NormalizedMetric, NORMALIZER_VERSION, repairLoadRow } from './normalize';
 import { addDays, startOfCivilDay, todayCivil } from './time';
 
 export interface RefreshSummary {
@@ -196,12 +197,13 @@ export class IngestService {
        FROM daily_metrics WHERE day = $1 ORDER BY metric`,
       [day],
     );
-    const present = new Set(rows.map((r) => r.metric));
+    const repaired = rows.map(repairLoadRow);
+    const present = new Set(repaired.map((r) => r.metric));
     const expected = DATA_TYPES.flatMap((d) => d.produces);
     return {
       day,
-      metrics: rows,
-      missing: expected.filter((m) => !present.has(m) || rows.find((r) => r.metric === m)?.status === 'missing'),
+      metrics: repaired,
+      missing: expected.filter((m) => !present.has(m) || repaired.find((r) => r.metric === m)?.status === 'missing'),
     };
   }
 
@@ -210,7 +212,17 @@ export class IngestService {
       `SELECT day, metric, value, unit, status, measured_start, measured_end, details FROM daily_metrics WHERE day >= $1 AND day < $2 ORDER BY day, metric`,
       [startDate, endDate],
     );
-    return rows;
+    return rows.map(repairLoadRow);
+  }
+
+  async health(days = 60) {
+    const today = todayCivil(config.USER_TIMEZONE);
+    const [rows, upstream] = await Promise.all([
+      this.getRange(addDays(today, -days), addDays(today, 1)),
+      this.pool.query(`SELECT DISTINCT ON (data_type) data_type, fetched_at, http_status
+        FROM api_responses ORDER BY data_type, fetched_at DESC, id DESC`),
+    ]);
+    return { ...healthOverview(rows, today, days), timezone: config.USER_TIMEZONE, upstream: upstream.rows };
   }
 
   async getExerciseSessions(startDate: string, endDate: string) {

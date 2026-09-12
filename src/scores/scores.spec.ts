@@ -12,9 +12,9 @@ function series(n: number, f: (i: number) => Partial<DayInput>): DayInput[] {
 }
 
 describe('stats', () => {
-  it('ewma seeds with the first value and treats null as zero load', () => {
+  it('ewma leaves a gap and restarts after missing load', () => {
     const e = ewma([null, 10, 10, null, 10], 7);
-    expect(e[0]).toBeNull(); expect(e[1]).toBe(10); expect(e[2]).toBe(10); expect(e[3]!).toBeLessThan(10); expect(e[4]!).toBeGreaterThan(e[3]!);
+    expect(e[0]).toBeNull(); expect(e[1]).toBe(10); expect(e[2]).toBe(10); expect(e[3]).toBeNull(); expect(e[4]).toBe(10);
   });
   it('hedges g and MWU agree on an obvious difference', () => {
     const a = [40, 41, 42, 43, 44, 45], b = [50, 51, 52, 53, 54, 55];
@@ -65,14 +65,34 @@ describe('recovery', () => {
 });
 
 describe('load', () => {
-  it('prefers TRIMP, then HR zones, then AZM zones, then AZM total', () => {
+  it('uses a common AZM scale and keeps workout TRIMP out of all-day load', () => {
     const base = { day: 'd', hrzModerate: null, hrzVigorous: null, hrzPeak: null, azmFatBurn: null, azmCardio: null, azmPeak: null, azmTotal: null, trimp: null, steps: null };
-    expect(dailyLoad({ ...base, trimp: 80 })).toEqual({ load: 80, source: 'trimp' });
-    expect(dailyLoad({ ...base, hrzModerate: 20, hrzVigorous: 10, hrzPeak: 5 })).toEqual({ load: 55, source: 'hr-zones' });
-    expect(dailyLoad({ ...base, azmFatBurn: 20, azmCardio: 20, azmPeak: 10 })).toEqual({ load: 20 + 2 * 10 + 3 * 5, source: 'azm-zones' });
+    expect(dailyLoad({ ...base, trimp: 80 })).toEqual({ load: null, source: 'none' });
+    expect(dailyLoad({ ...base, trimp: 800, azmTotal: 33 })).toEqual({ load: 33, source: 'azm-total' });
+    expect(dailyLoad({ ...base, hrzModerate: 20, hrzVigorous: 10, hrzPeak: 5 })).toEqual({ load: 50, source: 'hr-zones' });
+    expect(dailyLoad({ ...base, azmFatBurn: 20, azmCardio: 20, azmPeak: 10 })).toEqual({ load: 50, source: 'azm-zones' });
     expect(dailyLoad({ ...base, azmTotal: 33 })).toEqual({ load: 33, source: 'azm-total' });
-    expect(dailyLoad({ ...base, steps: 5000 })).toEqual({ load: 0, source: 'none' });
+    expect(dailyLoad({ ...base, steps: 5000 })).toEqual({ load: null, source: 'none' });
     expect(dailyLoad(base).load).toBeNull();
+  });
+  it('requires complete zones, preserves explicit zero and rejects invalid values', () => {
+    const base = { day: day(0), hrzModerate: null, hrzVigorous: null, hrzPeak: null, azmFatBurn: null, azmCardio: null, azmPeak: null, azmTotal: null, trimp: null, steps: 5000 };
+    expect(dailyLoad({ ...base, hrzModerate: 20 }).load).toBeNull();
+    expect(dailyLoad({ ...base, azmFatBurn: 20 }).load).toBeNull();
+    expect(dailyLoad({ ...base, azmTotal: 0 }).load).toBe(0);
+    expect(dailyLoad({ ...base, azmTotal: NaN }).load).toBeNull();
+    expect(dailyLoad({ ...base, azmTotal: -10 }).load).toBeNull();
+  });
+  it('a missing calendar day restarts trends and cannot become weekly rest', () => {
+    const days = Array.from({ length: 35 }, (_, i) => ({ day: day(i), hrzModerate: null, hrzVigorous: null, hrzPeak: null, azmFatBurn: null, azmCardio: null, azmPeak: null, azmTotal: i === 30 ? null : 30, trimp: null, steps: 1000 }));
+    const r = computeLoadSeries(days);
+    expect(r[29].acwr).not.toBeNull();
+    for (const row of r.slice(30)) {
+      expect(row.acute).toBeNull(); expect(row.acwr).toBeNull(); expect(row.strain).toBeNull();
+    }
+    expect(r[34].history).toBe(4);
+    const sparse = computeLoadSeries(days.filter((_, i) => i !== 30));
+    expect(sparse[sparse.length - 1].acwr).toBeNull();
   });
   it('TRIMP grows with intensity', () => {
     expect(trimp(60, 120, 60, 180, 'male')!).toBeLessThan(trimp(60, 160, 60, 180, 'male')!);
@@ -139,4 +159,13 @@ describe('strength', () => {
     expect(w[0]).toMatchObject({ weekStart: '2026-09-07', tonnage: 500 + 300 + 560, hardSets: 2, sessions: 2 });
     expect(w[0].bestE1rm.squat).toBeCloseTo(116.7, 1);
   });
+});
+
+it('keeps today provisional and restarts comparisons when the activity source family changes', () => {
+  const base = { hrzModerate: null, hrzVigorous: null, hrzPeak: null, azmFatBurn: null, azmCardio: null, azmPeak: null, trimp: null, steps: null };
+  const days = Array.from({ length: 30 }, (_, i) => ({ ...base, day: day(i), azmTotal: 30 }));
+  const today = computeLoadSeries(days, day(29))[29];
+  expect(today).toMatchObject({ load: 30, provisional: true, acute: null, chronic: null, strain: null });
+  const change = computeLoadSeries([...days, { ...base, day: day(30), azmTotal: null, hrzModerate: 30, hrzVigorous: 0, hrzPeak: 0 }])[30];
+  expect(change).toMatchObject({ load: 30, history: 1, acute: null, chronic: null });
 });

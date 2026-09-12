@@ -100,10 +100,50 @@ const I18N = {
   },
 };
 
+
+Object.assign(I18N.en, {
+  healthMonitor: 'Health Monitor', monitorNote: 'Today against your own recent readings. Your usual range is descriptive, not a health target.',
+  coverageTitle: 'Data coverage', coverageNote: 'Complete daily readings in the previous 60 days, excluding today. Missing may mean not fetched, not recorded, or a sync gap. This is not wear-time coverage.',
+  completeReadings: 'complete', partialReadings: 'partial', missingReadings: 'missing', fetchHistory: 'Fetch 60 days from Google',
+  healthUnavailable: 'The health report could not be loaded. Retry to check coverage and comparisons.', healthRetry: 'Retry health report',
+  previousReading: 'Last recorded', todayMissing: 'No reading for today', earlyRange: 'Early baseline', personalWindow: 'prior calendar days',
+  mean7: '7-day mean', mean28: '28-day mean', readings: 'readings', rangeNotReady: 'Collecting readings for your usual range',
+  recoveryDetails: 'What contributes to this index?', recoveryEstimate: 'Estimated recovery index', recoveryCaveat: 'A personal trend estimate, not a measured percentage recovered. Weights and score bands are heuristic.',
+  dataSupport: 'Data support', dataSupportNote: 'Weighted input coverage × baseline history. This is not a probability that the estimate is correct.',
+  inputCoverage: 'Input coverage', baselineHistory: 'HRV baseline', indexBaseline: 'Index baseline', contributorUp: 'Raises index', contributorDown: 'Lowers index', contributorNeutral: 'Near baseline', contributorMissing: 'Not used',
+  contributorNote: 'Directions reflect the calculation, not medical judgments. Sleep combines duration and efficiency; HRV combines this night and its 7-day trend. The index uses up to 60 prior days, independently of the Monitor range.',
+  recNoHrv: 'No HRV reading for this night', recFewInputs: 'Not enough usable inputs for this night',
+  recHrvLow: '7-day HRV is below its index baseline', recRhrUp: 'Resting HR is up while HRV is down', recBreathing: 'Breathing rate and SpO₂ both differ substantially from baseline', recVariation: 'Low HRV with little recent variation',
+  completedLoad: 'Latest completed-day trends', loadSoFar: 'Today so far', loadUnit: 'AZM', loadMethod: 'Moderate minutes + 2 × vigorous / peak minutes. Workout TRIMP is kept separate.',
+  loadGaps: 'Trends need 7 / 28 consecutive complete days. A missing day or source change restarts the comparison.', workoutTrimp: 'Recorded-workout TRIMP',
+  source_azm_total: 'Reported zone minutes', source_azm_zones: 'Summed zone credits', source_hr_zones: 'Converted heart-rate zones', source_none: 'No complete activity reading',
+  latestAttempt: 'Last fetch attempt', notFetched: 'No fetch recorded', fetchFailed: 'Fetch failed', fetchOk: 'Fetch succeeded', rangeDays: 'days checked',
+  monitorDetails: 'View today’s details', noRecovery: 'Recovery data could not be loaded', dayIncomplete: 'Day still in progress',
+});
+Object.assign(I18N.th, {
+  healthMonitor: 'ภาพรวมสุขภาพ', monitorNote: 'ค่าของวันนี้เทียบกับข้อมูลล่าสุดของคุณ ช่วงปกติส่วนตัวไม่ใช่เป้าหมายสุขภาพ',
+  coverageTitle: 'ความครบถ้วนของข้อมูล', coverageNote: 'ค่ารายวันที่ครบถ้วนใน 60 วันก่อนหน้า ไม่รวมวันนี้ ข้อมูลที่ขาดอาจยังไม่ได้ดึง ไม่ได้บันทึก หรือยังไม่ซิงก์ ไม่ใช่สัดส่วนเวลาที่สวมอุปกรณ์',
+  completeReadings: 'ครบถ้วน', partialReadings: 'บางส่วน', missingReadings: 'ขาด', fetchHistory: 'ดึงข้อมูล 60 วันจาก Google',
+  healthUnavailable: 'โหลดรายงานสุขภาพไม่สำเร็จ ลองอีกครั้งเพื่อตรวจข้อมูลและช่วงเปรียบเทียบ', healthRetry: 'โหลดรายงานอีกครั้ง',
+  previousReading: 'ค่าล่าสุดที่บันทึก', todayMissing: 'ยังไม่มีค่าของวันนี้', earlyRange: 'ช่วงเปรียบเทียบเบื้องต้น', personalWindow: 'วันปฏิทินก่อนหน้า',
+  mean7: 'เฉลี่ย 7 วัน', mean28: 'เฉลี่ย 28 วัน', readings: 'ค่า', rangeNotReady: 'กำลังสะสมข้อมูลสำหรับช่วงปกติของคุณ',
+  recoveryDetails: 'อะไรมีผลต่อดัชนีนี้?', recoveryEstimate: 'ดัชนีการฟื้นตัวโดยประมาณ', recoveryCaveat: 'ค่าประมาณแนวโน้มส่วนตัว ไม่ใช่เปอร์เซ็นต์การฟื้นตัวที่วัดได้ น้ำหนักและเกณฑ์คะแนนเป็นสูตรประมาณ',
+  dataSupport: 'ข้อมูลรองรับ', dataSupportNote: 'ความครบถ้วนของข้อมูลตามน้ำหนัก × ประวัติ baseline ไม่ใช่โอกาสที่ค่าประมาณจะถูกต้อง',
+  inputCoverage: 'ความครบถ้วนของข้อมูลที่ใช้', baselineHistory: 'ประวัติ HRV', indexBaseline: 'ค่าฐานของดัชนี', contributorUp: 'เพิ่มดัชนี', contributorDown: 'ลดดัชนี', contributorNeutral: 'ใกล้ค่าฐาน', contributorMissing: 'ไม่ได้ใช้',
+  contributorNote: 'ทิศทางมาจากสูตร ไม่ใช่ข้อสรุปทางการแพทย์ การนอนรวมระยะเวลาและประสิทธิภาพ HRV รวมค่าคืนนี้กับแนวโน้ม 7 วัน ดัชนีใช้ประวัติสูงสุด 60 วัน แยกจากช่วงเปรียบเทียบในภาพรวมสุขภาพ',
+  recNoHrv: 'ไม่มี HRV ของคืนนี้', recFewInputs: 'ข้อมูลที่ใช้คำนวณคืนนี้ยังไม่เพียงพอ',
+  recHrvLow: 'HRV เฉลี่ย 7 วันต่ำกว่าค่าฐานของดัชนี', recRhrUp: 'ชีพจรขณะพักสูงขึ้นพร้อมกับ HRV ลดลง', recBreathing: 'อัตราหายใจและ SpO₂ ต่างจากค่าฐานมากทั้งคู่', recVariation: 'HRV ต่ำและเปลี่ยนแปลงน้อยในช่วงที่ผ่านมา',
+  completedLoad: 'แนวโน้มจากวันล่าสุดที่สิ้นสุดแล้ว', loadSoFar: 'วันนี้ ณ ตอนนี้', loadUnit: 'AZM', loadMethod: 'นาทีปานกลาง + 2 × นาทีหนัก / สูงสุด แยก TRIMP ของการออกกำลังกายออกจากค่ารายวัน',
+  loadGaps: 'แนวโน้มต้องมีข้อมูลครบ 7 / 28 วันติดกัน หากขาดข้อมูลหรือเปลี่ยนแหล่งข้อมูลจะเริ่มเปรียบเทียบใหม่', workoutTrimp: 'TRIMP ของการออกกำลังกายที่บันทึก',
+  source_azm_total: 'นาทีในโซนที่รายงาน', source_azm_zones: 'ผลรวมเครดิตแต่ละโซน', source_hr_zones: 'แปลงจากเวลาในโซนหัวใจ', source_none: 'ยังไม่มีข้อมูลกิจกรรมที่ครบถ้วน',
+  latestAttempt: 'ดึงข้อมูลล่าสุด', notFetched: 'ยังไม่มีประวัติการดึง', fetchFailed: 'ดึงไม่สำเร็จ', fetchOk: 'ดึงสำเร็จ', rangeDays: 'วันที่ตรวจ',
+  monitorDetails: 'ดูรายละเอียดของวันนี้', noRecovery: 'โหลดข้อมูลการฟื้นตัวไม่สำเร็จ', dayIncomplete: 'วันนี้ยังไม่สิ้นสุด',
+});
+
 /* ================= state & helpers ================= */
 const S = {
   token: '', lang: 'th', theme: 'system', clock: '24', view: 'today',
-  status: null, rows: [], byDay: {}, days: [], scores: null, coachInfo: null, coachHist: [], journalToday: null,
+  health: null, status: null, rows: [], byDay: {}, days: [], scores: null, coachInfo: null, coachHist: [], journalToday: null,
   sleepRange: 7, selectedDay: null, loading: {}, err: {}, lastFetch: null, demo: false, raw: [], ctx: null,
   exercise: [], coachProfile: null, rules: null, insights: null, fitness: null, strength: null, strengthWeekly: null, bio: null, profile: null, coachOpen: false,
 };
@@ -118,7 +158,7 @@ const H12 = () => ({ hour: S.clock === '12' ? 'numeric' : '2-digit', minute: '2-
 const clock = (iso) => (iso ? new Date(iso).toLocaleTimeString(S.clock === '12' ? 'en-US' : LOC(), H12()) : '—');
 const dateS = (d, o = { weekday: 'short', day: 'numeric', month: 'short' }) => new Date(d + 'T00:00:00').toLocaleDateString(LOC(), o);
 const dt = (iso) => (iso ? `${new Date(iso).toLocaleDateString(LOC(), { day: 'numeric', month: 'short' })} ${clock(iso)}` : '—');
-const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const todayStr = () => { if (S.health?.day) return S.health.day; const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 const det = (day, m) => S.byDay[day]?.[m]?.details || null;
 const chk = (day, id) => S.rules?.byDay?.[day]?.find((c) => c.id === id) || null;
 const lvlCls = (l) => (l === 'good' ? 'ok' : l === 'low' ? 'warn' : l === 'fair' ? 'fair' : '');
@@ -266,10 +306,11 @@ function sleepBars(el, days) {
 /* ================= data loading ================= */
 async function loadCore() {
   S.status = await api('/auth/google/status').catch((e) => { if (e.status === 401) throw e; return null; });
-  const [rows, scores, info, hist, raw, ex] = await Promise.all([
-    api('/api/days?days=35').catch(() => []), api('/api/scores?days=35').catch(() => null), api('/api/coach/info').catch(() => null),
-    api('/api/coach/messages').catch(() => []), api('/api/raw?limit=5').catch(() => []), api('/api/exercise?days=35').catch(() => []),
+  const [rows, scores, info, hist, raw, ex, health] = await Promise.all([
+    api('/api/days?days=61').catch(() => []), api('/api/scores?days=35').catch(() => null), api('/api/coach/info').catch(() => null),
+    api('/api/coach/messages').catch(() => []), api('/api/raw?limit=5').catch(() => []), api('/api/exercise?days=35').catch(() => []), api('/api/health?days=60').catch(() => null),
   ]);
+  S.health = health;
   S.exercise = Array.isArray(ex) ? ex : [];
   S.rules = await api('/api/rules/eval?days=35').catch(() => null);
   S.rows = rows; S.byDay = {}; for (const r of rows) (S.byDay[r.day.slice(0, 10)] ||= {})[r.metric] = r;
@@ -295,7 +336,7 @@ function shell(inner) {
   <nav class="tabs" aria-label="views">${['today', 'trends', 'coach', 'settings'].map((v) => `<button class="${S.view === v ? 'on' : ''}" data-view="${v}">${t(v)}</button>`).join('')}</nav>
   <div class="right">
     ${S.demo ? `<span class="badge warn">${ICO.warn}${t('demo')}</span>` : ''}
-    <button class="icon-btn ghost" id="syncBtn" title="${t('refresh')}" aria-label="${t('refresh')}">${ICO.sync}</button>
+    <button class="icon-btn ghost ${S.loading.refresh ? 'is-loading' : ''}" id="syncBtn" title="${S.loading.refresh ? t('refreshing') : t('refresh')}" aria-label="${S.loading.refresh ? t('refreshing') : t('refresh')}" aria-busy="${S.loading.refresh}" ${S.loading.refresh ? 'disabled' : ''}>${S.loading.refresh ? '<span class="spinner" aria-hidden="true"></span>' : ICO.sync}</button>
     <button class="icon-btn ghost" data-view="settings" aria-label="${t('settings')}">${ICO.settings}</button>
   </div>
 </div></header>
@@ -345,30 +386,83 @@ function freshnessRow() {
   return `<div class="fresh">
     ${conn ? `<span class="badge ${S.status.needsReconnect ? 'warn' : 'ok'}">${S.status.needsReconnect ? ICO.warn : ICO.check}${S.status.needsReconnect ? t('reconnectTitle') : t('connected')}</span>` : `<span class="badge">${t('notConnected')}</span>`}
     <span class="small t2">${t('latestData')}: ${sd ? `${t('dataOf')} ${dateS(sd)}` : t('noData')}${stale ? ` <span class="badge warn">${t('usingOlder')}</span>` : ''} · ${t('fetchedAt')} ${S.lastFetch ? dt(S.lastFetch) : t('neverFetched')}</span>
-    <button class="ghost sm" id="refreshBtn" title="${t('refresh')}">${S.loading.refresh ? t('refreshing') : '↻ ' + t('refresh')}</button>
+    <button class="ghost sm ${S.loading.refresh ? 'is-loading' : ''}" id="refreshBtn" title="${S.loading.refresh ? t('refreshing') : t('refresh')}" aria-busy="${S.loading.refresh}" ${S.loading.refresh ? 'disabled' : ''}>${S.loading.refresh ? '<span class="spinner" aria-hidden="true"></span> ' + t('refreshing') : '↻ ' + t('refresh')}</button>
     ${S.err.refresh ? `<span class="err">${esc(S.err.refresh)}</span>` : ''}
   </div>`;
 }
 
-function recoveryBlock() {
-  const r = S.scores?.recovery?.[S.scores.recovery.length - 1];
-  if (!r) return '';
-  const day = r.day;
-  if (r.score === null) {
-    return `<section class="card quiet"><div class="row between"><div><div class="eyebrow"><span>${t('recovery')}</span></div><div class="t2 small">${r.status === 'insufficient' ? `${t('needNights')} · ${t('have')} ${r.baselineDays} ${t('nights')}` : esc(r.reasons.join(' · '))}</div></div><span class="badge">${t('rec_' + r.status)}</span></div></section>`;
-  }
-  const pct = r.score;
-  return `<section class="card">
-    <div class="eyebrow"><span>${t('recovery')}</span><span class="meta">${dateS(day)} · ${r.version}</span></div>
-    <div class="recovery" style="margin-top:8px">
-      <div class="score">${r.score}<small>/100</small></div>
-      <div>
-        <div class="row between" style="margin-bottom:8px"><span class="badge ${r.band === 'ready' ? 'ok' : r.band === 'recover' ? 'warn' : ''}">${t('rec_' + r.band)}</span><span class="meta">${t('confidence')} ${Math.round(r.confidence * 100)}% · ${t('rec_' + r.status)}</span></div>
-        <div class="scale"><span class="seg a"></span><span class="seg b"></span><i style="left:${pct}%"></i></div>
-        <div class="small t2" style="margin-top:10px">${r.reasons?.length ? esc(r.reasons.join(' · ')) : t('recoverySub')}</div>
-      </div>
-    </div>
+const REC_METRICS = { hrv: ['hrv_avg_ms', 'hrv', 'ms'], rhr: ['rhr_bpm', 'rhr', 'bpm'], sleep: ['sleep_minutes_asleep', 'sleep', 'min'], rr: ['respiratory_rate_bpm', 'rr', '/min'], spo2: ['spo2_avg_pct', 'spo2', '%'] };
+const measurement = (metric, value) => value === null || value === undefined ? '—' : metric === 'sleep_minutes_asleep' ? hm(value) : num(value, 1);
+function recoveryReasons(r) {
+  if (r.score === null) return r.status === 'insufficient' ? `${t('needNights')} · ${r.baselineDays}/14` : !r.contributors?.find(c => c.metric === 'hrv')?.value ? t('recNoHrv') : t('recFewInputs');
+  const names = { hrv7_low: 'recHrvLow', rhr_and_hrv_down: 'recRhrUp', illness_pattern: 'recBreathing', cv_collapse: 'recVariation' };
+  return (r.flags || []).map(f => names[f] ? t(names[f]) : '').filter(Boolean).join(' · ') || t('recoverySub');
+}
+function recoveryContributors(r) {
+  return `<p class="small t2">${t('contributorNote')}</p><div class="contributors">${(r.contributors || []).map(c => {
+    const [metric, label, unit] = REC_METRICS[c.metric] || [c.metric, c.metric, ''];
+    const used = r.score !== null && c.z !== null;
+    const effect = !used ? 'contributorMissing' : c.z > 0.1 ? 'contributorUp' : c.z < -0.1 ? 'contributorDown' : 'contributorNeutral';
+    return `<div class="contributor"><div><b>${t(label)}</b><span class="small">${measurement(metric, c.value)} ${metric === 'sleep_minutes_asleep' ? '' : unit}</span></div><div class="small t2">${t('indexBaseline')} ${measurement(metric, c.baseline)} ${metric === 'sleep_minutes_asleep' ? '' : unit}<br>${c.n} ${t('readings')}</div><span class="badge">${t(effect)}</span></div>`;
+  }).join('')}</div>`;
+}
+function recoveryBlock(day) {
+  const r = day ? S.scores?.recovery?.find(r => r.day === day) : S.scores?.recovery?.at(-1);
+  if (!r) return `<section class="card"><h2>${t('recoveryEstimate')}</h2><p class="small t2">${t('noRecovery')}</p></section>`;
+  const scored = r.score !== null;
+  const prior = (n) => { const xs = S.scores.recovery.filter(x => x.day < r.day && x.day >= shiftDay(r.day, -n) && x.score !== null); return { n: xs.length, value: mean(xs.map(x => x.score)) }; };
+  const trend = [7, 28].map(n => { const v = prior(n); return `<span>${t('mean' + n)} <b>${num(v.value, 0) ?? '—'}</b> <span class="small t2">(${v.n}/${n})</span></span>`; }).join('');
+  return `<section class="card recovery-card">
+    <div class="section-head"><h2>${t('recoveryEstimate')}</h2><span class="small t2">${dateS(r.day)}</span></div>
+    <div class="recovery"><div class="score">${scored ? r.score : '—'}<small>/100</small></div><div>
+      <div class="row between"><span class="badge">${t('rec_' + (scored ? r.band : r.status))}</span><span class="small t2">${t('dataSupport')} ${Math.round(r.confidence * 100)}%</span></div>
+      ${scored ? `<div class="scale recovery-scale" role="img" aria-label="${t('recoveryEstimate')} ${r.score}/100"><span class="seg a"></span><span class="seg b"></span><i style="left:${r.score}%"></i></div>` : ''}
+      <p class="small t2">${esc(recoveryReasons(r))}</p></div></div>
+    <div class="recovery-trends">${trend}</div>
+    <p class="small t2">${t('recoveryCaveat')}</p>
+    <details class="recovery-explain"><summary>${t('recoveryDetails')}</summary>
+      <div class="row recovery-meta"><span>${t('baselineHistory')}: <b>${r.baselineDays}</b> ${t('nights')}</span><span>${t('inputCoverage')}: <b>${Math.round(r.coverage * 100)}%</b></span></div>
+      <p class="small t2">${t('dataSupportNote')}</p>${recoveryContributors(r)}
+    </details>
   </section>`;
+}
+
+function shiftDay(day, offset) { const d = new Date(day + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + offset); return d.toISOString().slice(0, 10); }
+function healthMonitor() {
+  if (!S.health) return `<section class="card"><h2>${t('healthMonitor')}</h2><p class="small t2">${t('healthUnavailable')}</p><button data-health-retry>${t('healthRetry')}</button></section>`;
+  const defs = [...VITALS, {m:'sleep_minutes_asleep', k:'sleep', unit:'', c:'var(--deep)'}, {m:'sleep_efficiency_pct', k:'efficiency', unit:'%', c:'var(--c-blue)'}];
+  return `<section class="health-monitor"><div class="section-head"><h2>${t('healthMonitor')}</h2><button class="ghost sm" data-health-day="${S.health.day}">${t('monitorDetails')}</button></div>
+    <p class="small t2 monitor-intro">${dateS(S.health.day)} · ${t('monitorNote')}</p>
+    <div class="monitor-grid">${defs.map(def => {
+      const m = S.health.monitor.find(x => x.metric === def.m); if (!m) return '';
+      const position = m.position === 'collecting' ? 'collecting' : m.position === 'partial' ? 'partialReadings' : m.position === 'missing' ? 'todayMissing' : m.position;
+      const range = m.range ? `${measurement(def.m, m.range.lo)}–${measurement(def.m, m.range.hi)} ${def.unit}` : t('rangeNotReady');
+      const old = m.value === null && m.lastReading ? `<p class="small t2">${t('previousReading')}: ${measurement(def.m, m.lastReading.value)} ${def.unit} · ${dateS(m.lastReading.day)}</p>` : '';
+      return `<article class="monitor-metric" style="--mc:${def.c}"><h3>${t(def.k)}</h3><div class="monitor-value">${measurement(def.m, m.value)}<small>${def.unit}</small></div>
+        <span class="badge">${t(position)}</span><p class="small t2">${m.range ? t('yourRange') + ': ' : ''}${range}</p>
+        ${m.range ? `<span class="small t2">${m.range.n}/${m.baselineWindow} ${t('readings')}${m.range.n < 14 ? ' · ' + t('earlyRange') : ''}</span>` : ''}${old}
+        <dl class="monitor-means">${[7,28].map(n => `<div><dt>${t('mean'+n)}</dt><dd>${measurement(def.m,m['mean'+n].value)} <small>(${m['mean'+n].n}/${n})</small></dd></div>`).join('')}</dl></article>`;
+    }).join('')}</div></section>`;
+}
+function coverageBlock() {
+  if (!S.health) return `<p class="small t2">${t('healthUnavailable')}</p><button data-health-retry>${t('healthRetry')}</button>`;
+  const h = S.health;
+  const label = m => { const def = VITALS.find(v=>v.m===m); return def ? t(def.k) : t(({ sleep_minutes_asleep:'sleep', sleep_efficiency_pct:'efficiency', sleeping_hr_bpm:'sleepHr', steps:'steps', active_zone_minutes:'azm', azm_fat_burn_min:'zoneFat', azm_cardio_min:'zoneCardio', azm_peak_min:'zonePeak', hrz_moderate_min:'zoneFat', hrz_vigorous_min:'zoneCardio', hrz_peak_min:'zonePeak' })[m] || m); };
+  return `<details class="card coverage-panel"><summary>${t('coverageTitle')} · ${h.range.days} ${t('days')}</summary><p class="small t2">${t('coverageNote')}</p><p class="small t2">${dateS(h.range.start)} → ${dateS(h.range.end)} · ${esc(h.timezone)}</p>
+    <div class="coverage-list">${h.coverage.map(c => {
+      const upstream = h.upstream?.find(u=>u.data_type===c.dataType);
+      return `<details class="coverage-row"><summary><span>${label(c.metric)}${c.metric.startsWith('hrz_') ? ' · HR' : c.metric.startsWith('azm_') ? ' · AZM' : ''}</span><span>${c.completeDays}/${h.range.days} · ${c.coveragePct}%</span><span class="coverage-track" aria-hidden="true"><i style="width:${c.coveragePct}%"></i></span></summary>
+        <p class="small">${c.completeDays} ${t('completeReadings')} · ${c.partialDays} ${t('partialReadings')} · ${c.missingDays} ${t('missingReadings')}</p>
+        <p class="small t2">${t('latestAttempt')}: ${upstream ? `${dt(upstream.fetched_at)} · ${t(upstream.http_status >= 200 && upstream.http_status < 300 ? 'fetchOk' : 'fetchFailed')} (${upstream.http_status})` : t('notFetched')}</p>
+        ${c.missingDates.length ? `<p class="small t2">${t('missingReadings')}: ${c.missingDates.map(d=>dateS(d,{day:'numeric',month:'short'})).join(', ')}</p>` : ''}
+        ${c.partialDates.length ? `<p class="small t2">${t('partialReadings')}: ${c.partialDates.map(d=>dateS(d,{day:'numeric',month:'short'})).join(', ')}</p>` : ''}
+      </details>`;
+    }).join('')}</div><button class="sm" data-history-fetch ${S.loading.refresh ? 'disabled' : ''}>${S.loading.refresh ? t('refreshing') : t('fetchHistory')}</button></details>`;
+}
+function bindHealth() {
+  document.querySelectorAll('[data-health-retry]').forEach(b=>b.onclick=async()=>{ b.disabled=true; S.health=await api('/api/health?days=60').catch(()=>null); render(); });
+  document.querySelectorAll('[data-history-fetch]').forEach(b=>b.onclick=()=>refreshData(60));
+  document.querySelectorAll('[data-health-day]').forEach(b=>b.onclick=()=>openDay(b.dataset.healthDay));
 }
 
 function sleepSummary() {
@@ -416,6 +510,7 @@ function metricCard(def, latestOverall) {
 
 function activityBlock() {
   const l = S.scores?.load?.[S.scores.load.length - 1];
+  const completed = S.scores?.load?.filter(x=>x.day < todayStr()).at(-1);
   const sd = latestDayWith('steps'), ad = latestDayWith('active_zone_minutes');
   const dayLabel = sd && sd !== todayStr() ? ` · ${t('dataOfDay')} ${dateS(sd)}` : '';
   const card = (k, d, m, unit, c, extra = '') => { const v = d ? val(d, m) : null; return `<div class="metric" style="min-height:0;--mc:${c}"><div class="label">${t(k)}</div><div class="val">${v === null ? '<span class="dash">—</span>' : `${num(v)}<small>${unit}</small>`}</div>${extra}${sparkline(S.days.slice(-14), m, c)}</div>`; };
@@ -425,10 +520,10 @@ function activityBlock() {
   const azmExtra = azmWeek ? (azmWeek.kind === 'goal' ? `<div class="cmp">${t('weekTotal')} ${num(azmWeek.value)} ${t('minutes')}</div>${goalBar(azmWeek)}` : `<div class="cmp">${t('weekTotal')} ${num(azmWeek.value)} ${t('minutes')} ${lvlBadge(azmWeek)}</div>`) : '';
   const loadCard = l ? `<div class="metric" style="min-height:0;--mc:var(--c-purple)">
       <div class="label">${t('cardioLoad')}</div>
-      <div class="val">${l.load === null ? '<span class="dash">—</span>' : `${num(l.load)}<small>${l.source}</small>`}</div>
-      <div class="cmp">${t('acute')} ${num(l.acute, 1) ?? '—'} · ${t('chronic')} ${num(l.chronic, 1) ?? '—'}</div>
-      <div class="cmp">${l.acwr !== null ? `${t('acwr')} ${l.acwr} <span class="badge ${l.acwrBand === 'spike' ? 'warn' : ''}">${t('band_' + l.acwrBand)}</span>` : `<span class="muted">${t('needs28')} (${l.history}/28)</span>`}</div>
-      <div class="foot">${t('loadNote')}</div></div>` : '';
+      <div class="val">${l.load === null ? '<span class="dash">—</span>' : `${num(l.load)}<small>${t('loadUnit')}</small>`}</div>
+      <div class="cmp">${dateS(l.day)} · ${t(l.provisional ? 'loadSoFar' : 'dataOfDay')}</div><div class="cmp">${t('source_' + l.source.replaceAll('-', '_'))}</div><div class="cmp">${t('completedLoad')}${completed ? ' · ' + dateS(completed.day) : ''}: ${t('acute')} ${num(completed?.acute, 1) ?? '—'} · ${t('chronic')} ${num(completed?.chronic, 1) ?? '—'}</div>
+      <div class="cmp">${t('loadGaps')} (${completed?.history ?? 0}/28)</div>
+      <div class="foot">${t('loadMethod')}</div>${l.workoutTrimp != null ? `<div class="cmp">${t('workoutTrimp')}: ${num(l.workoutTrimp,1)}</div>` : ''}</div>` : '';
   return `<section><div class="section-head"><h2>${t('activity')}<span class="small t2" style="font-weight:400">${dayLabel}</span></h2></div>
     <div class="metrics" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">${card('steps', sd, 'steps', '', 'var(--c-yellow)', stepsExtra)}${card('azm', ad, 'active_zone_minutes', 'min', 'var(--c-orange)', azmExtra)}${loadCard}</div></section>`;
 }
@@ -470,10 +565,10 @@ function renderToday() {
   if (!hasData) {
     body += conn ? `<section class="card"><h2>${t('noRecords')}</h2><p class="t2" style="margin:8px 0 16px">${t('noRecordsSub')}</p><button class="primary" id="fetchAgain" ${S.loading.refresh ? 'disabled' : ''}>${S.loading.refresh ? t('refreshing') : t('fetchAgain')}</button></section>` : '';
   } else {
-    const latestOverall = S.days[S.days.length - 1];
     body += recoveryBlock();
-    body += `<div class="grid12 equal"><div class="span5">${sleepSummary()}</div><div class="span7"><div class="section-head"><h2>${t('vitals')}</h2><span class="pop-wrap"><button class="icon-btn ghost" id="vitalsInfo" aria-label="${t('vitalsInfo')}" aria-expanded="false">${ICO.info}</button><div class="popover" role="tooltip" hidden>${t('vitalsInfo')}</div></span></div><div class="metrics">${VITALS.map((v) => metricCard(v, latestOverall)).join('')}</div></div></div>`;
-    body += sleepHistory();
+    body += healthMonitor();
+    body += coverageBlock();
+    body += `<div class="grid12"><div class="span5">${sleepSummary()}</div><div class="span7">${sleepHistory()}</div></div>`;
     body += activityBlock();
   }
   body += coachPreview();
@@ -483,6 +578,7 @@ function renderToday() {
 }
 
 function bindToday() {
+  bindHealth();
   $('#refreshBtn')?.addEventListener('click', refreshData);
   $('#fetchAgain')?.addEventListener('click', refreshData);
   $('#connectBtn')?.addEventListener('click', () => { location.href = `/auth/google/start?token=${encodeURIComponent(S.token)}`; });
@@ -503,11 +599,12 @@ function bindToday() {
   if (sc) { sleepBars(sc, S.days.slice(-S.sleepRange)); sc.scrollLeft = sc.scrollWidth; }   // 2) start at the latest day; scroll left for history
 }
 
-async function refreshData() {
+async function refreshData(days = 7) {
+  if (typeof days !== 'number') days = 7;
   if (S.loading.refresh) return;
   S.loading.refresh = true; S.err.refresh = ''; render();
   try {
-    const r = await api('/api/refresh?days=7', { method: 'POST' });
+    const r = await api(`/api/refresh?days=${days}`, { method: 'POST' });
     const bad = r.perType.filter((x) => !x.ok);
     if (bad.length) S.err.refresh = `${t('partialFetch')}: ${bad.map((x) => `${x.dataType} (${x.error ? x.error.slice(0, 60) : x.httpStatus})`).join(', ')}`;
     await api('/api/scores/recompute', { method: 'POST' }).catch(() => {});
@@ -593,11 +690,13 @@ function activityStory(day) {
 }
 async function openDay(day) {
   const dr = $('#drawer');
+  dr.setAttribute('aria-label', t('dayDetail'));
   const sec = (k, color, inner) => `<section class="sec" style="--sc:${color}"><h3><i></i>${t(k)}</h3>${inner}</section>`;
   const idx = S.days.indexOf(day), prev = idx > 0 ? S.days[idx - 1] : null, next = idx >= 0 && idx < S.days.length - 1 ? S.days[idx + 1] : null;
   dr.innerHTML = `<div class="head"><button class="icon-btn ghost" id="drClose" aria-label="${t('close')}">${ICO.back}</button><div class="grow"><b>${t('dayDetail')}</b><span class="meta">${dateS(day, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span></div>
       <div class="seg-ctl daynav"><button id="dPrev" ${prev ? '' : 'disabled'} aria-label="${t('prevDay')}" title="${prev ? dateS(prev) : ''}">‹</button><button id="dNext" ${next ? '' : 'disabled'} aria-label="${t('nextDay')}" title="${next ? dateS(next) : ''}">›</button></div><button class="sm primary" id="askDay">${t('askCoachDay')}</button></div>
     <div class="msgs det">
+      ${recoveryBlock(day)}
       ${sec('secSleep', 'var(--deep)', sleepStory(day))}
       ${sec('secVitals', 'var(--c-teal)', ([{ m: 'sleeping_hr_bpm', k: 'sleepHr', unit: 'bpm', dec: 0, c: 'var(--c-orange)', hint: (dd) => { const x = det(dd, 'sleeping_hr_bpm'); return x?.coveragePct !== undefined ? `${t('sleepHrHint')} · ${t('coverageOf')} ${x.coveragePct}%` : t('sleepHrHint'); } }, ...VITALS]).map((v) => vitalRow(v, day)).join('') || `<div class="small muted">${t('noData')}</div>`)}
       ${sec('secAct', 'var(--c-orange)', activityStory(day))}
@@ -808,6 +907,7 @@ function renderSettings() {
         <div class="rule"></div><div class="label">${t('chatNotes')}</div><div class="meta" style="margin-bottom:8px">${t('chatNotesHint')}</div>
         <div class="list" id="cpNotes">${(c.chat_notes || []).length ? c.chat_notes.map((n, i) => `<div class="item" style="display:flex;justify-content:space-between;align-items:center;gap:12px"><span class="small">${esc(n.text)}<span class="meta" style="margin-left:8px">${dt(n.at)}</span></span><button class="sm ghost" data-rm="${i}">${t('removeNote')}</button></div>`).join('') : `<div class="meta">—</div>`}</div>`; })()}
     </section>
+    <div class="span12">${coverageBlock()}</div>
     <section class="card span12"><h2>${t('setDiag')}</h2><div class="small t2">${t('diagNote')}</div><div class="rule"></div>
       <div class="row" style="margin-bottom:12px"><span class="badge">${t('model')}: ${esc(info?.model || '—')}</span><span class="badge">${t('promptVersion')}: ${esc(info?.promptVersion || '—')}</span>${info && !info.configured ? `<span class="badge warn">${t('coachOff')}</span>` : ''}${S.demo ? `<span class="badge warn">${t('demo')}</span>` : ''}</div>
       <div class="row"><button class="sm" id="ctxBtn">${t('coachContext')}</button><button class="sm" id="recomputeBtn">${t('recompute')}</button><button class="sm" id="probeBtn">${t('probe')}</button><span class="meta" id="probeStatus"></span></div>
@@ -832,6 +932,7 @@ const PANEL_FIELDS = [
 ];
 let panelUnits = 'levine';
 function bindSettings() {
+  bindHealth();
   $('#signOut').onclick = () => { S.token = ''; try { sessionStorage.removeItem('adminToken'); } catch {} renderGate(); };
   $('#langSel').onchange = (e) => { S.lang = e.target.value; try { localStorage.setItem('lang', S.lang); } catch {} applyTheme(); render(); };
   $('#themeSel').onchange = (e) => { S.theme = e.target.value; try { localStorage.setItem('theme', S.theme); } catch {} applyTheme(); };

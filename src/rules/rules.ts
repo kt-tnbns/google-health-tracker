@@ -11,7 +11,7 @@
  */
 import type { MetricId } from '../ingest/metrics';
 
-export const RULES_VERSION = 'rules-v1';
+export const RULES_VERSION = 'rules-v1.1';
 
 export type Level = 'good' | 'fair' | 'low' | 'note' | 'na';
 export interface I18nText { th: string; en: string }
@@ -101,6 +101,12 @@ export const RULES: Rule[] = [
     source: 'Paluch et al., Lancet Public Health 2022 (meta-analysis of 15 cohorts): mortality benefit plateaus around 8,000–10,000 steps/day under age 60, 6,000–8,000 at 60+.',
   },
   // ---------- vitals (personal baseline) ----------
+  { kind: 'personal', id: 'personal.sleep', metric: 'sleep_minutes_asleep', title: T('เวลาหลับ', 'Time asleep'), unit: 'min', windowDays: 14, minDays: 3, floor: 30, better: 'neutral',
+    text: { within: T('อยู่ในช่วงการนอนปกติของคุณ', 'Within your usual sleep range'), above: T('นอนนานกว่าช่วงปกติของคุณ', 'Longer than your usual sleep range'), below: T('นอนสั้นกว่าช่วงปกติของคุณ', 'Shorter than your usual sleep range'), collecting: T('กำลังสะสมข้อมูลเปรียบเทียบ', 'Building your baseline') },
+    source: 'Descriptive personal baseline: mean ± max(SD, 30 min) of prior 14 calendar days (≥ 3 readings). This is not a sleep-need target; see the separate duration guideline.' },
+  { kind: 'personal', id: 'personal.efficiency', metric: 'sleep_efficiency_pct', title: T('ประสิทธิภาพการนอน', 'Sleep efficiency'), unit: '%', windowDays: 14, minDays: 3, floor: 2, better: 'neutral',
+    text: { within: T('อยู่ในช่วงปกติของคุณ', 'Within your usual range'), above: T('สูงกว่าช่วงปกติของคุณ', 'Above your usual range'), below: T('ต่ำกว่าช่วงปกติของคุณ', 'Below your usual range'), collecting: T('กำลังสะสมข้อมูลเปรียบเทียบ', 'Building your baseline') },
+    source: 'Descriptive personal baseline: mean ± max(SD, 2 percentage points) of prior 14 calendar days (≥ 3 readings). Heuristic range, not a diagnostic threshold.' },
   { kind: 'personal', id: 'personal.hrv', metric: 'hrv_avg_ms', title: T('HRV', 'HRV'), unit: 'ms', windowDays: 14, minDays: 3, floor: 3, better: 'higher',
     text: { within: T('อยู่ในช่วงปกติของคุณ', 'Within your usual range'), above: T('สูงกว่าช่วงของคุณ — มักสัมพันธ์กับการฟื้นตัวที่ดี', 'Above your range — often goes with good recovery'), below: T('ต่ำกว่าช่วงของคุณ — มักพบหลังวันหนัก นอนน้อย ดื่ม หรือเริ่มไม่สบาย', 'Below your range — common after hard days, short sleep, alcohol, or when getting ill'), collecting: T('กำลังสะสมข้อมูลเปรียบเทียบ', 'Building your baseline') },
     source: 'Personal baseline: mean ± max(SD, 3 ms) of the prior 14 days with data (≥ 3 days). Population HRV norms are not used because HRV varies widely between people.' },
@@ -166,7 +172,7 @@ export function evaluateDay(day: string, days: string[], get: Lookup, goals: Goa
       out.push({ id: r.id, kind: r.kind, metric: r.metric, level: b.level, value: v, unit: r.unit, title: r.title, text: b.text, band: { lo: b.min ?? Number.NEGATIVE_INFINITY, hi: b.max ?? Number.POSITIVE_INFINITY }, good: g ? { lo: g.min ?? null, hi: g.max ?? null } : undefined, source: r.source, version: RULES_VERSION });
     } else if (r.kind === 'personal') {
       const v = get(day, r.metric); if (v === null) continue;
-      const prior = days.filter((d) => d < day).slice(-r.windowDays).map((d) => get(d, r.metric)).filter((x): x is number => x !== null);
+      const prior = days.filter((d) => d < day && daysBetween(d, day) <= r.windowDays).map((d) => get(d, r.metric)).filter((x): x is number => x !== null);
       if (prior.length < r.minDays) { out.push({ id: r.id, kind: r.kind, metric: r.metric, level: 'na', value: v, unit: r.unit, title: r.title, text: r.text.collecting, band: { lo: NaN, hi: NaN, n: prior.length }, source: r.source, version: RULES_VERSION }); continue; }
       const mu = prior.reduce((a, b) => a + b, 0) / prior.length, sd = Math.sqrt(prior.reduce((a, x) => a + (x - mu) ** 2, 0) / prior.length), w = Math.max(sd, r.floor);
       const lo = mu - w, hi = mu + w;

@@ -1,7 +1,7 @@
 import { METRIC_UNITS, MetricId } from './metrics';
 import { civilDate, normalizeDate } from './time';
 
-export const NORMALIZER_VERSION = '2026-09-09.1';
+export const NORMALIZER_VERSION = '2026-09-12.1';
 
 export interface NormalizedMetric {
   day: string;                 // YYYY-MM-DD in user tz
@@ -172,18 +172,18 @@ export function normalizeRollup(dataType: string, rollupPoints: unknown[]): Norm
     const push = (metric: MetricId, v: number | null, reason = 'no numeric value in rollup') =>
       out.push(m({ day, status: v === null ? 'missing' : 'ok', statusReason: v === null ? reason : undefined }, metric, v, { raw }));
     switch (dataType) {
-      case 'steps': push('steps', firstNumber(inner, ['count', 'steps', 'sum'])); break;
+      case 'steps': push('steps', firstNumber(inner, ['countSum', 'count', 'steps', 'sum'])); break;
       case 'active-zone-minutes': {
         const fat = optNum(inner.sumInFatBurnHeartZone), cardio = optNum(inner.sumInCardioHeartZone), peak = optNum(inner.sumInPeakHeartZone);
         // AZM credit: fat-burn counts 1/min, cardio & peak 2/min — the API sums already carry that weighting.
-        const total = fat === null && cardio === null && peak === null ? firstNumber(inner, ['totalMinutes', 'minutes', 'count']) : (fat ?? 0) + (cardio ?? 0) + (peak ?? 0);
+        const total = firstNumber(inner, ['totalMinutes', 'minutes', 'count']) ?? (fat !== null && cardio !== null && peak !== null ? fat + cardio + peak : null);
         push('active_zone_minutes', total);
         push('azm_fat_burn_min', fat); push('azm_cardio_min', cardio); push('azm_peak_min', peak);
         break;
       }
       case 'time-in-heart-rate-zone': {
         const zones = (inner.timeInHeartRateZones ?? []) as { heartRateZone?: string; duration?: string }[];
-        const min = (z: string) => { const e = zones.find((x) => x.heartRateZone === z); return e ? (SEC(e.duration) ?? 0) / 60 : null; };
+        const min = (z: string) => { const e = zones.find((x) => x.heartRateZone === z); const seconds = e ? SEC(e.duration) : null; return seconds === null ? null : seconds / 60; };
         push('hrz_light_min', min('LIGHT')); push('hrz_moderate_min', min('MODERATE')); push('hrz_vigorous_min', min('VIGOROUS')); push('hrz_peak_min', min('PEAK'));
         break;
       }
@@ -286,4 +286,17 @@ function findUnionPayload(raw: Record<string, unknown>): Record<string, unknown>
     if (v && typeof v === 'object' && !Array.isArray(v)) return v as Record<string, unknown>;
   }
   return undefined;
+}
+
+/** Re-read preserved load payloads so pre-v0.2 cached totals do not retain invented zeros.
+ * No database/raw mutation. New fetches persist the corrected normalizer output normally.
+ */
+export function repairLoadRow<T extends { metric: string; value: any; status: string; details?: any }>(row: T): T {
+  const type = row.metric === 'steps' ? 'steps' : row.metric.startsWith('hrz_') ? 'time-in-heart-rate-zone'
+    : row.metric === 'active_zone_minutes' || row.metric.startsWith('azm_') ? 'active-zone-minutes' : null;
+  if (!type || !row.details?.raw) return row;
+  const fixed = normalizeRollup(type, [row.details.raw]).find(m => m.metric === row.metric);
+  if (!fixed) return row;
+  return { ...row, value: fixed.value, status: fixed.value === null ? 'missing' : row.status === 'partial' ? 'partial' : 'ok',
+    ...(fixed.value === null ? { status_reason: 'incomplete source fields; total unavailable' } : {}) };
 }

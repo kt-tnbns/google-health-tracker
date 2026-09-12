@@ -154,3 +154,41 @@ describe('normalizeRollup', () => {
     ]);
   });
 });
+
+
+describe('load normalization completeness', () => {
+  const point = (value: unknown) => [{ civilStartTime: { year: 2026, month: 9, day: 9 }, value }];
+  it('does not fabricate an AZM total from incomplete zone fields', () => {
+    const rows = normalizeRollup('active-zone-minutes', point({ activeZoneMinutes: { sumInFatBurnHeartZone: 20 } }));
+    expect(rows.find(r => r.metric === 'active_zone_minutes')!.value).toBeNull();
+    expect(rows.find(r => r.metric === 'azm_fat_burn_min')!.value).toBe(20);
+  });
+  it('accepts complete explicit zeros and a separately supplied total', () => {
+    const zero = normalizeRollup('active-zone-minutes', point({ activeZoneMinutes: { sumInFatBurnHeartZone: 0, sumInCardioHeartZone: 0, sumInPeakHeartZone: 0 } }));
+    expect(zero.find(r => r.metric === 'active_zone_minutes')!.value).toBe(0);
+    const total = normalizeRollup('active-zone-minutes', point({ activeZoneMinutes: { totalMinutes: 30, sumInFatBurnHeartZone: 20 } }));
+    expect(total.find(r => r.metric === 'active_zone_minutes')!.value).toBe(30);
+  });
+  it('does not turn a zone with an absent duration into zero', () => {
+    const rows = normalizeRollup('time-in-heart-rate-zone', point({ timeInHeartRateZone: { timeInHeartRateZones: [{ heartRateZone: 'PEAK' }] } }));
+    expect(rows.find(r => r.metric === 'hrz_peak_min')!.value).toBeNull();
+  });
+});
+
+describe('cached load data', () => {
+  it('reinterprets old partial AZM totals using the preserved raw response', () => {
+    const { repairLoadRow } = require('./normalize');
+    const old = { day: '2026-09-09', metric: 'active_zone_minutes', value: 20, status: 'ok', details: { raw: {
+      civilStartTime: { year: 2026, month: 9, day: 9 }, value: { activeZoneMinutes: { sumInFatBurnHeartZone: 20 } },
+    } } };
+    expect(repairLoadRow(old)).toMatchObject({ value: null, status: 'missing' });
+    expect(old.value).toBe(20);
+  });
+});
+
+it('reads Google steps countSum with nested civil dates, including cached missing rows', () => {
+  const { repairLoadRow } = require('./normalize');
+  const raw = { civilStartTime: { date: { year: 2026, month: 9, day: 12 }, time: {} }, steps: { countSum: '2900' } };
+  expect(normalizeRollup('steps', [raw])[0]).toMatchObject({ day: '2026-09-12', value: 2900, status: 'ok' });
+  expect(repairLoadRow({ metric: 'steps', value: null, status: 'missing', details: { raw } })).toMatchObject({ value: 2900, status: 'ok' });
+});

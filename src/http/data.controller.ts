@@ -37,6 +37,14 @@ export class DataController {
     return this.ingest.getRange(addDays(end, -n), end);
   }
 
+  /** Stored data coverage for completed days, and today's personal health comparisons. */
+  @Get('health')
+  health(@Query('days') days = '60') {
+    const n = Number(days);
+    if (!Number.isInteger(n) || n < 28 || n > 90) throw new BadRequestException('days must be 28..90');
+    return this.ingest.health(n);
+  }
+
   /** Exercise sessions for the last N days (from the exercise data type). */
   @Get('exercise')
   exercise(@Query('days') days = '35') {

@@ -2,9 +2,9 @@
  * Cardiovascular load — daily load points + EWMA acute (7 d) / chronic (28 d), ACWR, Foster monotony & strain.
  * See docs/calculations.md §2. ACWR is shown as "how fast load is changing", never as injury risk.
  */
-import { clamp, ewma, mean, median, round, sd } from './stats';
+import { clamp, mean, median, round, sd } from './stats';
 
-export const LOAD_VERSION = 'load-v0.1';
+export const LOAD_VERSION = 'load-v0.2';
 
 export interface LoadDayInput {
   day: string;
@@ -21,29 +21,30 @@ export interface LoadDayInput {
 export interface LoadDayResult {
   day: string;
   load: number | null;            // daily load points (null = no data at all that day)
-  source: 'trimp' | 'hr-zones' | 'azm-zones' | 'azm-total' | 'none';
+  source: 'hr-zones' | 'azm-zones' | 'azm-total' | 'none';
   acute: number | null;           // EWMA 7 d
   chronic: number | null;         // EWMA 28 d
   acwr: number | null;            // acute/chronic, null until 28 days of history
   acwrBand: 'low' | 'steady' | 'building' | 'spike' | null;
   monotony: number | null;        // mean/SD of last 7 days
   strain: number | null;          // Σ7d × monotony
-  history: number;                // days with load data so far (leading empty days excluded)
+  history: number;                // consecutive calendar days with comparable load
+  workoutTrimp: number | null;    // separate scale; never combined with all-day AZM
+  provisional: boolean;          // current civil day is still accumulating
 }
 
-/** Daily load points from whatever is available, most specific first. */
+/** One comparable scale: moderate minutes + 2× vigorous/peak minutes (AZM).
+ * Complete zone fields only. Steps and workout TRIMP cannot establish all-day load.
+ */
 export function dailyLoad(d: LoadDayInput): { load: number | null; source: LoadDayResult['source'] } {
-  if (d.trimp !== null) return { load: round(d.trimp, 1), source: 'trimp' };
-  if (d.hrzModerate !== null || d.hrzVigorous !== null || d.hrzPeak !== null) {
-    return { load: round(1 * (d.hrzModerate ?? 0) + 2 * (d.hrzVigorous ?? 0) + 3 * (d.hrzPeak ?? 0), 1), source: 'hr-zones' };
+  const valid = (v: number | null): v is number => v !== null && Number.isFinite(v) && v >= 0;
+  if (valid(d.azmTotal)) return { load: round(d.azmTotal, 1), source: 'azm-total' };
+  if ([d.azmFatBurn, d.azmCardio, d.azmPeak].every(valid)) {
+    return { load: round(d.azmFatBurn! + d.azmCardio! + d.azmPeak!, 1), source: 'azm-zones' };
   }
-  if (d.azmFatBurn !== null || d.azmCardio !== null || d.azmPeak !== null) {
-    // AZM sums already carry 2× for cardio/peak → minutes = sum/2. Re-weight: fat 1, cardio 2, peak 3.
-    const fat = d.azmFatBurn ?? 0, cardio = (d.azmCardio ?? 0) / 2, peak = (d.azmPeak ?? 0) / 2;
-    return { load: round(1 * fat + 2 * cardio + 3 * peak, 1), source: 'azm-zones' };
+  if ([d.hrzModerate, d.hrzVigorous, d.hrzPeak].every(valid)) {
+    return { load: round(d.hrzModerate! + 2 * d.hrzVigorous! + 2 * d.hrzPeak!, 1), source: 'hr-zones' };
   }
-  if (d.azmTotal !== null) return { load: round(d.azmTotal, 1), source: 'azm-total' };
-  if (d.steps !== null) return { load: 0, source: 'none' };     // wore the device, no zone minutes → genuine 0
   return { load: null, source: 'none' };
 }
 
@@ -55,30 +56,38 @@ export function trimp(durationMin: number, avgHr: number, restHr: number, maxHr:
   return round(durationMin * hrr * y, 1);
 }
 
-export function computeLoadSeries(days: LoadDayInput[]): LoadDayResult[] {
+export function computeLoadSeries(days: LoadDayInput[], provisionalDay?: string): LoadDayResult[] {
   const loads = days.map(dailyLoad);
-  const values = loads.map((l) => l.load);
-  const acute = ewma(values, 7), chronic = ewma(values, 28);
-  const med = median(values.filter((v): v is number => v !== null && v > 0)) ?? 0;
-  const floor = Math.max(1, 0.2 * med);
-  let seen = 0;
+  let a: number | null = null, c: number | null = null;
+  let run: number[] = [];
   return days.map((d, i) => {
-    if (values[i] !== null) seen++;
-    const history = seen;                 // days WITH data — leading empty days do not count
-    const a = history >= 7 ? round(acute[i]!, 1) : null;
-    const c = history >= 28 ? round(chronic[i]!, 1) : null;
+    const value = loads[i].load;
+    const provisional = d.day === provisionalDay;
+    const gap = i > 0 && Date.parse(d.day + 'T00:00:00Z') - Date.parse(days[i - 1].day + 'T00:00:00Z') !== 86_400_000;
+    const family = (source: LoadDayResult['source']) => source === 'hr-zones' ? 'hr-zones' : 'azm';
+    const sourceChanged = i > 0 && family(loads[i].source) !== family(loads[i - 1].source);
+    if (value === null || gap || provisional || sourceChanged) { a = null; c = null; run = []; }
+    if (value !== null && !provisional) {
+      a = a === null ? value : (2 / 8) * value + (1 - 2 / 8) * a;
+      c = c === null ? value : (2 / 29) * value + (1 - 2 / 29) * c;
+      run.push(value);
+    }
+    const history = run.length;
+    const acute = history >= 7 ? round(a!, 1) : null;
+    const chronic = history >= 28 ? round(c!, 1) : null;
+    const floor = Math.max(1, 0.2 * (median(run.filter(v => v > 0)) ?? 0));
     let acwr: number | null = null, band: LoadDayResult['acwrBand'] = null;
-    if (a !== null && c !== null && c >= floor) {
-      acwr = round(a / c, 2);
+    if (acute !== null && chronic !== null && chronic >= floor) {
+      acwr = round(acute / chronic, 2);
       band = acwr < 0.8 ? 'low' : acwr <= 1.3 ? 'steady' : acwr <= 1.5 ? 'building' : 'spike';
     }
-    const last7 = values.slice(Math.max(0, i - 6), i + 1).map((v) => v ?? 0);
     let monotony: number | null = null, strain: number | null = null;
     if (history >= 7) {
-      const m = mean(last7)!, s = sd(last7)!;
+      const last7 = run.slice(-7), m = mean(last7)!, s = sd(last7)!;
       monotony = s > 0 ? round(m / s, 2) : m > 0 ? 9.99 : null;
       strain = monotony === null ? null : round(last7.reduce((x, y) => x + y, 0) * monotony, 0);
     }
-    return { day: d.day, load: loads[i].load, source: loads[i].source, acute: a, chronic: c, acwr, acwrBand: band, monotony, strain, history };
+    return { day: d.day, load: value, source: loads[i].source, acute, chronic, acwr, acwrBand: band,
+      monotony, strain, history, workoutTrimp: d.trimp, provisional };
   });
 }

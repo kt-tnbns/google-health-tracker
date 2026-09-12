@@ -34,7 +34,7 @@ src/
   scores/
     stats.ts              mean/sd/median/MAD, EWMA, Hedges' g, bootstrap CI, Mann–Whitney (seeded PRNG)
     recovery.ts           Recovery index (ln RMSSD, SWC, per-person z-scores) — recovery-v0.1
-    load.ts               daily load (TRIMP / HR zones / AZM), EWMA 7/28, ACWR, monotony — load-v0.1
+    load.ts               daily load (AZM / HR zones; workout TRIMP separate), EWMA 7/28, ACWR, monotony — load-v0.2
     insights.ts           journal tags vs next-morning outcomes, gated — insights-v0.1
     strength.ts           tonnage, hard sets, e1RM (Epley/Brzycki), weekly
     bioage.ts             PhenoAge (Levine 2018) + Fitness age (HUNT3)
@@ -91,6 +91,7 @@ npm run start:dev
 | POST | `/api/refresh?days=7` หรือ `?start=YYYY-MM-DD&end=YYYY-MM-DD` | ดึงข้อมูลจาก cloud (ไม่ใช่ sync จากนาฬิกา) |
 | GET | `/api/days/today` , `/api/days/2026-09-09` | ค่าต่อวัน + รายการ field ที่ขาด |
 | GET | `/api/days?days=14` | ตารางย่อ N วันล่าสุด |
+| GET | `/api/health?days=60` | Health Monitor: today's personal comparisons + complete/partial/missing coverage |
 | GET | `/api/raw?limit=50` , `/api/raw/:id` | response ดิบจาก Google |
 | GET | `/api/devices` | อุปกรณ์ที่ Google เห็นในบัญชี (probe การเชื่อมต่อ) |
 | GET | `/api/coach/info` | model / prompt version / configured? |

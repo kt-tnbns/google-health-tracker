@@ -1,5 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Pool } from 'pg';
+import { repairLoadRow } from '../ingest/normalize';
 import { config } from '../config';
 import { PG_POOL } from '../db/db.module';
 import { HealthApiClient } from '../google/health-api.client';
@@ -20,9 +21,9 @@ export class ScoresService {
   // ---------- shared loaders ----------
 
   private async grid(startDate: string, endDate: string): Promise<{ grid: Grid; days: string[] }> {
-    const { rows } = await this.pool.query(`SELECT day, metric, value, status FROM daily_metrics WHERE day >= $1 AND day <= $2`, [startDate, endDate]);
+    const { rows } = await this.pool.query(`SELECT day, metric, value, status, details FROM daily_metrics WHERE day >= $1 AND day <= $2`, [startDate, endDate]);
     const grid: Grid = {};
-    for (const r of rows) (grid[String(r.day).slice(0, 10)] ||= {})[r.metric] = r.status === 'missing' || r.value === null ? null : Number(r.value);
+    for (const r of rows.map(repairLoadRow)) (grid[String(r.day).slice(0, 10)] ||= {})[r.metric] = r.status !== 'ok' || r.value === null || !Number.isFinite(Number(r.value)) ? null : Number(r.value);
     const days: string[] = [];
     for (let d = startDate; d <= endDate; d = addDays(d, 1)) { days.push(d); grid[d] ||= {}; }
     return { grid, days };
@@ -65,7 +66,7 @@ export class ScoresService {
       trimp: trimpByDay.get(d) ?? null, steps: grid[d].steps ?? null,
     }));
     const recovery = computeRecoverySeries(recIn).slice(-days);
-    const load = computeLoadSeries(loadIn).slice(-days);
+    const load = computeLoadSeries(loadIn, today).slice(-days);
     return { recovery, load, versions: { recovery: RECOVERY_VERSION, load: LOAD_VERSION } };
   }
 

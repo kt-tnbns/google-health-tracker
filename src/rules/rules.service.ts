@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Pool } from 'pg';
+import { repairLoadRow } from '../ingest/normalize';
 import { config } from '../config';
 import { PG_POOL } from '../db/db.module';
 import { addDays, todayCivil } from '../ingest/time';
@@ -15,11 +16,11 @@ export class RulesService {
   async evaluate(days = 35): Promise<{ version: string; goals: GoalValues; byDay: Record<string, Check[]> }> {
     const today = todayCivil(config.USER_TIMEZONE);
     const start = addDays(today, -(days + 21));   // extra history so personal baselines have a window
-    const { rows } = await this.pool.query<{ day: string; metric: string; value: string | null; status: string }>(
-      `SELECT day, metric, value, status FROM daily_metrics WHERE day >= $1 AND day <= $2`, [start, today]);
+    const { rows } = await this.pool.query<{ day: string; metric: string; value: string | null; status: string; details?: unknown }>(
+      `SELECT day, metric, value, status, details FROM daily_metrics WHERE day >= $1 AND day <= $2`, [start, today]);
     const grid = new Map<string, Map<string, number>>();
-    for (const r of rows) {
-      if (r.value === null || r.status === 'missing') continue;
+    for (const r of rows.map(repairLoadRow)) {
+      if (r.value === null || r.status !== 'ok' || !Number.isFinite(Number(r.value))) continue;
       const d = String(r.day).slice(0, 10);
       if (!grid.has(d)) grid.set(d, new Map());
       grid.get(d)!.set(r.metric, Number(r.value));
