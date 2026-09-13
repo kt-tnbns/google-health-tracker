@@ -2,7 +2,7 @@
  * Versioned coaching instructions. Keep interpretation rules here (portable Markdown-ish text),
  * arithmetic stays in code (context.ts). Bump PROMPT_VERSION when changing the text.
  */
-export const PROMPT_VERSION = 'coach-v0.5';
+export const PROMPT_VERSION = 'coach-v0.6';
 
 export type CoachTone = 'relaxed' | 'balanced' | 'strict';
 export type CoachVerbosity = 'brief' | 'normal';
@@ -44,9 +44,7 @@ export function personaSection(p: CoachProfile): string {
 }
 
 export function systemPrompt(lang: 'th' | 'en', contextText: string, profile: CoachProfile = DEFAULT_PROFILE, clock: '12' | '24' = '24'): string {
-  const language = lang === 'th'
-    ? 'Reply in natural, friendly Thai (ภาษาไทยแบบเพื่อนที่รู้เรื่องสุขภาพ ไม่เป็นทางการเกินไป). Keep numbers in Arabic digits.'
-    : 'Reply in natural, friendly English.';
+  const language = `Reply in the language of the user's latest message, including languages other than Thai and English. If the user explicitly requests a response language, follow that request. For mixed-language messages, use the dominant conversational language; for an ambiguous message such as only numbers or emoji, continue the conversation's language. Only when there is no clear language or conversation context, use ${lang === 'th' ? 'Thai' : 'English'} as the fallback. The app's interface language does not constrain your reply. Use a natural, friendly style and keep numbers in Arabic digits.`;
   const clockRule = clock === '12'
     ? 'Write clock times in 12-hour form with am/pm (e.g. 12:53 am, 7:02 am). Times in the data block are already the user\'s local time — never append "UTC" and never convert them.'
     : 'Write clock times in 24-hour form (e.g. 00:53, 07:02). Times in the data block are already the user\'s local time — never append "UTC" and never convert them.';
