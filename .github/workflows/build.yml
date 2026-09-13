@@ -91,7 +91,9 @@ jobs:
           trap 'rm -f "$response_file"' EXIT
           status=$(curl -sS --location --max-redirs 3 --connect-timeout 15 --max-time 60 \
             -o "$response_file" -w '%{http_code}' \
-            --request POST "$WEBHOOK")
+            --request POST "$WEBHOOK" \
+            -H 'content-type: application/json' -H 'x-github-event: push' \
+            --data-binary "@$GITHUB_EVENT_PATH")
           echo "Dokploy HTTP $status"
           # Keep errors visible without printing the secret webhook URL.
           cat "$response_file"
