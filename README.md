@@ -146,7 +146,7 @@ TEST_DATABASE_URL=postgres://... npm test   # + integration (idempotent upsert, 
 4. volume `health_pgdata` ต้องเป็น persistent (ข้อมูล + token ต้องรอด redeploy) — migrations รันเองตอน boot
 5. อัปเดตแบบ manual: รอ Actions push image สำเร็จ แล้วกด Deploy ใน Dokploy เพื่อ pull `latest` (`pull_policy: always`)
 6. อัปเดตอัตโนมัติ (optional): เพิ่ม repository secret `DOKPLOY_DEPLOY_WEBHOOK` เป็น deployment webhook URL ของบริการนี้ที่รับ POST ได้ (รองรับชื่อเดิม `DOKPLOY_WEBHOOK` เป็น fallback) ไม่ต้องตั้ง API key; ถ้าไม่มี secret จะข้ามการเรียก deploy โดย workflow ไม่ล้ม
-7. ลำดับ: push `main` → test → job `image` build/push GHCR สำเร็จ → job `redeploy` เรียก webhook เปล่าแบบ POST ส่วน tag builds และ PR ไม่เรียก deploy
+7. ลำดับ: push `main` → test → job `image` build/push GHCR สำเร็จ → job `redeploy` ส่ง GitHub push payload พร้อม `x-github-event: push` ให้ webhook เพื่อให้ Dokploy อ่าน branch `main` ได้ ส่วน tag builds และ PR ไม่เรียก deploy
    อย่าให้ Dokploy deploy จาก repository `On Push` อีกทางพร้อมกัน เพราะจะเริ่มก่อน image พร้อม การแยก job ใน Actions ไม่ได้ปิด trigger ฝั่ง Dokployให้เอง
    Git-provider webhook บางแบบต้องเปิด Autodeploy และรับ payload ของ Git event จึงไม่ใช่ทุก webhook ที่ใช้กับ POST เปล่าได้ ถ้าได้ HTTP 400 ให้ดู response ใน Actions ก่อนเปลี่ยนการตั้งค่า; อย่าปิด Autodeploy โดยสมมติว่า webhook เดิมจะยังทำงาน
    Workflow จัดคิวแต่ละ ref เพื่อไม่ให้ build เขียน `latest` พร้อมกัน; HTTP 2xx หมายถึงรับคำขอแล้ว ให้ตรวจ deployment logs ใน Dokploy เพื่อยืนยันว่า deploy เสร็จจริง
