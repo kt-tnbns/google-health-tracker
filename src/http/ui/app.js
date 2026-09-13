@@ -152,6 +152,34 @@ const S = {
 try { S.token = sessionStorage.getItem('adminToken') || ''; } catch {}
 try { S.lang = localStorage.getItem('lang') || (navigator.language.startsWith('th') ? 'th' : 'en'); S.theme = localStorage.getItem('theme') || 'system'; S.clock = localStorage.getItem('clock') === '12' ? '12' : '24'; } catch {}
 const t = (k) => (I18N[S.lang] && I18N[S.lang][k]) ?? I18N.th[k] ?? k;
+const pendingButtons = new Map();
+function bindBusyButtons(selector) {
+  document.querySelectorAll(selector).forEach(button => {
+    const action = button.onclick;
+    if (!action || button.dataset.busyBound) return;
+    button.dataset.busyBound = 'true';
+    const key = button.id || selector;
+    const idle = button.innerHTML;
+    const paint = busy => {
+      button.disabled = busy;
+      button.setAttribute('aria-busy', String(busy));
+      button.classList.toggle('is-loading', busy);
+      button.innerHTML = busy ? `<span class="spinner" aria-hidden="true"></span> ${S.lang === 'th' ? 'กำลังดำเนินการ…' : 'Working…'}` : idle;
+    };
+    // A re-render must not re-enable a request that is still in flight.
+    if (pendingButtons.has(key)) { pendingButtons.get(key).add(paint); paint(true); }
+    button.onclick = async event => {
+      if (pendingButtons.has(key)) return;
+      const listeners = new Set([paint]); pendingButtons.set(key, listeners); paint(true);
+      try { await action.call(button, event); }
+      catch (error) {
+        const message = document.createElement('span'); message.className = 'err';
+        message.setAttribute('role', 'alert'); message.textContent = error.message || t('err_generic');
+        if (button.isConnected) button.after(message);
+      } finally { pendingButtons.delete(key); listeners.forEach(update => update(false)); }
+    };
+  });
+}
 const LOC = () => (S.lang === 'th' ? 'th-TH' : 'en-GB');
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const num = (v, d = 0) => (v === null || v === undefined || Number.isNaN(+v) ? null : Number(v).toLocaleString('en-US', { maximumFractionDigits: d }));
@@ -459,12 +487,13 @@ function coverageBlock() {
         ${c.missingDates.length ? `<p class="small t2">${t('missingReadings')}: ${c.missingDates.map(d=>dateS(d,{day:'numeric',month:'short'})).join(', ')}</p>` : ''}
         ${c.partialDates.length ? `<p class="small t2">${t('partialReadings')}: ${c.partialDates.map(d=>dateS(d,{day:'numeric',month:'short'})).join(', ')}</p>` : ''}
       </details>`;
-    }).join('')}</div><button class="sm" data-history-fetch ${S.loading.refresh ? 'disabled' : ''}>${S.loading.refresh ? t('refreshing') : t('fetchHistory')}</button></details>`;
+    }).join('')}</div><button class="sm ${S.loading.refresh ? 'is-loading' : ''}" data-history-fetch aria-busy="${!!S.loading.refresh}" ${S.loading.refresh ? 'disabled' : ''}>${S.loading.refresh ? '<span class="spinner" aria-hidden="true"></span> ' + t('refreshing') : t('fetchHistory')}</button></details>`;
 }
 function bindHealth() {
   document.querySelectorAll('[data-health-retry]').forEach(b=>b.onclick=async()=>{ b.disabled=true; S.health=await api('/api/health?days=60').catch(()=>null); render(); });
   document.querySelectorAll('[data-history-fetch]').forEach(b=>b.onclick=()=>refreshData(60));
   document.querySelectorAll('[data-health-day]').forEach(b=>b.onclick=()=>openDay(b.dataset.healthDay));
+  bindBusyButtons('[data-health-retry]');
 }
 
 function sleepSummary() {
@@ -882,6 +911,7 @@ function bindTrends(rec, load) {
   $('#jsave').onclick = async () => { const st = $('#jstatus'); try { S.journalToday = await api(`/api/journal/${todayStr()}`, { method: 'PUT', body: JSON.stringify({ tags: [...selected], note: $('#jnote').value }) }); st.textContent = t('saved'); S.insights = await api('/api/insights').catch(() => S.insights); } catch (e) { st.textContent = e.message; } };
   // strength form
   $('#addStrength').onclick = () => { const f = $('#strengthForm'); f.hidden = !f.hidden; if (!f.hidden) renderStrengthForm(f); };
+  bindBusyButtons('#jsave');
 }
 function renderStrengthForm(f) {
   const row = () => `<div class="setrow"><div class="f"><label>${t('exercise')}</label><input class="ex" placeholder="squat"></div><div class="f"><label>${t('reps')}</label><input class="reps" type="number" min="1" value="5"></div><div class="f"><label>${t('load')}</label><input class="load" type="number" min="0" step="0.5" value="0"></div><div class="f"><label>${t('rpe')}</label><input class="rpe" type="number" min="6" max="10" step="0.5"></div><label class="row small" style="min-height:44px"><input type="checkbox" class="wu" style="min-height:0;width:18px">${t('warmup')}</label></div>`;
@@ -891,6 +921,7 @@ function renderStrengthForm(f) {
     const sets = [...f.querySelectorAll('.setrow')].map((r) => ({ exercise: r.querySelector('.ex').value.trim(), reps: +r.querySelector('.reps').value, load_kg: +r.querySelector('.load').value, rpe: r.querySelector('.rpe').value ? +r.querySelector('.rpe').value : null, is_warmup: r.querySelector('.wu').checked })).filter((s) => s.exercise && s.reps > 0);
     try { await api('/api/strength/sessions', { method: 'POST', body: JSON.stringify({ day: $('#sday').value, sets }) }); await loadTrends(); renderTrends(); } catch (e) { $('#sstatus').textContent = e.message; }
   };
+  bindBusyButtons('#saveStrength');
 }
 
 /* ================= settings view ================= */
@@ -960,8 +991,8 @@ function bindSettings() {
   $('#themeSel').onchange = (e) => { S.theme = e.target.value; try { localStorage.setItem('theme', S.theme); } catch {} applyTheme(); };
   $('#clockSel').onchange = (e) => { S.clock = e.target.value === '12' ? '12' : '24'; try { localStorage.setItem('clock', S.clock); } catch {} };
   $('#connectBtn').onclick = () => { location.href = `/auth/google/start?token=${encodeURIComponent(S.token)}`; };
-  $('#devBtn')?.addEventListener('click', async () => showDiag(await api('/api/devices')));
-  $('#discBtn')?.addEventListener('click', async () => { await api('/auth/google/disconnect', { method: 'POST' }); await loadCore(); render(); });
+  if ($('#devBtn')) $('#devBtn').onclick = async () => showDiag(await api('/api/devices'));
+  if ($('#discBtn')) $('#discBtn').onclick = async () => { await api('/auth/google/disconnect', { method: 'POST' }); await loadCore(); render(); };
   $('#psave').onclick = async () => { try { S.profile = await api('/api/profile', { method: 'PUT', body: JSON.stringify({ birth_year: $('#pby').value || null, sex: $('#psex').value || null, hr_max: $('#phr').value || null, height_cm: $('#pht').value || null }) }); $('#pstatus').textContent = t('saved'); } catch (e) { $('#pstatus').textContent = e.message; } };
   const drawPanel = () => { $('#panelForm').innerHTML = PANEL_FIELDS.map((f) => `<div class="f"><label>${f.th} <span class="muted">(${panelUnits === 'levine' ? f.levine : f.us})</span></label><input data-k="${f.k}" type="number" step="any" min="0"></div>`).join(''); };
   drawPanel();
@@ -984,6 +1015,7 @@ function bindSettings() {
   $('#ctxBtn').onclick = async () => showDiag(await api('/api/coach/context'));
   $('#recomputeBtn').onclick = async () => showDiag(await api('/api/scores/recompute', { method: 'POST' }));
   $('#probeBtn').onclick = async () => { $('#probeStatus').textContent = t('probing'); try { const r = await api('/api/energy/probe', { method: 'POST' }); $('#probeStatus').textContent = r.ok ? `${t('coverage')} ${r.coveragePct}% · ${r.samples} ${t('samples')} · ${t('verdict_' + r.verdict)}` : r.error || t('err_generic'); showDiag(r); } catch (e) { $('#probeStatus').textContent = e.message; } };
+  bindBusyButtons('#psave, #bsave, #cpSave, #devBtn, #discBtn, #ctxBtn, #recomputeBtn, #probeBtn');
   api('/api/rules').then((r) => {
     const bands = (x) => x.bands ? x.bands.map((b) => `<span class="badge ${lvlCls(b.level)}" style="margin:2px 4px 2px 0">${b.min ?? ''}${b.min != null && b.max != null ? '–' : b.min != null ? '+' : b.max != null ? '< ' : ''}${b.max ?? ''} ${x.unit} · ${t('lvl_' + b.level)}</span>`).join('') : x.personal ? `<span class="meta">mean ± max(SD, ${x.personal.floor}) · ${x.personal.windowDays} d · ≥ ${x.personal.minDays} d</span>` : `<span class="meta">${esc(x.goal.profileField)}</span>`;
     $('#rulesTbl').innerHTML = `<div class="meta" style="margin-bottom:6px">${esc(r.version)}</div><table><thead><tr><th>id</th><th>${t('type')}</th><th>${t('range')}</th><th>${t('source')}</th></tr></thead><tbody>${r.rules.map((x) => `<tr><td><b>${esc(x.title?.[S.lang] || x.id)}</b><div class="meta">${esc(x.id)}</div></td><td class="muted">${t('ruleKind_' + x.kind)}</td><td style="white-space:normal;min-width:220px">${bands(x)}</td><td class="muted" style="white-space:normal;max-width:420px">${esc(x.source)}</td></tr>`).join('')}</tbody></table>`;
