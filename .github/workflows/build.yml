@@ -10,6 +10,11 @@ on:
 env:
   IMAGE: ghcr.io/${{ github.repository }}
 
+# Serialize publication of :latest; do not interrupt an image push/deploy request.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -67,10 +72,30 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      - name: Trigger Dokploy redeploy (image is on GHCR now)
-        if: github.ref == 'refs/heads/main'
+  # Optional; only request deployment after the image has been published.
+  redeploy:
+    needs: image
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    permissions: {}
+    steps:
+      - name: Trigger Dokploy redeploy
         env:
-          HOOK: ${{ secrets.DOKPLOY_WEBHOOK }}
+          WEBHOOK: ${{ secrets.DOKPLOY_DEPLOY_WEBHOOK || secrets.DOKPLOY_WEBHOOK }}
         run: |
-          test -n "$HOOK" || { echo "DOKPLOY_WEBHOOK secret not set"; exit 1; }
-          curl -fsS -X POST "$HOOK" -H 'content-type: application/json' -d '{}' && echo "redeploy requested"
+          if [ -z "$WEBHOOK" ]; then
+            echo "DOKPLOY_DEPLOY_WEBHOOK not set; skipping automatic redeploy."
+            exit 0
+          fi
+          response_file=$(mktemp)
+          trap 'rm -f "$response_file"' EXIT
+          status=$(curl -sS --location --max-redirs 3 --connect-timeout 15 --max-time 60 \
+            -o "$response_file" -w '%{http_code}' \
+            --request POST "$WEBHOOK")
+          echo "Dokploy HTTP $status"
+          # Keep errors visible without printing the secret webhook URL.
+          cat "$response_file"
+          case "$status" in
+            2??) echo "redeploy requested (deployment completion not yet verified)" ;;
+            *) echo "::error::Dokploy rejected the redeploy request (HTTP $status); see response above"; exit 1 ;;
+          esac
