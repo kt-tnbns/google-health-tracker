@@ -380,6 +380,7 @@ function bindShell() {
   document.querySelectorAll('[data-view]').forEach((b) => (b.onclick = () => go(b.dataset.view)));
   $('#syncBtn').onclick = refreshData;
   $('#scrim').onclick = () => openCoach(false);
+  bindDrawerSwipe($('#drawer'));
 }
 
 function go(view) {
@@ -762,8 +763,41 @@ async function openDay(day) {
 }
 
 let lastFocus = null;
+function bindDrawerSwipe(drawer) {
+  let gesture = null;
+  const reset = () => { gesture = null; drawer.classList.remove('dragging'); drawer.style.removeProperty('transform'); };
+  drawer.addEventListener('touchstart', event => {
+    reset();
+    if (window.innerWidth > 599 || !drawer.classList.contains('on') || event.touches.length !== 1) return;
+    if (event.target.closest('input, textarea, button, a, select, pre, code, .scrollx, .tbl, [contenteditable]')) return;
+    const touch = event.touches[0];
+    gesture = { x: touch.clientX, y: touch.clientY, dx: 0, horizontal: false };
+  }, { passive: true });
+  drawer.addEventListener('touchmove', event => {
+    if (!gesture) return;
+    if (event.touches.length !== 1) { reset(); return; }
+    const dx = event.touches[0].clientX - gesture.x, dy = event.touches[0].clientY - gesture.y;
+    if (!gesture.horizontal) {
+      if (Math.abs(dy) > 10 && Math.abs(dy) >= Math.abs(dx) || dx < -10) { reset(); return; }
+      if (dx < 12 || dx < Math.abs(dy) * 1.5) return;
+      gesture.horizontal = true;
+    }
+    if (!event.cancelable) { reset(); return; }
+    event.preventDefault();
+    gesture.dx = Math.max(0, dx);
+    drawer.classList.add('dragging');
+    drawer.style.transform = `translateX(${gesture.dx}px)`;
+  }, { passive: false });
+  drawer.addEventListener('touchend', () => {
+    const dismiss = gesture?.horizontal && gesture.dx >= Math.max(72, drawer.clientWidth * .22);
+    reset();
+    if (dismiss) openDrawer(false);
+  });
+  drawer.addEventListener('touchcancel', reset);
+}
 function openDrawer(on) {
   const dr = $('#drawer'), sc = $('#scrim');
+  dr.classList.remove('dragging'); dr.style.removeProperty('transform');
   if (on) { lastFocus = document.activeElement; dr.classList.add('on'); sc.classList.add('on'); document.body.style.overflow = 'hidden'; setTimeout(() => dr.querySelector('button,textarea,input')?.focus(), 50); }
   else { dr.classList.remove('on'); sc.classList.remove('on'); document.body.style.overflow = ''; S.coachOpen = false; lastFocus?.focus?.(); if (location.hash === '#coach') history.replaceState(null, '', '#' + S.view); }
 }
