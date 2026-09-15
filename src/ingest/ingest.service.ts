@@ -1,5 +1,4 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
 import { healthOverview } from '../scores/health';
 import { config } from '../config';
@@ -8,11 +7,14 @@ import { FetchResult, HealthApiClient } from '../google/health-api.client';
 import { buildFilter, DATA_TYPES, DataTypeSpec } from './metrics';
 import { ExerciseSession, normalizeDaily, normalizeExercise, normalizeRollup, normalizeSleep, NormalizedMetric, NORMALIZER_VERSION, repairLoadRow } from './normalize';
 import { addDays, startOfCivilDay, todayCivil } from './time';
+import { RawStore } from './raw-store';
+import { SyncCoordinator, SyncOptions, SyncResult } from './sync-coordinator';
 
 export interface RefreshSummary {
   batchId: string;
   range: { startDate: string; endDate: string };   // [start, end) civil dates
   perType: { dataType: string; ok: boolean; httpStatus: number; items: number; pages: number; upserted: number; error?: string }[];
+  status?: SyncResult['status'];
 }
 
 @Injectable()
@@ -27,12 +29,39 @@ export class IngestService {
    * Default window: the last `days` days ending today (inclusive), plus one extra day of lead for sleep
    * sessions that started the evening before the window.
    */
-  async refresh(opts: { startDate?: string; endDate?: string; days?: number } = {}): Promise<RefreshSummary> {
+  async refresh(opts: SyncOptions = {}): Promise<RefreshSummary> {
+    const raw = new RawStore(this.pool);
+    return new SyncCoordinator(this.pool, config.USER_TIMEZONE).run(opts,
+      (range, batchId) => this.performRefresh(range, batchId), async client => {
+        try {
+          await raw.prune(config.RAW_RETENTION_DAYS, client);
+          await client.query(`INSERT INTO storage_observations(day, database_bytes, raw_bytes)
+            VALUES ($1, pg_database_size(current_database()), pg_total_relation_size('api_responses'))
+            ON CONFLICT(day) DO UPDATE SET observed_at = now(), database_bytes = EXCLUDED.database_bytes, raw_bytes = EXCLUDED.raw_bytes`, [todayCivil(config.USER_TIMEZONE)]);
+          await client.query("DELETE FROM sync_runs WHERE started_at < now() - interval '30 days' AND status <> 'running'");
+          await client.query("DELETE FROM storage_observations WHERE day < current_date - 1095");
+          return true;
+        } catch (error) { this.log.warn(`Sync maintenance failed: ${(error as Error).message}`); return false; }
+      });
+  }
+
+  async syncStatus() {
+    const { rows: [state] } = await this.pool.query('SELECT * FROM sync_state WHERE id = 1');
+    const { rows: [latest] } = await this.pool.query('SELECT id, trigger, started_at, finished_at, status, range_start, range_end FROM sync_runs ORDER BY started_at DESC LIMIT 1');
+    const { rows: [lock] } = await this.pool.query("SELECT EXISTS(SELECT 1 FROM pg_locks WHERE locktype='advisory' AND classid=2200 AND objid=1 AND objsubid=2 AND granted AND database=(SELECT oid FROM pg_database WHERE datname=current_database())) AS running");
+    return { ...state, running: lock.running, latest: latest ?? null, autoSyncEnabled: config.AUTO_SYNC_ENABLED };
+  }
+
+  async storageStatus() {
+    const { rows } = await this.pool.query('SELECT * FROM storage_observations ORDER BY day DESC LIMIT 31');
+    return { ...await new RawStore(this.pool).storageStats(), observations: rows, rawRetentionDays: config.RAW_RETENTION_DAYS };
+  }
+
+  private async performRefresh(opts: { startDate: string; endDate: string }, batchId: string): Promise<RefreshSummary> {
     const tz = config.USER_TIMEZONE;
     const today = todayCivil(tz);
     const endDate = opts.endDate ?? addDays(today, 1);
-    const startDate = opts.startDate ?? addDays(endDate, -(opts.days ?? 7));
-    const batchId = randomUUID();
+    const startDate = opts.startDate;
     const summary: RefreshSummary = { batchId, range: { startDate, endDate }, perType: [] };
 
     for (const spec of DATA_TYPES) {
@@ -136,29 +165,7 @@ export class IngestService {
   }
 
   private async storeRaw(batchId: string, spec: DataTypeSpec, r: FetchResult, startDate: string, endDate: string, tz: string): Promise<number[]> {
-    const ids: number[] = [];
-    for (const p of r.pages) {
-      const { rows } = await this.pool.query<{ id: string }>(
-        `INSERT INTO api_responses (provider, data_type, method, request_url, request_body, range_start, range_end, http_status, duration_ms, page_index, payload, error_text, batch_id)
-         VALUES ('google-health', $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`,
-        [
-          spec.dataType,
-          spec.method,
-          p.url,
-          p.requestBody ? JSON.stringify(p.requestBody) : null,
-          startOfCivilDay(startDate, tz),
-          startOfCivilDay(endDate, tz),
-          p.status,
-          p.durationMs,
-          p.pageIndex,
-          p.body === undefined ? null : JSON.stringify(p.body),
-          p.errorText ?? null,
-          batchId,
-        ],
-      );
-      ids.push(Number(rows[0].id));
-    }
-    return ids;
+    return new RawStore(this.pool).store(batchId, spec, r, startDate, endDate, tz);
   }
 
   private async upsertMetrics(rows: NormalizedMetric[], sourceIds: number[]): Promise<number> {
@@ -236,7 +243,7 @@ export class IngestService {
     const { rows } = await this.pool.query(
       `SELECT id, fetched_at, data_type, method, http_status, page_index, duration_ms, batch_id, range_start, range_end,
               jsonb_array_length(COALESCE(payload->'dataPoints', payload->'rollupDataPoints', '[]'::jsonb)) AS item_count, error_text
-       FROM api_responses ORDER BY id DESC LIMIT $1`,
+       FROM api_responses ORDER BY fetched_at DESC, id DESC LIMIT $1`,
       [limit],
     );
     return rows;

@@ -79,7 +79,8 @@ d('IngestService (integration)', () => {
     const after = await pool.query('SELECT count(*)::int AS n FROM daily_metrics');
     const raw2 = await pool.query(`SELECT count(*)::int AS n FROM api_responses WHERE data_type <> 'heart-rate'`);
     expect(after.rows[0].n).toBe(before.rows[0].n);
-    expect(raw2.rows[0].n).toBe(raw1.rows[0].n * 2);
+    // Only changed sleep and the unsuccessful SpO2 request add rows.
+    expect(raw2.rows[0].n).toBe(raw1.rows[0].n + 2);
 
     // sleeping HR: mean of the stubbed samples inside the sleep interval, full coverage, Google-definition efficiency
     const shr = await pool.query(`SELECT value, status, details FROM daily_metrics WHERE day = '2026-09-09' AND metric = 'sleeping_hr_bpm'`);

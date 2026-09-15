@@ -12,7 +12,18 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 export class DataController {
   constructor(private readonly ingest: IngestService, private readonly api: HealthApiClient) {}
 
-  /** Pull cloud data. POST /api/refresh?days=7  or  ?start=YYYY-MM-DD&end=YYYY-MM-DD (end exclusive). */
+  @Get('sync/status')
+  syncStatus() { return this.ingest.syncStatus(); }
+
+  @Get('storage')
+  storage() { return this.ingest.storageStatus(); }
+
+  @Post('sync/ensure')
+  ensureFresh() {
+    return this.ingest.refresh({ trigger: 'app-open' });
+  }
+
+  /** Pull cloud data. Default: today + yesterday. Explicit start/end are end-exclusive. */
   @Post('refresh')
   refresh(@Query('days') days?: string, @Query('start') start?: string, @Query('end') end?: string) {
     if ((start && !DATE_RE.test(start)) || (end && !DATE_RE.test(end))) throw new BadRequestException('dates must be YYYY-MM-DD');
