@@ -5,6 +5,8 @@ const schema = z.object({
   PUBLIC_BASE_URL: z.string().url().default('http://localhost:3000'),
   ADMIN_TOKEN: z.string().min(16, 'ADMIN_TOKEN must be at least 16 chars'),
   USER_TIMEZONE: z.string().default('Asia/Bangkok'),
+  AUTO_SYNC_ENABLED: z.enum(['true', 'false']).default('true').transform(v => v === 'true'),
+  RAW_RETENTION_DAYS: z.coerce.number().int().min(30).max(3650).default(30),
   DATABASE_URL: z.string().min(1),
   GOOGLE_CLIENT_ID: z.string().default(''),
   GOOGLE_CLIENT_SECRET: z.string().default(''),

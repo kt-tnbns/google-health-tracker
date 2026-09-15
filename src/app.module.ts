@@ -12,11 +12,12 @@ import { ScoresController } from './http/scores.controller';
 import { RulesController } from './http/rules.controller';
 import { RulesService } from './rules/rules.service';
 import { IngestService } from './ingest/ingest.service';
+import { SyncScheduler } from './ingest/sync-scheduler.service';
 import { ScoresService } from './scores/scores.service';
 
 @Module({
   imports: [DbModule],
   controllers: [AuthController, DataController, UiController, CoachController, ScoresController, RulesController],
-  providers: [GoogleOAuthService, HealthApiClient, IngestService, GlmClient, CoachService, ScoresService, RulesService],
+  providers: [GoogleOAuthService, HealthApiClient, IngestService, SyncScheduler, GlmClient, CoachService, ScoresService, RulesService],
 })
 export class AppModule {}

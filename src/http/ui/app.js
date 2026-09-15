@@ -345,7 +345,8 @@ async function loadCore() {
   S.rules = await api('/api/rules/eval?days=35').catch(() => null);
   S.rows = rows; S.byDay = {}; for (const r of rows) (S.byDay[r.day.slice(0, 10)] ||= {})[r.metric] = r;
   S.days = Object.keys(S.byDay).sort(); S.scores = scores; S.coachInfo = info; S.coachHist = hist; S.raw = raw;
-  S.lastFetch = raw[0]?.fetched_at ?? null;
+  S.sync = await api('/api/sync/status').catch(() => null);
+  S.lastFetch = S.sync?.last_success_at ?? null;
   S.demo = !!(info && /mock|demo/i.test(info.model || ''));
   S.journalToday = (await api(`/api/journal?days=1`).catch(() => []))[0] ?? null;
 }
@@ -643,18 +644,65 @@ function bindToday() {
   if (sc) { sleepBars(sc, S.days.slice(-S.sleepRange)); sc.scrollLeft = sc.scrollWidth; }   // 2) start at the latest day; scroll left for history
 }
 
-async function refreshData(days = 7) {
-  if (typeof days !== 'number') days = 7;
+async function refreshData(days = 2) {
+  if (typeof days !== 'number') days = 2;
   if (S.loading.refresh) return;
   S.loading.refresh = true; S.err.refresh = ''; render();
   try {
     const r = await api(`/api/refresh?days=${days}`, { method: 'POST' });
+    if (r.status === 'busy') {
+      S.err.refresh = S.lang === 'th' ? 'กำลัง sync จากอีกคำขอ ระบบจะอัปเดตเมื่อเสร็จ' : 'Another sync is running. Data will update when it finishes.';
+      await waitForSync();
+    }
     const bad = r.perType.filter((x) => !x.ok);
     if (bad.length) S.err.refresh = `${t('partialFetch')}: ${bad.map((x) => `${x.dataType} (${x.error ? x.error.slice(0, 60) : x.httpStatus})`).join(', ')}`;
     await api('/api/scores/recompute', { method: 'POST' }).catch(() => {});
     await loadCore();
   } catch (e) { S.err.refresh = e.message; }
   S.loading.refresh = false; render();
+}
+
+let autoSyncPending = false, lastAutoSyncCheck = 0;
+async function waitForSync() {
+  for (let i = 0; i < 60; i++) {
+    if (!S.token || document.visibilityState === 'hidden') return;
+    const state = await api('/api/sync/status');
+    if (!state.running) return;
+    await new Promise(resolve => setTimeout(resolve, 5000));
+  }
+}
+function paintAutoSyncBusy(busy) {
+  const button = $('#syncBtn');
+  if (!button) return;
+  button.disabled = busy;
+  button.setAttribute('aria-busy', String(busy));
+  button.innerHTML = busy ? '<span class="spinner" aria-hidden="true"></span>' : ICO.sync;
+  button.setAttribute('aria-label', t(busy ? 'refreshing' : 'refresh'));
+}
+async function ensureFreshOnOpen() {
+  if (!S.token || autoSyncPending || S.loading.refresh || document.visibilityState === 'hidden' || Date.now() - lastAutoSyncCheck < 60_000) return;
+  autoSyncPending = true; lastAutoSyncCheck = Date.now();
+  const token = S.token;
+  try {
+    const state = await api('/api/sync/status');
+    if (token !== S.token || !state.autoSyncEnabled) return;
+    if (!state.running && state.last_success_at && Date.now() - Date.parse(state.last_success_at) < 15 * 60_000) return;
+    S.loading.refresh = true; paintAutoSyncBusy(true);
+    const result = state.running ? { status: 'busy' } : await api('/api/sync/ensure', { method: 'POST' });
+    if (result.status === 'busy') await waitForSync();
+    if (token !== S.token) return;
+    if (result.status === 'partial') S.err.refresh = t('partialFetch');
+    else if (result.status === 'success') S.err.refresh = '';
+    await loadCore();
+    // Preserve open chat and in-progress settings/form edits.
+    if (!S.coachOpen && S.view === 'today' && !document.activeElement?.matches('input,textarea,select')) renderToday();
+  } catch (error) { if (token === S.token) S.err.refresh = error.message; }
+  finally {
+    autoSyncPending = false; S.loading.refresh = false; paintAutoSyncBusy(false);
+    if (token === S.token && !S.coachOpen && S.view === 'today') {
+      const button = $('#refreshBtn'); if (button) { button.disabled = false; button.setAttribute('aria-busy', 'false'); button.classList.remove('is-loading'); button.textContent = S.lang === 'th' ? 'ดึงข้อมูล' : 'Fetch data'; }
+    }
+  }
 }
 
 /* ================= day detail drawer ================= */
@@ -995,6 +1043,7 @@ function renderSettings() {
         <div class="list" id="cpNotes">${(c.chat_notes || []).length ? c.chat_notes.map((n, i) => `<div class="item" style="display:flex;justify-content:space-between;align-items:center;gap:12px"><span class="small">${esc(n.text)}<span class="meta" style="margin-left:8px">${dt(n.at)}</span></span><button class="sm ghost" data-rm="${i}">${t('removeNote')}</button></div>`).join('') : `<div class="meta">—</div>`}</div>`; })()}
     </section>
     <div class="span12">${coverageBlock()}</div>
+    <section class="card span12"><h2>${S.lang === 'th' ? 'การ Sync และพื้นที่จัดเก็บ' : 'Sync & storage'}</h2><p class="small t2" id="storageStatus" role="status">${S.lang === 'th' ? 'กำลังอ่านข้อมูล…' : 'Loading…'}</p></section>
     <section class="card span12"><h2>${t('setDiag')}</h2><div class="small t2">${t('diagNote')}</div><div class="rule"></div>
       <div class="row" style="margin-bottom:12px"><span class="badge">${t('model')}: ${esc(info?.model || '—')}</span><span class="badge">${t('promptVersion')}: ${esc(info?.promptVersion || '—')}</span>${info && !info.configured ? `<span class="badge warn">${t('coachOff')}</span>` : ''}${S.demo ? `<span class="badge warn">${t('demo')}</span>` : ''}</div>
       <div class="row"><button class="sm" id="ctxBtn">${t('coachContext')}</button><button class="sm" id="recomputeBtn">${t('recompute')}</button><button class="sm" id="probeBtn">${t('probe')}</button><span class="meta" id="probeStatus"></span></div>
@@ -1019,6 +1068,14 @@ const PANEL_FIELDS = [
 ];
 let panelUnits = 'levine';
 function bindSettings() {
+  const storageElement = $('#storageStatus');
+  api('/api/storage').then(storage => {
+    if (!storageElement?.isConnected) return;
+    const mb = bytes => `${(Number(bytes) / 1024 / 1024).toFixed(1)} MB`;
+    const oldest = storage.observations?.at(-1), newest = storage.observations?.[0];
+    const growth = oldest && newest && oldest.day !== newest.day ? ` · ${S.lang === 'th' ? 'เปลี่ยนแปลงจาก' : 'Change since'} ${dateS(oldest.day.slice(0,10))}: ${mb(Number(newest.database_bytes) - Number(oldest.database_bytes))}` : '';
+    storageElement.textContent = `${S.lang === 'th' ? 'ฐานข้อมูล' : 'Database'} ${mb(storage.databaseBytes)} · Raw ${mb(storage.rawBytes)} · ${S.lang === 'th' ? 'เก็บ raw ที่ไม่ได้อ้างอิง' : 'Unreferenced raw retention'} ${storage.rawRetentionDays} ${t('days')}${growth}`;
+  }).catch(() => { if (storageElement?.isConnected) storageElement.textContent = t('err_generic'); });
   bindHealth();
   $('#signOut').onclick = () => { S.token = ''; try { sessionStorage.removeItem('adminToken'); } catch {} renderGate(); };
   $('#langSel').onchange = (e) => { S.lang = e.target.value; try { localStorage.setItem('lang', S.lang); } catch {} applyTheme(); render(); };
@@ -1082,7 +1139,10 @@ async function boot() {
   S.view = ['today', 'trends', 'settings'].includes(h) ? h : 'today';
   render();
   if (h === 'coach') openCoach(true);
+  void ensureFreshOnOpen();
 }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') void ensureFreshOnOpen(); });
+window.addEventListener('pageshow', () => { if ($('#main')) void ensureFreshOnOpen(); });
 window.addEventListener('hashchange', () => { const h = location.hash.replace('#', ''); if (h === 'coach') { openCoach(true); return; } if (['today', 'trends', 'settings'].includes(h) && h !== S.view) { S.view = h; render(); } });
 let rs; window.addEventListener('resize', () => { clearTimeout(rs); rs = setTimeout(() => { if (S.token && $('#main')) render(); }, 150); });
 boot();
