@@ -319,7 +319,11 @@ function sleepBars(el, days) {
   const paint = (c) => (ctx) => (selIdx >= 0 && ctx.dataIndex !== selIdx ? alpha(c, 0.35) : col(c));
   const datasets = stages.map(([m, c, lab]) => ({ label: lab, data: days.map((d, i) => (hasStages[i] ? val(d, m) : m === 'sleep_rem_minutes' ? asleep[i] : null)), backgroundColor: paint(c), hoverBackgroundColor: col(c), borderRadius: 4, borderSkipped: false, maxBarThickness: 34, categoryPercentage: 0.72, barPercentage: 1 }));
   const totals = days.map((_, i) => stages.reduce((a, [m]) => a + (val(days[i], m) ?? 0), 0));
-  const yMax = Math.ceil(Math.max(480, ...totals, ...asleep.map((x) => x ?? 0)) / 120) * 120;
+  // Whole-hour tick steps: pick the step first, then round the axis max up to it. If the step produced more ticks
+  // than maxTicksLimit, Chart.js would silently pick its own spacing (e.g. 200 min → "3.33h" labels).
+  const peakMin = Math.max(480, ...totals, ...asleep.map((x) => x ?? 0));
+  const stepMin = (peakMin <= 600 ? 2 : peakMin <= 900 ? 3 : 4) * 60;
+  const yMax = Math.ceil(peakMin / stepMin) * stepMin;
   mkChart(box, { type: 'bar', data: { labels: days.map(dayLabel), datasets }, options: {
     ...base, interaction: { mode: 'index', intersect: false },
     plugins: { ...base.plugins, tooltip: { ...base.plugins.tooltip, filter: (it) => it.raw !== null && it.raw > 0, callbacks: {
@@ -327,7 +331,7 @@ function sleepBars(el, days) {
       label: (it) => ` ${it.dataset.label}: ${num(it.raw)} ${t('minutes')}`,
       footer: (it) => { const i = it[0]?.dataIndex; return i === undefined || asleep[i] === null ? t('noDay') : `${t('asleepTotal')} ${hm(asleep[i])}`; },
     } } },
-    scales: { x: { ...base.scales.x, stacked: true }, y: { ...base.scales.y, stacked: true, min: 0, max: yMax, ticks: { ...base.scales.y.ticks, stepSize: 120, callback: (v) => `${v / 60}${t('hrs')}` } } },
+    scales: { x: { ...base.scales.x, stacked: true }, y: { ...base.scales.y, stacked: true, min: 0, max: yMax, ticks: { ...base.scales.y.ticks, maxTicksLimit: 8, stepSize: stepMin, callback: (v) => `${num(v / 60, Number.isInteger(v / 60) ? 0 : 1)}${t('hrs')}` } } },
     onClick: (e, _els, chart) => { const pts = chart.getElementsAtEventForMode(e, 'index', { intersect: false }, false); if (pts.length) { S.selectedDay = days[pts[0].index]; render(); } },
     onHover: (e, els) => { e.native.target.style.cursor = els.length ? 'pointer' : 'default'; },
   } });
