@@ -40,6 +40,13 @@ export class DataController {
     return this.ingest.getDay(d);
   }
 
+  /** Timeline from the stored raw response for the selected main sleep. */
+  @Get('days/:day/sleep-stages')
+  sleepStages(@Param('day') day: string) {
+    if (!DATE_RE.test(day)) throw new BadRequestException('day must be YYYY-MM-DD');
+    return this.ingest.getSleepStages(day);
+  }
+
   /** Compact table for the last N days (for baseline inspection). */
   @Get('days')
   range(@Query('days') days = '14') {

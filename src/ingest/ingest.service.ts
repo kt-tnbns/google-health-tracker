@@ -5,7 +5,7 @@ import { config } from '../config';
 import { PG_POOL } from '../db/db.module';
 import { FetchResult, HealthApiClient } from '../google/health-api.client';
 import { buildFilter, DATA_TYPES, DataTypeSpec } from './metrics';
-import { ExerciseSession, normalizeDaily, normalizeExercise, normalizeRollup, normalizeSleep, NormalizedMetric, NORMALIZER_VERSION, repairLoadRow } from './normalize';
+import { ExerciseSession, normalizeDaily, normalizeExercise, normalizeRollup, normalizeSleep, NormalizedMetric, NORMALIZER_VERSION, repairLoadRow, SleepPoint } from './normalize';
 import { addDays, startOfCivilDay, todayCivil } from './time';
 import { RawStore } from './raw-store';
 import { SyncCoordinator, SyncOptions, SyncResult } from './sync-coordinator';
@@ -220,6 +220,25 @@ export class IngestService {
       [startDate, endDate],
     );
     return rows.map(repairLoadRow);
+  }
+
+  async getSleepStages(day: string) {
+    // Follow the metric's provenance, rather than selecting a different session or newer raw batch.
+    const { rows } = await this.pool.query<Pick<SleepPoint, 'sleep'>>(
+      `SELECT point->'sleep' AS sleep
+       FROM daily_metrics m
+       JOIN api_responses r ON r.id = ANY(m.source_response_ids)
+       CROSS JOIN LATERAL jsonb_array_elements(COALESCE(r.payload->'dataPoints', '[]'::jsonb)) point
+       WHERE m.day = $1 AND m.metric = 'sleep_minutes_asleep' AND r.data_type = 'sleep'
+         AND ((m.source_point_name IS NOT NULL AND point->>'name' = m.source_point_name)
+           OR (m.source_point_name IS NULL
+             AND (point->'sleep'->'interval'->>'startTime')::timestamptz = m.measured_start
+             AND (point->'sleep'->'interval'->>'endTime')::timestamptz = m.measured_end))
+       ORDER BY r.fetched_at DESC, r.id DESC LIMIT 1`, [day]);
+    const sleep = rows[0]?.sleep;
+    return { day, interval: sleep?.interval ?? null, stages: Array.isArray(sleep?.stages) ? sleep.stages
+      .filter(s => ['AWAKE', 'REM', 'LIGHT', 'DEEP'].includes(s.type))
+      .map(s => ({ type: s.type, startTime: s.startTime, endTime: s.endTime })) : [] };
   }
 
   async health(days = 60) {

@@ -19,7 +19,7 @@ export interface NormalizedMetric {
 // ---------- Sleep ----------
 
 interface SleepStage { startTime: string; endTime: string; type: string }
-interface SleepPoint {
+export interface SleepPoint {
   name?: string;
   sleep?: {
     interval?: { startTime?: string; endTime?: string };
