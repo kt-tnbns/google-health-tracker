@@ -66,6 +66,8 @@ d('IngestService (integration)', () => {
 
   it('stores raw pages and upserts normalized rows idempotently', async () => {
     const first = await svc.refresh({ startDate: '2026-09-07', endDate: '2026-09-10' });
+    // The stubbed SpO2 failure makes this partial; a busy sync must not be mistaken for missing data.
+    expect(first.status).toBe('partial');
     expect(first.perType.find((t) => t.dataType === 'sleep')).toMatchObject({ ok: true, items: 1, upserted: 13 });   // 9 main-sleep metrics + latency, naps, total, session count
     expect(first.perType.find((t) => t.dataType === 'heart-rate')).toMatchObject({ ok: true, items: 430, upserted: 1 });
     expect(first.perType.find((t) => t.dataType === 'daily-oxygen-saturation')).toMatchObject({ ok: false, httpStatus: 403 });

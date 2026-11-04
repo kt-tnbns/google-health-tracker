@@ -102,6 +102,8 @@ const I18N = {
 
 
 Object.assign(I18N.en, {
+  sleepStages: 'Sleep stages', sleepSummary: 'Summary', sleepStageHint: 'Press and drag across the chart to explore sleep stages', sleepStageGap: 'No stage recorded at this time',
+  sleepStagesLoading: 'Loading sleep stages…', sleepStagesError: 'Unable to load. Switch back and try again.',
   sleep: 'Sleep',
   healthMonitor: 'Health Monitor', monitorNote: 'Today against your own recent readings. Your usual range is descriptive, not a health target.',
   coverageTitle: 'Data coverage', coverageNote: 'Complete daily readings in the previous 60 days, excluding today. Missing may mean not fetched, not recorded, or a sync gap. This is not wear-time coverage.',
@@ -122,6 +124,8 @@ Object.assign(I18N.en, {
   monitorDetails: 'View today’s details', noRecovery: 'Recovery data could not be loaded', dayIncomplete: 'Day still in progress',
 });
 Object.assign(I18N.th, {
+  sleepStages: 'Sleep stages', sleepSummary: 'ดูสรุป', sleepStageHint: 'กดค้างแล้วลากบนกราฟเพื่อดูช่วงการนอน', sleepStageGap: 'ไม่มีข้อมูล stage ในช่วงเวลานี้',
+  sleepStagesLoading: 'กำลังโหลดช่วงการนอน…', sleepStagesError: 'โหลดไม่สำเร็จ สลับกลับแล้วลองอีกครั้ง',
   sleep: 'การนอน',
   healthMonitor: 'ภาพรวมสุขภาพ', monitorNote: 'ค่าของวันนี้เทียบกับข้อมูลล่าสุดของคุณ ช่วงปกติส่วนตัวไม่ใช่เป้าหมายสุขภาพ',
   coverageTitle: 'ความครบถ้วนของข้อมูล', coverageNote: 'ค่ารายวันที่ครบถ้วนใน 60 วันก่อนหน้า ไม่รวมวันนี้ ข้อมูลที่ขาดอาจยังไม่ได้ดึง ไม่ได้บันทึก หรือยังไม่ซิงก์ ไม่ใช่สัดส่วนเวลาที่สวมอุปกรณ์',
@@ -502,6 +506,117 @@ function bindHealth() {
   bindBusyButtons('[data-health-retry]');
 }
 
+function sleepTimeline(data) {
+  const types = ['AWAKE', 'REM', 'LIGHT', 'DEEP'];
+  const labels = ['Awake', 'REM', 'Light', 'Deep'];
+  const start = Date.parse(data.interval?.startTime), end = Date.parse(data.interval?.endTime);
+  const stages = (data.stages || []).map(s => ({ type: s.type, start: Math.max(start, Date.parse(s.startTime)), end: Math.min(end, Date.parse(s.endTime)) }))
+    .filter(s => types.includes(s.type) && Number.isFinite(s.start) && Number.isFinite(s.end) && s.end > s.start)
+    .sort((a, b) => a.start - b.start);
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start || !stages.length) return `<div class="empty">${t('noStages')}</div>`;
+  const x = time => 64 + (time - start) / (end - start) * 360;
+  const y = type => 30 + types.indexOf(type) * 44;
+  const time = value => clock(new Date(value).toISOString());
+  const segments = stages.map((s, i) => {
+    const prev = stages[i - 1], color = `var(--${s.type.toLowerCase()})`;
+    const label = `${labels[types.indexOf(s.type)]} · ${time(s.start)} → ${time(s.end)} · ${num((s.end - s.start) / 60000, 1)} ${t('minutes')}`;
+    const connector = prev && prev.end === s.start ? `<line x1="${x(s.start)}" x2="${x(s.start)}" y1="${y(prev.type)}" y2="${y(s.type)}" stroke="${color}" stroke-opacity=".35" stroke-width="1.5"/>` : '';
+    return `${connector}<g class="sleep-stage-segment" tabindex="0" role="button" aria-label="${esc(label)}" data-stage-label="${esc(label)}" data-stage-duration="${num((s.end - s.start) / 60000, 1)} ${t('minutes')}" data-stage-start="${x(s.start)}" data-stage-end="${x(s.end)}"><line x1="${x(s.start)}" x2="${x(s.end)}" y1="${y(s.type)}" y2="${y(s.type)}" stroke="transparent" stroke-width="22"/><line class="sleep-stage-line" x1="${x(s.start)}" x2="${x(s.end)}" y1="${y(s.type)}" y2="${y(s.type)}" stroke="${color}" stroke-width="12" stroke-linecap="butt"/></g>`;
+  }).join('');
+  return `<div class="sleep-timeline-wrap"><div class="sleep-stage-tooltip" role="tooltip" hidden></div><svg data-start="${start}" data-end="${end}" class="sleep-timeline" viewBox="0 0 440 210" role="group" aria-label="${t('sleepStages')}">
+    ${types.map((type, i) => `<text x="0" y="${y(type) + 4}">${labels[i]}</text><line x1="64" x2="424" y1="${y(type)}" y2="${y(type)}" class="sleep-stage-grid"/>`).join('')}
+    ${segments}
+    <line class="sleep-stage-cursor" x1="64" x2="64" y1="0" y2="178" hidden/>
+    ${[0, .5, 1].map((fraction, i) => `<text x="${x(start + (end - start) * fraction)}" y="202" text-anchor="${['start', 'middle', 'end'][i]}">${esc(time(start + (end - start) * fraction))}</text>`).join('')}
+  </svg></div><p class="sleep-stage-readout small t2" aria-live="polite">${t('sleepStageHint')}</p>`;
+}
+
+function bindSleepTimeline(detail) {
+  const svg = detail.querySelector('.sleep-timeline');
+  if (!svg) return;
+  const wrap = detail.querySelector('.sleep-timeline-wrap'), tooltip = detail.querySelector('.sleep-stage-tooltip');
+  const cursor = detail.querySelector('.sleep-stage-cursor'), readout = detail.querySelector('.sleep-stage-readout');
+  const segments = [...detail.querySelectorAll('[data-stage-label]')];
+  let pointer = null;
+  const hide = () => { tooltip.hidden = true; cursor.setAttribute('hidden', ''); segments.forEach(s => s.classList.remove('selected')); };
+  const select = x => {
+    x = Math.max(64, Math.min(424, x));
+    const segment = segments.find(s => x >= Number(s.dataset.stageStart) && (x < Number(s.dataset.stageEnd) || x === 424 && Number(s.dataset.stageEnd) === 424));
+    const time = Number(svg.dataset.start) + (x - 64) / 360 * (Number(svg.dataset.end) - Number(svg.dataset.start));
+    const label = `${clock(new Date(time).toISOString())} · ${segment ? segment.dataset.stageLabel : t('sleepStageGap')}`;
+    tooltip.textContent = segment?.dataset.stageDuration || ''; tooltip.hidden = !segment;
+    if (readout.textContent !== label) readout.textContent = label;
+    segments.forEach(s => s.classList.toggle('selected', s === segment));
+    cursor.removeAttribute('hidden'); cursor.setAttribute('x1', x); cursor.setAttribute('x2', x);
+    const point = svg.createSVGPoint(); point.x = x;
+    const screen = point.matrixTransform(svg.getScreenCTM());
+    const bounds = wrap.getBoundingClientRect(), half = tooltip.offsetWidth / 2;
+    tooltip.style.left = `${Math.max(half, Math.min(bounds.width - half, screen.x - bounds.left))}px`;
+  };
+  const move = e => {
+    const matrix = svg.getScreenCTM();
+    if (!matrix) return;
+    const point = svg.createSVGPoint(); point.x = e.clientX; point.y = e.clientY;
+    select(point.matrixTransform(matrix.inverse()).x);
+  };
+  svg.onpointerdown = e => {
+    if (!e.isPrimary || e.button !== 0) return;
+    pointer = e.pointerId; svg.setPointerCapture(pointer); move(e);
+  };
+  svg.onpointermove = e => { if (pointer === e.pointerId) move(e); };
+  const release = e => {
+    if (pointer !== e.pointerId) return;
+    if (svg.hasPointerCapture(pointer)) svg.releasePointerCapture(pointer);
+    pointer = null;
+    if (e.type === 'pointercancel') hide();
+  };
+  svg.onpointerup = release; svg.onpointercancel = release;
+  svg.onlostpointercapture = () => { pointer = null; };
+  svg.onpointerleave = () => { if (pointer === null) hide(); };
+  segments.forEach(segment => {
+    const focus = () => select((Number(segment.dataset.stageStart) + Number(segment.dataset.stageEnd)) / 2);
+    segment.onblur = hide;
+    segment.onkeydown = e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); focus(); }
+      else if (e.key === 'Escape') hide();
+    };
+  });
+}
+
+function bindSleepToggle() {
+  const buttons = document.querySelectorAll('[data-sleep-view]');
+  buttons.forEach(button => {
+  const card = button.closest('.sleep-card'), summary = card.querySelector('.sleep-summary-content'), detail = card.querySelector('.sleep-detail-content');
+  button.onclick = async () => {
+    const show = button.dataset.sleepView === 'stages';
+    if (show && detail.hidden) card.style.minHeight = `${card.getBoundingClientRect().height}px`;
+    else if (!show) card.style.removeProperty('min-height');
+    buttons.forEach(b => {
+      const active = b === button;
+      b.classList.toggle('on', active);
+      b.setAttribute('aria-pressed', String(active));
+    });
+    summary.hidden = show; detail.hidden = !show;
+    if (!show || detail.dataset.loaded || detail.dataset.loading) return;
+    detail.dataset.loading = 'true';
+    detail.setAttribute('aria-busy', 'true');
+    detail.innerHTML = `<div class="empty">${t('sleepStagesLoading')}</div>`;
+    try {
+      const data = await api(`/api/days/${button.dataset.sleepToggle}/sleep-stages`);
+      if (!detail.isConnected) return;
+      detail.innerHTML = sleepTimeline(data);
+      detail.dataset.loaded = 'true';
+      bindSleepTimeline(detail);
+    } catch {
+      if (detail.isConnected) detail.innerHTML = `<div class="empty">${t('sleepStagesError')}</div>`;
+    } finally {
+      delete detail.dataset.loading;
+      detail.removeAttribute('aria-busy');
+    }
+  };
+  });
+}
+
 function sleepSummary() {
   const d = latestDayWith('sleep_minutes_asleep');
   if (!d) return `<section class="card sleep-card"><div class="eyebrow"><span>${t('lastSleep')}</span></div><div class="empty" style="margin-top:12px">${t('noSleep')}</div></section>`;
@@ -515,7 +630,8 @@ function sleepSummary() {
   const seg = (v, c) => (v === null || !tot ? '' : `<span style="width:${((v / tot) * 100).toFixed(1)}%;background:${c}"></span>`);
   const n0 = (v) => (v === null ? '—' : `${num(v)} ${t('minutes')}`);
   return `<section class="card sleep-card">
-    <div class="eyebrow"><span>${t('lastSleep')}</span><span>${t('woke')} ${dateS(d, { weekday: 'short', day: 'numeric', month: 'short' })}</span></div>
+    <div class="eyebrow sleep-card-heading"><span>${t('lastSleep')}</span><div class="seg-ctl" role="group" aria-label="${t('sleepStages')}"><button type="button" class="on" data-sleep-view="summary" data-sleep-toggle="${d}" aria-pressed="true" aria-controls="sleep-summary-content">${t('sleepSummary')}</button><button type="button" data-sleep-view="stages" data-sleep-toggle="${d}" aria-pressed="false" aria-controls="sleep-stage-detail">${t('sleepStages')}</button></div></div>
+    <div class="sleep-summary-content" id="sleep-summary-content">
     <div class="hero-val">${asleep === null ? '—' : `${Math.floor(asleep / 60)}<small>${t('hrs')}</small>${Math.round(asleep % 60)}<small>${t('min')}</small>`}</div>
     <div class="small t2">${delta === null ? `${t('noBaseline')} (${priorVals(d, 'sleep_minutes_asleep').length}/7)` : `${t('vs7')} · ${delta >= 0 ? t('more') : t('less')} ${hm(Math.abs(delta))}`}${row?.status === 'partial' ? ` · ${t('multiSession')}` : ''}</div>
     ${tot ? `<div class="stage-bar" role="img" aria-label="${t('recorded')} ${hm(tot)}">${seg(deep, 'var(--deep)')}${seg(rem, 'var(--rem)')}${seg(light, 'var(--light)')}${seg(awake, 'var(--awake)')}</div>` : `<div class="small muted" style="margin-top:12px">${t('noStages')}</div>`}
@@ -523,7 +639,9 @@ function sleepSummary() {
     ${goalBar(chk(d, 'goal.sleep'))}
     ${nap || shr !== null ? `<div class="small t2" style="margin-top:8px">${[nap ? `${t('napsLabel')} ${hm(nap)} · ${t('totalInclNaps')} ${hm(tot2)}` : '', shr !== null ? `${t('sleepHr')} ${num(shr)} bpm` : ''].filter(Boolean).join(' · ')}</div>` : ''}
     ${tot ? `<div class="legend"><span><i style="background:var(--deep)"></i>${t('deep')} ${n0(deep)}</span><span><i style="background:var(--rem)"></i>${t('rem')} ${n0(rem)}</span><span><i style="background:var(--light)"></i>${t('light')} ${n0(light)}</span><span><i style="background:var(--awake)"></i>${t('awake')} ${n0(awake)}</span></div>` : ''}
-    <div style="margin-top:12px"><a href="#" data-day="${d}" class="small">${t('details')} →</a></div>
+    </div>
+    <div class="sleep-detail-content" id="sleep-stage-detail" hidden></div>
+    <div class="sleep-card-footer"><a href="#" data-day="${d}" class="small">${t('details')} →</a></div>
   </section>`;
 }
 
@@ -628,6 +746,7 @@ function renderToday() {
 
 function bindToday() {
   bindHealth();
+  bindSleepToggle();
   $('#refreshBtn')?.addEventListener('click', refreshData);
   $('#fetchAgain')?.addEventListener('click', refreshData);
   $('#connectBtn')?.addEventListener('click', () => { location.href = `/auth/google/start?token=${encodeURIComponent(S.token)}`; });
